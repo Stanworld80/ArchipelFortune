@@ -25,7 +25,7 @@ $Config = @{
     dev = @{
         ProjectId          = 'archipel-fortune-dev'
         AndroidAppId       = '1:83241971458:android:dde10259edb60d45711c1b'
-        DartDefines        = 'APP_ENV=dev,SUPER_ADMIN_EMAIL=stanworld@gmail.com'
+        DartDefines        = 'APP_ENV=dev,SUPER_ADMIN_EMAIL=tester-admin@archipel-fortune.net'
         Flavor             = ''
         EntryPoint         = 'lib/main.dart'
         GoogleServicesPath = 'android/app/google-services.dev.json'
@@ -70,6 +70,7 @@ if (Test-Path $AppPath) {
 if (-not $NoClean) {
     Write-Host '-> Step 1: Cleaning...' -ForegroundColor Yellow
     flutter clean
+    flutter pub get
 }
 
 Write-Host '-> Step 2: Version Logic...' -ForegroundColor Yellow

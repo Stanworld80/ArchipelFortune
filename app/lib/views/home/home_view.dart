@@ -1,16 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/session_provider.dart';
+import '../../services/firestore_service.dart';
 import '../admin/admin_view.dart';
+import '../game/collections_view.dart';
 import '../game/game_dashboard_view.dart';
 import '../../models/user_model.dart';
-import '../../providers/session_provider.dart';
 
-class HomeView extends ConsumerWidget {
+class HomeView extends ConsumerStatefulWidget {
   const HomeView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends ConsumerState<HomeView> {
+  bool _isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
     final userProfileAsync = ref.watch(userProfileProvider);
 
     return Scaffold(
@@ -60,6 +69,16 @@ class HomeView extends ConsumerWidget {
               ],
             ),
             orElse: () => const SizedBox.shrink(),
+          ),
+          const SizedBox(width: 8),
+          IconButton(
+            icon: const Icon(Icons.collections_bookmark, color: Colors.amber),
+            tooltip: 'Mes Collections',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const CollectionsView()),
+              );
+            },
           ),
           const SizedBox(width: 8),
         ],
@@ -244,28 +263,40 @@ class HomeView extends ConsumerWidget {
                   onPressed: () => Navigator.pop(context),
                   child: const Text('Annuler', style: TextStyle(color: Colors.white70)),
                 ),
-                ElevatedButton(
                   onPressed: canAfford ? () async {
-                    final firestoreService = ref.read(firestoreServiceProvider);
-                    await firestoreService.updateUserField(profile.uid, 'piecesOr', profile.piecesOr - totalCost);
-                    
-                    const int? testSeed = bool.hasEnvironment('TEST_SEED') ? int.fromEnvironment('TEST_SEED') : null;
-                    
-                    ref.read(sessionProvider.notifier).startNewSession(
-                      startingProvisions: provisionsToBuy,
-                      startingBois: woodToBuy,
-                      seed: testSeed,
-                    );
-
-                    if (context.mounted) {
-                      Navigator.pop(context);
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const GameDashboardView()),
+                    setState(() => _isLoading = true);
+                    try {
+                      final firestoreService = ref.read(firestoreServiceProvider);
+                      await firestoreService.updateUserField(profile.uid, 'piecesOr', profile.piecesOr - totalCost);
+                      
+                      const int? testSeed = bool.hasEnvironment('TEST_SEED') ? int.fromEnvironment('TEST_SEED') : null;
+                      
+                      await ref.read(sessionProvider.notifier).startNewSession(
+                        startingProvisions: provisionsToBuy,
+                        startingBois: woodToBuy,
+                        seed: testSeed,
                       );
+
+                      if (context.mounted) {
+                        Navigator.pop(context);
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const GameDashboardView()),
+                        );
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Erreur: $e')),
+                        );
+                      }
+                    } finally {
+                      if (context.mounted) setState(() => _isLoading = false);
                     }
                   } : null,
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
-                  child: const Text('Prendre la Mer'),
+                  child: _isLoading 
+                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.brown))
+                    : const Text('Prendre la Mer'),
                 ),
               ],
             );
