@@ -1,9 +1,13 @@
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
+const { setGlobalOptions } = require("firebase-functions/v2");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const admin = require("firebase-admin");
 
 admin.initializeApp();
 const db = getFirestore();
+
+// Définir les options globales (Région us-central1 pour correspondre à Cloud Run)
+setGlobalOptions({ region: "us-central1" });
 
 // Constantes partagées avec le client
 const MAP_SIZE = 36;

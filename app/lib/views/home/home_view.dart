@@ -263,6 +263,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                   onPressed: () => Navigator.pop(context),
                   child: const Text('Annuler', style: TextStyle(color: Colors.white70)),
                 ),
+                ElevatedButton(
                   onPressed: canAfford ? () async {
                     setState(() => _isLoading = true);
                     try {

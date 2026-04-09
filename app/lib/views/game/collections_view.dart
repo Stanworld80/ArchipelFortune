@@ -7,10 +7,8 @@ class CollectionsView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Note: On utilise le profil utilisateur pour les collections persistantes
-    // mais ici on peut aussi regarder la session si elle est active.
-    // Pour cet affichage, on simulera ou on utilisera une donnée statique pour le moment
-    // car le backend pour les collections réelles est en cours de déploiement.
+    final session = ref.watch(sessionProvider);
+    final inventory = session?.inventory ?? [];
 
     final panoplies = [
       {
@@ -18,9 +16,9 @@ class CollectionsView extends ConsumerWidget {
         'name': 'Explorateur des Sables',
         'description': 'Les outils essentiels pour cartographier l\'inconnu.',
         'items': [
-          {'id': 'boussole_antique', 'name': 'Boussole Antique', 'collected': true},
-          {'id': 'longue-vue_en_ivoire', 'name': 'Longue-vue en Ivoire', 'collected': false},
-          {'id': 'sextant_en_or', 'name': 'Sextant en Or', 'collected': false},
+          {'id': 'boussole_antique', 'name': 'Boussole Antique'},
+          {'id': 'longue-vue_en_ivoire', 'name': 'Longue-vue en Ivoire'},
+          {'id': 'sextant_en_or', 'name': 'Sextant en Or'},
         ],
         'color': Colors.amber,
       },
@@ -29,12 +27,23 @@ class CollectionsView extends ConsumerWidget {
         'name': 'Collectionneur du Récif',
         'description': 'Objets perdus par ceux qui ont défié l\'Archipel.',
         'items': [
-          {'id': 'sabre_rouille', 'name': 'Sabre Rouillé', 'collected': true},
-          {'id': 'chapeau_de_capitaine', 'name': 'Chapeau de Capitaine', 'collected': true},
+          {'id': 'sabre_rouille', 'name': 'Sabre Rouillé'},
+          {'id': 'chapeau_de_capitaine', 'name': 'Chapeau de Capitaine'},
         ],
         'color': Colors.redAccent,
       },
     ];
+
+    // Déterminer le statut 'collected' dynamiquement
+    for (var panoplie in panoplies) {
+      final items = panoplie['items'] as List<Map<String, String>>;
+      panoplie['items_data'] = items.map((item) {
+        return {
+          ...item,
+          'collected': inventory.contains(item['id']),
+        };
+      }).toList();
+    }
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -56,7 +65,7 @@ class CollectionsView extends ConsumerWidget {
           itemCount: panoplies.length,
           itemBuilder: (context, index) {
             final panoplie = panoplies[index];
-            final items = panoplie['items'] as List<Map<String, dynamic>>;
+            final items = panoplie['items_data'] as List<Map<String, dynamic>>;
             final collectedCount = items.where((i) => i['collected'] == true).length;
             final progress = collectedCount / items.length;
 
