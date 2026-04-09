@@ -157,7 +157,7 @@ class HomeView extends ConsumerWidget {
                       ),
                       const SizedBox(height: 40),
                       const Text(
-                        'Une aventure de gestion et de fortune vous attend',
+                        'Une aventure d\'exploration , de découvertes et de fortune vous attend...',
                         style: TextStyle(
                           fontSize: 18,
                           color: Colors.white70,

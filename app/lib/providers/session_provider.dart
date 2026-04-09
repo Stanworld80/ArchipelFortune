@@ -251,14 +251,43 @@ class SessionNotifier extends Notifier<SessionState?> {
 
     if (itemId != null) {
       newInventory.add(itemId);
+      _checkCollectionsProgress(itemId, current.collections, (newCollections) {
+        state = current.copyWith(
+          copperKeys: ck,
+          silverKeys: sk,
+          goldKeys: gk,
+          inventory: newInventory,
+          collections: newCollections,
+        );
+      });
+    } else {
+      state = current.copyWith(
+        copperKeys: ck,
+        silverKeys: sk,
+        goldKeys: gk,
+        inventory: newInventory,
+      );
     }
+  }
 
-    state = current.copyWith(
-      copperKeys: ck,
-      silverKeys: sk,
-      goldKeys: gk,
-      inventory: newInventory,
-    );
+  void _checkCollectionsProgress(String itemId, Map<String, int> currentCollections, Function(Map<String, int>) onUpdate) {
+    final Map<String, int> newCollections = Map.from(currentCollections);
+    
+    // Définition simple des panoplies
+    final panoplies = {
+      'panoplie_explorateur': ['boussole_antique', 'longue-vue_en_ivoire', 'sextant_en_or'],
+      'panoplie_pirate': ['sabre_rouille', 'chapeau_de_capitaine'],
+    };
+
+    panoplies.forEach((panoplieId, items) {
+      if (items.contains(itemId)) {
+        // Optionnel: On incrémente le compteur de la panoplie
+        // Ici on pourrait aussi vérifier si elle est complète
+        newCollections[panoplieId] = (newCollections[panoplieId] ?? 0) + 1;
+      }
+    });
+
+    onUpdate(newCollections);
   }
 }
 
