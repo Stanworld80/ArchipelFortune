@@ -1,0 +1,39 @@
+# Flutter
+build/
+app/build/
+.dart_tool/
+app/.dart_tool/
+.packages
+app/.packages
+.pub-cache/
+.pub/
+app/.pub/
+
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+pubsub-debug.log
+ui-debug.log
+
+# Node.js
+node_modules/
+functions/node_modules/
+npm-debug.log
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment specific (handled by script)
+app/android/app/google-services.json
+firebase.json
+app/web/index.html
+app/android/key.properties

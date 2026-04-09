@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1025390075112",
+    "project_id": "archipel-fortune-dev",
+    "storage_bucket": "archipel-fortune-dev.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1025390075112:android:a3a175d5e0c63cf26bfd5d",
+        "android_client_info": {
+          "package_name": "fr.stanislasselleinformatique.archipelfortune"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1025390075112-935ujpbqg9tr6tg2cnumqtljucpqpo4i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAODWwRr0OX7LSOyEqejocZlIrlPayBxGU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1025390075112-935ujpbqg9tr6tg2cnumqtljucpqpo4i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
