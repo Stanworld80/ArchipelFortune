@@ -235,6 +235,31 @@ class SessionNotifier extends Notifier<SessionState?> {
       boisCharpente: current.boisCharpente + wood,
     );
   }
+
+  void addSpecialLoot({String? keyType, String? itemId}) {
+    final current = state;
+    if (current == null) return;
+
+    int ck = current.copperKeys;
+    int sk = current.silverKeys;
+    int gk = current.goldKeys;
+    final List<String> newInventory = List.from(current.inventory);
+
+    if (keyType == 'copper') ck++;
+    else if (keyType == 'silver') sk++;
+    else if (keyType == 'gold') gk++;
+
+    if (itemId != null) {
+      newInventory.add(itemId);
+    }
+
+    state = current.copyWith(
+      copperKeys: ck,
+      silverKeys: sk,
+      goldKeys: gk,
+      inventory: newInventory,
+    );
+  }
 }
 
 // Random déterministe identique au serveur

@@ -340,10 +340,9 @@ fi
 
 # 3. Logique de déploiement
 echo "-> Étape 3/3 : Déploiement..."
-if [[ " ${PLATFORMS[*]} " =~ " web " ]]; then
-    echo "   - Déploiement Web vers Firebase Hosting (Projet: $CURRENT_FIREBASE_PROJECT_ID)..."
-    execute_verbose "Déploiement Firebase Web" firebase deploy --only hosting -P "$CURRENT_FIREBASE_PROJECT_ID"
-    if [ $? -ne 0 ]; then echo "ERREUR : Le déploiement web a échoué."; else echo "   Déploiement web réussi."; fi
+    echo "   - Déploiement complet vers Firebase (Hosting, Functions, Firestore) (Projet: $CURRENT_FIREBASE_PROJECT_ID)..."
+    execute_verbose "Déploiement Firebase " firebase deploy --only hosting,functions,firestore -P "$CURRENT_FIREBASE_PROJECT_ID"
+    if [ $? -ne 0 ]; then echo "ERREUR : Le déploiement Firebase a échoué."; else echo "   Déploiement réussi."; fi
 fi
 
 if [[ " ${PLATFORMS[*]} " =~ " android " ]]; then
@@ -365,11 +364,11 @@ fi
 # --- Nettoyage Final ---
 echo ""
 echo ">>> Nettoyage Final <<<"
-if [ "$FIREBASE_JSON_COPIED" = true ]; then
+if [ "$FIREBASE_JSON_COPIED" = true ] && [ "$CURRENT_FIREBASE_CONFIG_FILE_SOURCE_PATH" != "$TARGET_FIREBASE_JSON_PATH" ]; then
     execute_verbose "Nettoyage de firebase.json" rm -f "$TARGET_FIREBASE_JSON_PATH"
     echo " - Fichier temporaire 'firebase.json' nettoyé."
 else
-    echo " - Nettoyage de 'firebase.json' ignoré car il n'a pas été temporairement remplacé."
+    echo " - Conservation de 'firebase.json' (fichier principal ou non-temporaire)."
 fi
 
 if [[ " ${PLATFORMS[*]} " =~ " android " ]] && [ "$BUILD_TYPE" == "release" ] && [ -f "android/key.properties" ]; then

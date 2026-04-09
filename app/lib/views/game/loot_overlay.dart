@@ -27,10 +27,31 @@ class _LootOverlayState extends State<LootOverlay> {
     final rand = Random();
     _crates = List.generate(6, (_) {
       int type = rand.nextInt(100);
-      if (type < 40) return _CrateContent(type: 'gold', value: (rand.nextInt(10) + 5) * 10, icon: Icons.monetization_on, color: Colors.amber);
-      if (type < 70) return _CrateContent(type: 'provisions', value: rand.nextInt(5) + 3, icon: Icons.apple, color: Colors.red);
-      if (type < 85) return _CrateContent(type: 'wood', value: 1, icon: Icons.handyman, color: Colors.brown);
-      return _CrateContent(type: 'treasure', value: 0, icon: Icons.auto_awesome, color: Colors.purple, label: "Trésor !");
+      if (type < 35) return _CrateContent(type: 'gold', value: (rand.nextInt(10) + 5) * 10, icon: Icons.monetization_on, color: Colors.amber);
+      if (type < 60) return _CrateContent(type: 'provisions', value: rand.nextInt(5) + 3, icon: Icons.apple, color: Colors.red);
+      if (type < 75) return _CrateContent(type: 'wood', value: 1, icon: Icons.handyman, color: Colors.brown);
+      
+      // Nouvelles récompenses rares
+      if (type < 85) {
+        final keyTypes = ['copper', 'silver', 'gold'];
+        final kt = keyTypes[rand.nextInt(3)];
+        return _CrateContent(
+          type: 'key', 
+          value: 1, 
+          icon: Icons.key, 
+          color: kt == 'gold' ? Colors.yellow : (kt == 'silver' ? Colors.grey : Colors.orange), 
+          label: kt.toUpperCase(),
+          keyType: kt,
+        );
+      }
+      
+      if (type < 95) {
+        final items = ['Boussole Antique', 'Longue-vue en Ivoire', 'Sextant en Or', 'Sabre Rouillé', 'Chapeau de Capitaine'];
+        final item = items[rand.nextInt(items.length)];
+        return _CrateContent(type: 'item', value: 1, icon: Icons.auto_awesome, color: Colors.purple, label: item, itemId: item.toLowerCase().replaceAll(' ', '_'));
+      }
+
+      return _CrateContent(type: 'treasure', value: 0, icon: Icons.star, color: Colors.cyan, label: "Trésor !");
     });
     _allRevealed = false;
     _goldGained = 0;
@@ -113,6 +134,17 @@ class _LootOverlayState extends State<LootOverlay> {
                       onPressed: () {
                         // Ajouter le butin à la cargaison
                         ref.read(sessionProvider.notifier).addLootToCargaison(_goldGained, _provGained, _woodGained);
+                        
+                        // Ajouter les items spéciaux trouvés
+                        for (var crate in _crates) {
+                          if (crate.type == 'key' || crate.type == 'item') {
+                            ref.read(sessionProvider.notifier).addSpecialLoot(
+                              keyType: crate.keyType,
+                              itemId: crate.itemId,
+                            );
+                          }
+                        }
+
                         ref.read(sessionProvider.notifier).endLootSerie();
                         
                         if (session!.lootRemaining > 0) {
@@ -142,9 +174,19 @@ class _CrateContent {
   final IconData icon;
   final Color color;
   final String? label;
+  final String? keyType;
+  final String? itemId;
   bool revealed = false;
 
-  _CrateContent({required this.type, required this.value, required this.icon, required this.color, this.label});
+  _CrateContent({
+    required this.type, 
+    required this.value, 
+    required this.icon, 
+    required this.color, 
+    this.label,
+    this.keyType,
+    this.itemId,
+  });
 }
 
 class _CrateWidget extends StatefulWidget {
