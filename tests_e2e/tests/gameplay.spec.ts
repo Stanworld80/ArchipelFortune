@@ -29,21 +29,12 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
     await page.getByLabel('Mot de passe').fill(testPassword);
     
     const signupBtn = page.getByRole('button', { name: /Créer un compte/i });
-    // 2. Si ça échoue, on tente le clic forcé via Playwright
-    try {
-      const pBtn = page.getByRole('button', { name: /Enable accessibility/i });
-      if (await pBtn.isVisible({ timeout: 2000 })) {
-        await pBtn.click({ force: true });
-      }
-    } catch (e) {
-      // Ignore
-    }
     await signupBtn.click();
 
     // 2. Vérification HomeView
-    // On cherche le bouton qui contient EXPLORER dans son aria-label
-    const exploreBtn = page.locator('[aria-label*="EXPLORER"]');
-    await expect(exploreBtn.first()).toBeVisible({ timeout: 60000 });
+    // On cherche le bouton EXPLORER
+    const exploreBtn = page.getByLabel('EXPLORE_MAIN_BTN', { exact: true });
+    await expect(exploreBtn).toBeVisible({ timeout: 60000 });
     
     // Vérifier l'or initial (50 gold)
     await expect(page.getByText(/50 Pièces d'Or/i)).toBeVisible();

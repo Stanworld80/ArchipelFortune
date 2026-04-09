@@ -14,14 +14,14 @@
 ```
 Error: expect(locator).toBeVisible() failed
 
-Locator: getByRole('button', { name: /EXPLORER/i })
+Locator: getByLabel('EXPLORE_MAIN_BTN', { exact: true })
 Expected: visible
 Timeout: 60000ms
 Error: element(s) not found
 
 Call log:
   - Expect "toBeVisible" with timeout 60000ms
-  - waiting for getByRole('button', { name: /EXPLORER/i })
+  - waiting for getByLabel('EXPLORE_MAIN_BTN', { exact: true })
 
 ```
 
@@ -36,7 +36,7 @@ Call log:
           - generic:
             - group:
               - group "Inscription branding_title L'Archipel de la Fortune":
-                - textbox "Email" [ref=e6]: capitaine.1775727480459@fortune.com
+                - textbox "Email" [ref=e6]: capitaine.1775729038349@fortune.com
                 - textbox "Mot de passe" [ref=e8]
                 - button "Créer un compte" [active] [ref=e9]
                 - button "Déjà un compte ? Se connecter" [ref=e10]
@@ -80,36 +80,37 @@ Call log:
   32 |     await signupBtn.click();
   33 | 
   34 |     // 2. Vérification HomeView
-  35 |     const exploreBtn = page.getByRole('button', { name: /EXPLORER/i });
-> 36 |     await expect(exploreBtn).toBeVisible({ timeout: 60000 });
+  35 |     // On cherche le bouton EXPLORER
+  36 |     const exploreBtn = page.getByLabel('EXPLORE_MAIN_BTN', { exact: true });
+> 37 |     await expect(exploreBtn).toBeVisible({ timeout: 60000 });
      |                              ^ Error: expect(locator).toBeVisible() failed
-  37 |     
-  38 |     // Vérifier l'or initial (50 gold)
-  39 |     await expect(page.getByText(/50 Pièces d'Or/i)).toBeVisible();
-  40 | 
-  41 |     // 3. Préparation du Navire
-  42 |     await exploreBtn.click();
-  43 |     await page.waitForTimeout(2000); // Animation du dialogue
-  44 |     
-  45 |     const embarkBtn = page.getByRole('button', { name: /Prendre la Mer/i });
-  46 |     await expect(embarkBtn).toBeVisible({ timeout: 10000 });
-  47 |     await embarkBtn.click();
-  48 | 
-  49 |     // 4. Navigation (Sea Map)
-  50 |     await expect(page.getByText(/Navigation en Mer/i)).toBeVisible({ timeout: 45000 });
-  51 |     
-  52 |     // Vérifier la position initiale
-  53 |     await expect(page.getByText(/POSITION: 18, 18/i)).toBeVisible();
-  54 | 
-  55 |     // 5. Mouvement
-  56 |     const advanceBtn = page.getByRole('button', { name: /AVANCER/i });
-  57 |     await expect(advanceBtn).toBeVisible({ timeout: 10000 });
-  58 |     await advanceBtn.click();
-  59 | 
-  60 |     // Attendre la mise à jour
-  61 |     await expect(page.getByText(/POSITION: 18, 17/i)).toBeVisible({ timeout: 10000 });
-  62 |     await expect(page.getByText(/19 🍎/i)).toBeVisible();
-  63 |   });
-  64 | });
-  65 | 
+  38 |     
+  39 |     // Vérifier l'or initial (50 gold)
+  40 |     await expect(page.getByText(/50 Pièces d'Or/i)).toBeVisible();
+  41 | 
+  42 |     // 3. Préparation du Navire
+  43 |     await exploreBtn.click();
+  44 |     await page.waitForTimeout(2000); // Animation du dialogue
+  45 |     
+  46 |     const embarkBtn = page.getByRole('button', { name: /Prendre la Mer/i });
+  47 |     await expect(embarkBtn).toBeVisible({ timeout: 10000 });
+  48 |     await embarkBtn.click();
+  49 | 
+  50 |     // 4. Navigation (Sea Map)
+  51 |     await expect(page.getByText(/Navigation en Mer/i)).toBeVisible({ timeout: 45000 });
+  52 |     
+  53 |     // Vérifier la position initiale
+  54 |     await expect(page.getByText(/POSITION: 18, 18/i)).toBeVisible();
+  55 | 
+  56 |     // 5. Mouvement
+  57 |     const advanceBtn = page.getByRole('button', { name: /AVANCER/i });
+  58 |     await expect(advanceBtn).toBeVisible({ timeout: 10000 });
+  59 |     await advanceBtn.click();
+  60 | 
+  61 |     // Attendre la mise à jour
+  62 |     await expect(page.getByText(/POSITION: 18, 17/i)).toBeVisible({ timeout: 10000 });
+  63 |     await expect(page.getByText(/19 🍎/i)).toBeVisible();
+  64 |   });
+  65 | });
+  66 | 
 ```

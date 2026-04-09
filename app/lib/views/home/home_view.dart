@@ -28,9 +28,16 @@ class HomeView extends ConsumerWidget {
                   ref.read(authControllerProvider).signOut();
                 }
               },
-              icon: const CircleAvatar(
-                backgroundColor: Colors.amber,
-                child: Icon(Icons.person, color: Colors.brown),
+              child: Semantics(
+                label: 'PROFILE_BTN',
+                button: true,
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  child: CircleAvatar(
+                    backgroundColor: Colors.amber,
+                    child: Icon(Icons.person, color: Colors.brown),
+                  ),
+                ),
               ),
               itemBuilder: (context) => [
                 if (profile.role == 'admin' || profile.role == 'superAdmin')
@@ -131,19 +138,22 @@ class HomeView extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: 60),
-                      ElevatedButton.icon(
-                        icon: const Icon(Icons.explore, size: 28),
-                        label: const Text('EXPLORER L\'ARCHIPEL', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.amber,
-                          foregroundColor: Colors.brown[900],
-                          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                          elevation: 10,
+                      Semantics(
+                        label: 'EXPLORE_MAIN_BTN',
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.explore, size: 28),
+                          label: const Text('EXPLORER L\'ARCHIPEL', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.amber,
+                            foregroundColor: Colors.brown[900],
+                            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                            elevation: 10,
+                          ),
+                          onPressed: () {
+                            _showPreparationDialog(context, ref, profile);
+                          },
                         ),
-                        onPressed: () {
-                          _showPreparationDialog(context, ref, profile);
-                        },
                       ),
                       const SizedBox(height: 40),
                       const Text(

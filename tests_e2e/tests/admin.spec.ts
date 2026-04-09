@@ -26,8 +26,12 @@ test.describe('Archipel Fortune Admin Panel', () => {
     await page.getByLabel('Mot de passe').fill(TEST_PASSWORD);
     await page.getByRole('button', { name: /Se connecter/i }).click();
 
+    // Wait for Login to complete
+    await expect(page.getByText(/Bienvenue/i)).toBeVisible({ timeout: 30000 });
+
     // 2. Open User Menu
-    const profileBtn = page.locator('button').filter({ hasText: '' }).first(); // Avatar
+    const profileBtn = page.getByLabel('PROFILE_BTN');
+    await expect(profileBtn).toBeVisible({ timeout: 20000 });
     await profileBtn.click();
 
     // 3. Click Panel Admin
@@ -45,9 +49,14 @@ test.describe('Archipel Fortune Admin Panel', () => {
     await page.getByLabel('Email').fill(SUPER_ADMIN_EMAIL);
     await page.getByLabel('Mot de passe').fill(TEST_PASSWORD);
     await page.getByRole('button', { name: /Se connecter/i }).click();
+
+    // Wait for Login to complete
+    await expect(page.getByText(/Bienvenue/i)).toBeVisible({ timeout: 30000 });
     
     // Open Admin Panel
-    await page.locator('button').first().click();
+    const profileBtn = page.getByLabel('PROFILE_BTN');
+    await expect(profileBtn).toBeVisible({ timeout: 20000 });
+    await profileBtn.click();
     await page.getByText(/Panel Admin/i).click();
 
     // 1. Click on first player
