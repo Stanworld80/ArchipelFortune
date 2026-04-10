@@ -7,6 +7,19 @@ plugins {
 }
 
 android {
+    namespace = "fr.stanislasselleinformatique.archipelfortune"
+    compileSdk = flutter.compileSdkVersion
+    ndkVersion = flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_17.toString()
+    }
+
     val keystorePropertiesFile = rootProject.file("key.properties")
     val keystoreProperties = java.util.Properties()
     if (keystorePropertiesFile.exists()) {
