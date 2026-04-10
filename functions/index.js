@@ -50,11 +50,14 @@ exports.startExpedition = onCall(async (request) => {
     wood: wood,
     orVolatil: 0,
     seed: seed || Date.now(),
-    map: map, // TODO: Optimiser le stockage si nécessaire
+    map: map.flat(),
+    inventory: [],
+    collections: {},
     isAtStopover: false,
-    isGameOver: false,
+    lootRemaining: 0,
     startTime: FieldValue.serverTimestamp(),
-    statusMessage: "Bienvenue en mer, Capitaine !"
+    isGameOver: false,
+    statusMessage: "Expédition lancée !"
   };
 
   await db.runTransaction(async (t) => {
@@ -102,10 +105,11 @@ exports.moveShip = onCall(async (request) => {
   else if (nextOrientation === 180) nextY++;
   else if (nextOrientation === 270) nextX--;
 
-  // Validation des limites
+  // Validation des limites (Mur infranchissable)
   if (nextX < 0 || nextX >= MAP_SIZE || nextY < 0 || nextY >= MAP_SIZE) {
-    await sessionRef.update({ isGameOver: true, statusMessage: "Perdu en mer !" });
-    return { isGameOver: true };
+    // On annule juste le mouvement, pas de provision consommée, pas de Game Over
+    await sessionRef.update({ statusMessage: "Mur infranchissable !" });
+    return { success: false, reason: "out_of_bounds" };
   }
 
   const tileType = session.map[nextX][nextY];
@@ -128,7 +132,11 @@ exports.moveShip = onCall(async (request) => {
   } else if (tileType === TileType.island || tileType === TileType.continent) {
     update.isAtStopover = true;
     update.lootRemaining = (tileType === TileType.island) ? 5 : 15;
-    update.statusMessage = "Escale réussie !";
+    update.statusMessage = "Escale ! Butin récupéré (île explorée).";
+    
+    // Retirer l'île de la carte pour éviter d'être pillée plusieurs fois (se transforme en 'grass')
+    session.map[nextX][nextY] = TileType.grass;
+    update.map = session.map.flat();
   }
 
   await sessionRef.update(update);

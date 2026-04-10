@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'map_painter.dart';
@@ -109,31 +110,20 @@ class GameDashboardView extends ConsumerWidget {
             ),
           ),
 
-          // Contrôles de Navigation
+          // Contrôles de Navigation (Barre de Gouvernail)
           Positioned(
-            bottom: 30,
+            bottom: 40,
             left: 0,
             right: 0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _NavButton(
-                  icon: Icons.rotate_left,
-                  label: 'BÂBORD',
-                  onPressed: () => ref.read(sessionProvider.notifier).movePort(),
-                ),
-                _NavButton(
-                  icon: Icons.arrow_upward,
-                  label: 'AVANCER',
-                  isMain: true,
-                  onPressed: () => ref.read(sessionProvider.notifier).moveForward(),
-                ),
-                _NavButton(
-                  icon: Icons.rotate_right,
-                  label: 'TRIBORD',
-                  onPressed: () => ref.read(sessionProvider.notifier).moveStarboard(),
-                ),
-              ],
+            child: Center(
+              child: ShipControlWheel(
+                session: session,
+                onMove: (dir) async {
+                  if (dir == 'forward') await ref.read(sessionProvider.notifier).moveForward();
+                  if (dir == 'port') await ref.read(sessionProvider.notifier).movePort();
+                  if (dir == 'starboard') await ref.read(sessionProvider.notifier).moveStarboard();
+                },
+              ),
             ),
           ),
 
@@ -189,37 +179,140 @@ class GameDashboardView extends ConsumerWidget {
   }
 }
 
-class _NavButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onPressed;
-  final bool isMain;
+class ShipControlWheel extends StatelessWidget {
+  final SessionState session;
+  final Function(String) onMove;
 
-  const _NavButton({
+  const ShipControlWheel({super.key, required this.session, required this.onMove});
+
+  @override
+  Widget build(BuildContext context) {
+    const double wheelSize = 130;
+    const int mapSize = 36;
+
+    // Helper to check if a direction is "Reverse"
+    bool isReverse(int arrowAngle) {
+      return (session.orientation + 180) % 360 == arrowAngle;
+    }
+
+    // Helper to check if a direction is Forward relative to orientation
+    String getMoveType(int arrowAngle) {
+      if (session.orientation == arrowAngle) return 'forward';
+      if ((session.orientation + 90) % 360 == arrowAngle) return 'starboard';
+      if ((session.orientation - 90 + 360) % 360 == arrowAngle) return 'port';
+      return 'none';
+    }
+
+    // Edge check
+    bool isEdge(int arrowAngle) {
+      if (arrowAngle == 0 && session.y == 0) return true;
+      if (arrowAngle == 90 && session.x == mapSize - 1) return true;
+      if (arrowAngle == 180 && session.y == mapSize - 1) return true;
+      if (arrowAngle == 270 && session.x == 0) return true;
+      return false;
+    }
+
+    return SizedBox(
+      width: wheelSize + 100,
+      height: wheelSize + 100,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Ombre/Fond du contrôleur
+          Container(
+            width: wheelSize + 20,
+            height: wheelSize + 20,
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.2),
+              shape: BoxShape.circle,
+            ),
+          ),
+          
+          // La Barre (Gouvernail)
+          const Text(
+            '☸️', // Emoji gouvernail pour un look thématique immédiat
+            style: TextStyle(fontSize: 80),
+          ),
+
+          // Les 4 Flèches Directionnelles
+          _DirectionArrow(
+            angle: 0,
+            icon: Icons.keyboard_arrow_up,
+            isHidden: isReverse(0),
+            isDisabled: isEdge(0),
+            onTap: () => onMove(getMoveType(0)),
+          ),
+          _DirectionArrow(
+            angle: 90,
+            icon: Icons.keyboard_arrow_right,
+            isHidden: isReverse(90),
+            isDisabled: isEdge(90),
+            onTap: () => onMove(getMoveType(90)),
+          ),
+          _DirectionArrow(
+            angle: 180,
+            icon: Icons.keyboard_arrow_down,
+            isHidden: isReverse(180),
+            isDisabled: isEdge(180),
+            onTap: () => onMove(getMoveType(180)),
+          ),
+          _DirectionArrow(
+            angle: 270,
+            icon: Icons.keyboard_arrow_left,
+            isHidden: isReverse(270),
+            isDisabled: isEdge(270),
+            onTap: () => onMove(getMoveType(270)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DirectionArrow extends StatelessWidget {
+  final double angle;
+  final IconData icon;
+  final bool isHidden;
+  final bool isDisabled;
+  final VoidCallback onTap;
+
+  const _DirectionArrow({
+    required this.angle,
     required this.icon,
-    required this.label,
-    required this.onPressed,
-    this.isMain = false,
+    this.isHidden = false,
+    this.isDisabled = false,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        IconButton.filled(
-          style: IconButton.styleFrom(
-            backgroundColor: isMain ? Colors.amber : Colors.teal.shade700,
-            foregroundColor: isMain ? Colors.brown[900] : Colors.white,
-            padding: EdgeInsets.all(isMain ? 20 : 12),
+    if (isHidden) return const SizedBox.shrink();
+
+    // Positionnement polaire par rapport au centre
+    double dist = 75.0;
+    double rad = (angle - 90) * pi / 180;
+    double dx = cos(rad) * dist;
+    double dy = sin(rad) * dist;
+
+    return Transform.translate(
+      offset: Offset(dx, dy),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: isDisabled ? null : onTap,
+          borderRadius: BorderRadius.circular(30),
+          child: Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: isDisabled ? Colors.grey.withValues(alpha: 0.5) : Colors.teal.shade700,
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white24, width: 2),
+              boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2))],
+            ),
+            child: Icon(icon, color: isDisabled ? Colors.white38 : Colors.white, size: 40),
           ),
-          icon: Icon(icon, size: isMain ? 32 : 24),
-          tooltip: label,
-          onPressed: onPressed,
         ),
-        const SizedBox(height: 4),
-        Text(label, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
-      ],
+      ),
     );
   }
 }

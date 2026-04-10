@@ -90,4 +90,61 @@ class SessionState {
       statusMessage: statusMessage ?? this.statusMessage,
     );
   }
+  Map<String, dynamic> toMap() {
+    return {
+      'sessionId': sessionId,
+      'x': x,
+      'y': y,
+      'orientation': orientation,
+      'provisions': provisions,
+      'orVolatil': orVolatil,
+      'boisCharpente': boisCharpente,
+      'copperKeys': copperKeys,
+      'silverKeys': silverKeys,
+      'goldKeys': goldKeys,
+      'map': map.expand((row) => row.map((tile) => tile.index)).toList(),
+      'inventory': inventory,
+      'isAtStopover': isAtStopover,
+      'lootRemaining': lootRemaining,
+      'startTime': startTime.toIso8601String(),
+      'isGameOver': isGameOver,
+      'statusMessage': statusMessage,
+      'collections': collections,
+    };
+  }
+
+  factory SessionState.fromMap(Map<String, dynamic> mapData, {String? id}) {
+    final List<dynamic> flatMap = mapData['map'] as List<dynamic>;
+    // On assume une taille fixe de 36 pour l'Archipel (MAP_SIZE coté serveur)
+    const int size = 36;
+    final List<List<TileType>> reconstructedMap = List.generate(size, (i) {
+      return List.generate(size, (j) {
+        final int index = flatMap[i * size + j] as int;
+        return TileType.values[index];
+      });
+    });
+
+    return SessionState(
+      sessionId: id ?? mapData['sessionId'],
+      x: mapData['x']?.toInt() ?? 0,
+      y: mapData['y']?.toInt() ?? 0,
+      orientation: mapData['orientation']?.toInt() ?? 0,
+      provisions: mapData['provisions']?.toInt() ?? 0,
+      orVolatil: mapData['orVolatil']?.toInt() ?? 0,
+      boisCharpente: mapData['boisCharpente']?.toInt() ?? 0,
+      copperKeys: mapData['copperKeys']?.toInt() ?? 0,
+      silverKeys: mapData['silverKeys']?.toInt() ?? 0,
+      goldKeys: mapData['goldKeys']?.toInt() ?? 0,
+      map: reconstructedMap,
+      inventory: List<String>.from(mapData['inventory'] ?? []),
+      isAtStopover: mapData['isAtStopover'] ?? false,
+      lootRemaining: mapData['lootRemaining']?.toInt() ?? 0,
+      startTime: mapData['startTime'] is String 
+          ? DateTime.parse(mapData['startTime']) 
+          : (mapData['startTime'] as dynamic)?.toDate() ?? DateTime.now(),
+      isGameOver: mapData['isGameOver'] ?? false,
+      statusMessage: mapData['statusMessage'],
+      collections: Map<String, int>.from(mapData['collections'] ?? {}),
+    );
+  }
 }

@@ -37,3 +37,4 @@ app/android/app/google-services.json
 firebase.json
 app/web/index.html
 app/android/key.properties
+base64_for_github.txt

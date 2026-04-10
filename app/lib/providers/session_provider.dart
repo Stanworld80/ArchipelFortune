@@ -172,7 +172,7 @@ class SessionNotifier extends Notifier<SessionState?> {
     else if (newOrientation == 270) nextX--; 
 
     if (nextX < 0 || nextX >= mapSize || nextY < 0 || nextY >= mapSize) {
-        state = current.copyWith(isGameOver: true, statusMessage: "Perdu en mer !");
+        state = current.copyWith(statusMessage: "Mur infranchissable !"); // Mouvement annulé
         return;
     }
 
@@ -195,6 +195,10 @@ class SessionNotifier extends Notifier<SessionState?> {
     }
 
     if (tile == TileType.island || tile == TileType.continent) {
+        // L'île est pillée, on la transforme en herbe ('grass') pour empêcher de re-looter
+        final newMap = List<List<TileType>>.generate(mapSize, (i) => List<TileType>.from(current.map[i]));
+        newMap[nextX][nextY] = TileType.grass;
+        
         state = current.copyWith(
             x: nextX,
             y: nextY,
@@ -202,6 +206,8 @@ class SessionNotifier extends Notifier<SessionState?> {
             provisions: current.provisions - 1,
             isAtStopover: true,
             lootRemaining: (tile == TileType.island) ? 5 : 15,
+            map: newMap,
+            statusMessage: "Escale ! Butin récupéré (île explorée).",
         );
         return;
     }

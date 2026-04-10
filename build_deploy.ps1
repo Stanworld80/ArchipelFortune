@@ -22,10 +22,11 @@ $ErrorActionPreference = 'Stop'
 
 # --- Configuration ---
 $Config = @{
-    dev = @{
+    dev     = @{
         ProjectId          = 'archipel-fortune-dev'
         AndroidAppId       = '1:83241971458:android:dde10259edb60d45711c1b'
         DartDefines        = 'APP_ENV=dev,SUPER_ADMIN_EMAIL=tester-admin@archipel-fortune.net'
+        #DartDefines        = 'APP_ENV=dev,SUPER_ADMIN_EMAIL=stanworld@gmail.com'        
         Flavor             = ''
         EntryPoint         = 'lib/main.dart'
         GoogleServicesPath = 'android/app/google-services.dev.json'
@@ -33,14 +34,15 @@ $Config = @{
     staging = @{
         ProjectId          = 'archipel-fortune-staging'
         AndroidAppId       = '1:344541548510:android:631fa078fb9926677d174f'
-        DartDefines        = 'APP_ENV=staging,SUPER_ADMIN_EMAIL=stanworld@gmail.com'
+        DartDefines        = 'APP_ENV=dev,SUPER_ADMIN_EMAIL=tester-admin@archipel-fortune.net'
+        #DartDefines        = 'APP_ENV=staging,SUPER_ADMIN_EMAIL=stanworld@gmail.com'
         Flavor             = ''
         EntryPoint         = 'lib/main.dart'
         GoogleServicesPath = 'android/app/google-services.staging.json'
     }
     prod    = @{
         ProjectId          = 'archipel-fortune-prod'
-        AndroidAppId       = '1:48301164525:android:c3713960cdefdbb28589e4'
+        AndroidAppId       = '1:417958901427:android:afebbbc0aa7ded9b0762c6'
         DartDefines        = 'APP_ENV=prod,SUPER_ADMIN_EMAIL=stanworld@gmail.com'
         Flavor             = ''
         EntryPoint         = 'lib/main.dart'
@@ -92,10 +94,12 @@ if ($Environment -eq 'prod' -or (-not $BypassTest)) {
         if ($testFiles) {
             flutter test
             if ($LASTEXITCODE -ne 0) { throw 'Tests failed.' }
-        } else {
+        }
+        else {
             Write-Host 'ℹ️ No test files found, skipping.' -ForegroundColor Yellow
         }
-    } else {
+    }
+    else {
         Write-Host '   No tests found.' -ForegroundColor Gray
     }
 }
@@ -133,7 +137,8 @@ if ($Platform -eq 'android' -or $Platform -eq 'all') {
         Write-Host '   Building Android AppBundle...'
         flutter build appbundle @AndroidArgs
         if ($LASTEXITCODE -ne 0) { throw 'Android AAB Build Failed' }
-    } else {
+    }
+    else {
         Write-Host '   Building Android APK...'
         flutter build apk @AndroidArgs
         if ($LASTEXITCODE -ne 0) { throw 'Android APK Build Failed' }

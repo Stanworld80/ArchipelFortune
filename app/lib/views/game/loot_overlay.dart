@@ -13,6 +13,7 @@ class LootOverlay extends StatefulWidget {
 class _LootOverlayState extends State<LootOverlay> {
   late List<_CrateContent> _crates;
   bool _allRevealed = false;
+  bool _isAutoRevealing = false;
   int _goldGained = 0;
   int _provGained = 0;
   int _woodGained = 0;
@@ -54,9 +55,36 @@ class _LootOverlayState extends State<LootOverlay> {
       return _CrateContent(type: 'treasure', value: 0, icon: Icons.star, color: Colors.cyan, label: "Trésor !");
     });
     _allRevealed = false;
+    _isAutoRevealing = false;
     _goldGained = 0;
     _provGained = 0;
     _woodGained = 0;
+  }
+
+  void _processRevealedContent(_CrateContent content) {
+    if (content.type == 'gold') _goldGained += content.value;
+    if (content.type == 'provisions') _provGained += content.value;
+    if (content.type == 'wood') _woodGained += content.value;
+    
+    if (_crates.every((c) => c.revealed)) {
+      _allRevealed = true;
+    }
+  }
+
+  Future<void> _autoRevealAll() async {
+    if (_isAutoRevealing) return;
+    setState(() => _isAutoRevealing = true);
+
+    for (var crate in _crates) {
+      if (!crate.revealed) {
+        await Future.delayed(const Duration(milliseconds: 300));
+        if (!mounted) return;
+        setState(() {
+          crate.revealed = true;
+          _processRevealedContent(crate);
+        });
+      }
+    }
   }
 
   @override
@@ -92,19 +120,29 @@ class _LootOverlayState extends State<LootOverlay> {
                   return _CrateWidget(
                     content: _crates[index],
                     onRevealed: (content) {
-                      if (content.type == 'gold') _goldGained += content.value;
-                      if (content.type == 'provisions') _provGained += content.value;
-                      if (content.type == 'wood') _woodGained += content.value;
-                      
-                      if (_crates.every((c) => c.revealed)) {
-                        setState(() => _allRevealed = true);
-                      }
+                      setState(() {
+                        _processRevealedContent(content);
+                      });
                     },
                   );
                 },
               ),
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 20),
+            if (!_allRevealed && !_isAutoRevealing)
+              ElevatedButton.icon(
+                icon: const Icon(Icons.flash_on),
+                label: const Text('AUTO-RÉVÉLER'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                ),
+                onPressed: _autoRevealAll,
+              ),
+            if (_isAutoRevealing && !_allRevealed)
+              const CircularProgressIndicator(color: Colors.amber),
+            const SizedBox(height: 20),
             if (_allRevealed)
               Consumer(builder: (context, ref, child) {
                 final session = ref.watch(sessionProvider);
