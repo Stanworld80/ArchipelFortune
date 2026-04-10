@@ -6,7 +6,7 @@ Future<UserCredential?> googleLogin(FirebaseAuth auth) async {
   final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
   if (googleUser == null) return null;
 
-  final googleAuth = await googleUser.authentication;
+  final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
   final AuthCredential credential = GoogleAuthProvider.credential(
     accessToken: googleAuth.accessToken,
     idToken: googleAuth.idToken,
