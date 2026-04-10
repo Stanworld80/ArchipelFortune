@@ -6,6 +6,7 @@ plugins {
     id("com.google.gms.google-services")
 }
 
+android {
     val keystorePropertiesFile = rootProject.file("key.properties")
     val keystoreProperties = java.util.Properties()
     if (keystorePropertiesFile.exists()) {
