@@ -52,7 +52,7 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
 
   Future<void> _loadAssets() async {
     _mapBg = await _loadImage('assets/images/map_background.png');
-    _shipIcon = await _loadImage('assets/images/ship_sprite.png');
+    _shipIcon = await _loadImage('assets/images/ship_sprite2.png');
     _islandIcon = await _loadImage('assets/images/island_sprite.png');
     _compassIcon = await _loadImage('assets/images/compass_rose.png');
     if (mounted) setState(() {});
