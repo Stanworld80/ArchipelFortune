@@ -1,6 +1,7 @@
 {
   "projects": {
     "default": "archipel-fortune-dev",
+    "dev": "archipel-fortune-dev",
     "staging": "archipel-fortune-stg",
     "prod": "archipel-fortune-prod"
   }

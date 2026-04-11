@@ -265,9 +265,9 @@ echo "-> Étape 6/6 : Compilation des plateformes..."
 for PLATFORM in "${PLATFORMS[@]}"; do
     echo "   -> Lancement de la compilation pour : $PLATFORM"
     if [ "$PLATFORM" == "web" ]; then
-        execute_verbose "Build Web" flutter build web --"$BUILD_TYPE" --dart-define=APP_ENV="$ENVIRONMENT" --web-renderer html --dart-define=SUPER_ADMIN_EMAIL="stanworld@gmail.com"
+        execute_verbose "Build Web" flutter build web --"$BUILD_TYPE" --dart-define=APP_ENV="$ENVIRONMENT" --dart-define=SUPER_ADMIN_EMAIL="stanworld@gmail.com"
         if [ $? -ne 0 ]; then echo "ERREUR : La compilation web a échoué."; exit 1; fi
-        echo "   Compilation web terminée avec succès (Renderer: HTML)."
+        echo "   Compilation web terminée avec succès."
     elif [ "$PLATFORM" == "android" ]; then
         if [ -z "$SPECIFIC_ANDROID_BUILD" ] || [ "$SPECIFIC_ANDROID_BUILD" == "apk" ]; then
             echo "      -> Construction de l'APK Android..."
