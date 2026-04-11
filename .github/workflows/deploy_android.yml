@@ -1,4 +1,4 @@
-name: Deploy to Play Store (Internal)
+name: Deploy to Play Store (Internal) & Firebase Hosting (Prod)
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-deploy:
-    name: Build & Deploy to Play Console
+    name: Build & Deploy (Android + Web)
     runs-on: ubuntu-latest
 
     steps:
@@ -31,6 +31,7 @@ jobs:
         working-directory: app
         run: flutter pub get
 
+      # ─── Android Build ───────────────────────────────────────────────────────
       - name: 🔑 Setup Keystore
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/android/app/upload-keystore.jks
@@ -44,16 +45,30 @@ jobs:
           KEYSTORE_PATH: upload-keystore.jks
         run: |
           cp android/app/google-services-prod.json android/app/google-services.json
-          flutter build appbundle --release --build-number=${{ github.run_number }}
+          flutter build appbundle --release \
+            --dart-define=APP_ENV=prod \
+            --dart-define=SUPER_ADMIN_EMAIL=stanworld@gmail.com \
+            --build-number=${{ github.run_number }}
 
-      - name: 🔥 Deploy Firestore Rules to Prod
+      # ─── Web Build (Prod) ─────────────────────────────────────────────────────
+      - name: 🌐 Build Web (Prod)
+        working-directory: app
+        run: |
+          flutter build web --release \
+            --dart-define=APP_ENV=prod \
+            --dart-define=SUPER_ADMIN_EMAIL=stanworld@gmail.com \
+            --web-renderer html
+
+      # ─── Firebase Deploy (Firestore Rules + Hosting) ──────────────────────────
+      - name: 🔥 Deploy Firestore Rules & Web Hosting to Prod
         run: |
           npm install -g firebase-tools
           echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_PROD }}' > firebase-sa-prod.json
           export GOOGLE_APPLICATION_CREDENTIALS=firebase-sa-prod.json
-          firebase deploy --only firestore:rules --project archipel-fortune-prod
+          firebase deploy --only firestore:rules,hosting --project archipel-fortune-prod
           rm firebase-sa-prod.json
 
+      # ─── Google Play Store ────────────────────────────────────────────────────
       - name: 🚀 Upload to Google Play
         uses: r0adkll/upload-google-play@v1
         with:
