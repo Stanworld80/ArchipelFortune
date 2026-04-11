@@ -12,21 +12,15 @@ class LoginView extends ConsumerStatefulWidget {
   ConsumerState<LoginView> createState() => _LoginViewState();
 }
 
-class _LoginViewState extends ConsumerState<LoginView> with SingleTickerProviderStateMixin {
+class _LoginViewState extends ConsumerState<LoginView> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
   bool _isLogin = true;
 
-  late AnimationController _animationController;
-
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 20),
-    )..repeat();
   }
 
   void _setLoading(bool value) {
@@ -82,7 +76,6 @@ class _LoginViewState extends ConsumerState<LoginView> with SingleTickerProvider
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
-    _animationController.dispose();
     super.dispose();
   }
 
@@ -106,25 +99,16 @@ class _LoginViewState extends ConsumerState<LoginView> with SingleTickerProvider
             ),
           ),
 
-          // Rotating Compass Rose in background
+          // Static Compass Rose in background
           Positioned(
             top: -100,
             right: -100,
-            child: AnimatedBuilder(
-              animation: _animationController,
-              builder: (context, child) {
-                return Transform.rotate(
-                  angle: _animationController.value * 2 * math.pi,
-                  child: child,
-                );
-              },
-              child: Opacity(
-                opacity: 0.2,
-                child: Image.asset(
-                  'assets/images/compass_rose.png',
-                  width: 400,
-                  height: 400,
-                ),
+            child: Opacity(
+              opacity: 0.15,
+              child: Image.asset(
+                'assets/images/compass_rose.png',
+                width: 400,
+                height: 400,
               ),
             ),
           ),
@@ -136,21 +120,10 @@ class _LoginViewState extends ConsumerState<LoginView> with SingleTickerProvider
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo/Treasure Chest
-                  TweenAnimationBuilder<double>(
-                    duration: const Duration(seconds: 2),
-                    tween: Tween(begin: 0.0, end: 1.0),
-                    curve: Curves.elasticOut,
-                    builder: (context, value, child) {
-                      return Transform.scale(
-                        scale: value,
-                        child: child,
-                      );
-                    },
-                    child: Image.asset(
-                      'assets/images/treasure_chest.png',
-                      height: 120,
-                    ),
+                  // Logo/Treasure Chest (Static)
+                  Image.asset(
+                    'assets/images/treasure_chest.png',
+                    height: 120,
                   ),
                   const SizedBox(height: 16),
                   
@@ -271,7 +244,7 @@ class _LoginViewState extends ConsumerState<LoginView> with SingleTickerProvider
                                   _buildActionButton(
                                     onPressed: _loginWithGoogle,
                                     label: 'CONTINUER AVEC GOOGLE',
-                                    iconPath: 'assets/images/gold_coin.png',
+                                    icon: const Icon(Icons.g_mobiledata, color: Colors.blue, size: 30),
                                   ),
                                 ],
                               ],
@@ -292,30 +265,6 @@ class _LoginViewState extends ConsumerState<LoginView> with SingleTickerProvider
                 ],
               ),
             ),
-          ),
-          
-          // Floating Coins (Decoration)
-          const _FloatingDecoration(
-            assetPath: 'assets/images/gold_coin.png',
-            top: 100,
-            left: 50,
-            size: 40,
-            duration: Duration(seconds: 4),
-          ),
-          const _FloatingDecoration(
-            assetPath: 'assets/images/gold_coin.png',
-            bottom: 80,
-            right: 40,
-            size: 60,
-            duration: Duration(seconds: 6),
-          ),
-          const _FloatingDecoration(
-            assetPath: 'assets/images/ship_sprite2.png',
-            bottom: 150,
-            left: -30,
-            size: 150,
-            duration: Duration(seconds: 8),
-            opacity: 0.3,
           ),
         ],
       ),
@@ -361,7 +310,7 @@ class _LoginViewState extends ConsumerState<LoginView> with SingleTickerProvider
     required VoidCallback onPressed,
     required String label,
     bool isPrimary = false,
-    String? iconPath,
+    Widget? icon,
   }) {
     return Container(
       width: double.infinity,
@@ -396,8 +345,8 @@ class _LoginViewState extends ConsumerState<LoginView> with SingleTickerProvider
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (iconPath != null) ...[
-              Image.asset(iconPath, width: 20, height: 20),
+            if (icon != null) ...[
+              icon,
               const SizedBox(width: 12),
             ],
             Text(
@@ -410,69 +359,6 @@ class _LoginViewState extends ConsumerState<LoginView> with SingleTickerProvider
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _FloatingDecoration extends StatefulWidget {
-  final String assetPath;
-  final double? top, bottom, left, right;
-  final double size;
-  final Duration duration;
-  final double opacity;
-
-  const _FloatingDecoration({
-    required this.assetPath,
-    this.top,
-    this.bottom,
-    this.left,
-    this.right,
-    required this.size,
-    required this.duration,
-    this.opacity = 1.0,
-  });
-
-  @override
-  State<_FloatingDecoration> createState() => _FloatingDecorationState();
-}
-
-class _FloatingDecorationState extends State<_FloatingDecoration> with SingleTickerProviderStateMixin {
-  late AnimationController _ctrl;
-  late Animation<double> _anim;
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = AnimationController(vsync: this, duration: widget.duration)..repeat(reverse: true);
-    _anim = Tween<double>(begin: 0, end: 20).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
-  }
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned(
-      top: widget.top != null ? widget.top! : null,
-      bottom: widget.bottom != null ? widget.bottom! : null,
-      left: widget.left != null ? widget.left! : null,
-      right: widget.right != null ? widget.right! : null,
-      child: AnimatedBuilder(
-        animation: _anim,
-        builder: (context, child) {
-          return Transform.translate(
-            offset: Offset(0, _anim.value),
-            child: child,
-          );
-        },
-        child: Opacity(
-          opacity: widget.opacity,
-          child: Image.asset(widget.assetPath, width: widget.size, height: widget.size),
         ),
       ),
     );
