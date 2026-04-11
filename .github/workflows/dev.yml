@@ -57,11 +57,13 @@ jobs:
             --dart-define=APP_ENV=dev \
             --dart-define=SUPER_ADMIN_EMAIL=stanworld@gmail.com
 
+      - name: 🔑 Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DEV }}
+
       - name: 🔥 Firebase Deploy & Distribute
         run: |
-          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_DEV }}' > firebase-sa-dev.json
-          export GOOGLE_APPLICATION_CREDENTIALS=firebase-sa-dev.json
-          
           # Deploy hosting and rules
           npx firebase-tools deploy --only hosting,firestore:rules --project archipel-fortune-dev
           
@@ -73,5 +75,3 @@ jobs:
             --app "$APP_ID" \
             --groups "dev-testers" \
             --project archipel-fortune-dev
-          
-          rm firebase-sa-dev.json

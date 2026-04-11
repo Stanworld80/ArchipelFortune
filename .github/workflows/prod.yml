@@ -71,19 +71,19 @@ jobs:
             --dart-define=SUPER_ADMIN_EMAIL=stanworld@gmail.com
 
       # ─── Firebase Deploy ──────────────────────────────────────────────────────
+      - name: 🔑 Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PROD }}
+
       - name: 🔥 Deploy to Firebase (Rules, Indexes, Hosting)
         run: |
-          # Use npx to avoid global install overhead
-          export GOOGLE_APPLICATION_CREDENTIALS=firebase-sa-prod.json
-          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_PROD }}' > firebase-sa-prod.json
-          
           # DEPLOY WITHOUT FUNCTIONS (Missing Billing on Prod project)
+          # Use npx to avoid global install overhead
           npx firebase-tools deploy \
             --only firestore:rules,firestore:indexes,hosting \
             --project archipel-fortune-prod \
             --force
-          
-          rm firebase-sa-prod.json
 
       # ─── Google Play Store ────────────────────────────────────────────────────
       - name: 🚀 Upload to Google Play
