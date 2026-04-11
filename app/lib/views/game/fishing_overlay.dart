@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/session_provider.dart';
 
-class FishingOverlay extends StatefulWidget {
+class FishingOverlay extends ConsumerStatefulWidget {
   const FishingOverlay({super.key});
 
   @override
-  State<FishingOverlay> createState() => _FishingOverlayState();
+  ConsumerState<FishingOverlay> createState() => _FishingOverlayState();
 }
 
-class _FishingOverlayState extends State<FishingOverlay> with SingleTickerProviderStateMixin {
+class _FishingOverlayState extends ConsumerState<FishingOverlay> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _oscillation;
   bool _isFishing = false;
@@ -116,7 +116,7 @@ class _FishingOverlayState extends State<FishingOverlay> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.blue.withValues(alpha: 0.9),
+      color: Colors.blue.withOpacity(0.9),
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

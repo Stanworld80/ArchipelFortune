@@ -13,9 +13,9 @@ class UpgradeShopView extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.blueGrey.shade900.withValues(alpha: 0.95),
+        color: Colors.blueGrey.shade900.withOpacity(0.95),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
-        border: Border.all(color: Colors.amber.withValues(alpha: 0.3), width: 1),
+        border: Border.all(color: Colors.amber.withOpacity(0.3), width: 1),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -87,7 +87,7 @@ class UpgradeShopView extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.5),
+            color: Colors.black.withOpacity(0.5),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: Colors.amber),
           ),
@@ -131,7 +131,7 @@ class UpgradeShopView extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.amber.withValues(alpha: 0.1),
+                color: Colors.amber.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: Colors.amber, size: 28),

@@ -1,5 +1,7 @@
 import 'dart:math';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'map_painter.dart';
 import 'loot_overlay.dart';
@@ -17,8 +19,15 @@ class GameDashboardView extends ConsumerStatefulWidget {
   ConsumerState<GameDashboardView> createState() => _GameDashboardViewState();
 }
 
-class _GameDashboardViewState extends ConsumerState<GameDashboardView> with SingleTickerProviderStateMixin {
+class _GameDashboardViewState extends ConsumerState<GameDashboardView> with TickerProviderStateMixin {
   late AnimationController _animationController;
+  late AnimationController _shakeController;
+  late AnimationController _flashController;
+  String? _lastStatusMessage;
+  ui.Image? _mapBg;
+  ui.Image? _shipIcon;
+  ui.Image? _islandIcon;
+  ui.Image? _compassIcon;
 
   @override
   void initState() {
@@ -27,17 +36,63 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Sing
       vsync: this,
       duration: const Duration(seconds: 5),
     )..repeat();
+    
+    _shakeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    
+    _flashController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+
+    _loadAssets();
+  }
+
+  Future<void> _loadAssets() async {
+    _mapBg = await _loadImage('assets/images/map_background.png');
+    _shipIcon = await _loadImage('assets/images/ship_sprite.png');
+    _islandIcon = await _loadImage('assets/images/island_sprite.png');
+    _compassIcon = await _loadImage('assets/images/compass_rose.png');
+    if (mounted) setState(() {});
+  }
+
+  Future<ui.Image> _loadImage(String path) async {
+    final data = await rootBundle.load(path);
+    final bytes = data.buffer.asUint8List();
+    final codec = await ui.instantiateImageCodec(bytes);
+    final frame = await codec.getNextFrame();
+    return frame.image;
   }
 
   @override
   void dispose() {
     _animationController.dispose();
+    _shakeController.dispose();
+    _flashController.dispose();
     super.dispose();
+  }
+
+  void _triggerFeedback(String message) {
+    final msg = message.toUpperCase();
+    if (msg.contains('PERDEZ') || msg.contains('ATTAQUE') || msg.contains('DÉGÂTS') || msg.contains('NAUFRAGE')) {
+      _shakeController.forward(from: 0);
+      _flashController.forward(from: 0).then((_) => _flashController.reverse());
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final session = ref.watch(sessionProvider);
+
+    // Trigger feedback on status message change
+    if (session?.statusMessage != null && session?.statusMessage != _lastStatusMessage) {
+      _lastStatusMessage = session!.statusMessage;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _triggerFeedback(session.statusMessage!);
+      });
+    }
 
     if (session == null) {
       return Scaffold(
@@ -79,24 +134,49 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Sing
           // La carte 2D Interactive (Vue restreinte 5x5)
           Positioned.fill(
             child: Container(
-              color: Colors.blue.shade900,
+              color: const Color(0xFF2D1B13), // Bois sombre
               child: Center(
                 child: AspectRatio(
                   aspectRatio: 1,
                   child: AnimatedBuilder(
-                    animation: _animationController,
+                    animation: Listenable.merge([_animationController, _shakeController]),
                     builder: (context, child) {
-                      return CustomPaint(
-                        painter: MapPainter(
-                          session: session, 
-                          tileSize: MediaQuery.of(context).size.shortestSide / 5,
-                          animationValue: _animationController.value,
+                      // Calcul de la secousse
+                      double shake = 0;
+                      if (_shakeController.isAnimating) {
+                        shake = sin(_shakeController.value * pi * 10) * 8 * (1 - _shakeController.value);
+                      }
+
+                      return Transform.translate(
+                        offset: Offset(shake, shake / 2),
+                        child: CustomPaint(
+                          painter: MapPainter(
+                            session: session, 
+                            tileSize: MediaQuery.of(context).size.shortestSide / 5,
+                            animationValue: _animationController.value,
+                            background: _mapBg,
+                            shipImage: _shipIcon,
+                            islandImage: _islandIcon,
+                            compassImage: _compassIcon,
+                          ),
                         ),
                       );
                     },
                   ),
                 ),
               ),
+            ),
+          ),
+
+          // Flash de dégâts
+          IgnorePointer(
+            child: AnimatedBuilder(
+              animation: _flashController,
+              builder: (context, child) {
+                return Container(
+                  color: Colors.red.withValues(alpha: _flashController.value * 0.4),
+                );
+              },
             ),
           ),
 
@@ -109,7 +189,7 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Sing
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.8),
+                  color: Colors.black.withOpacity(0.8),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.amber, width: 1),
                 ),
@@ -128,7 +208,7 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Sing
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.7),
+                color: Colors.black.withOpacity(0.7),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -190,6 +270,7 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Sing
               child: ShipControlWheel(
                 session: session,
                 onMove: (dir) async {
+                  HapticFeedback.lightImpact();
                   if (dir == 'forward') await ref.read(sessionProvider.notifier).moveForward();
                   if (dir == 'port') await ref.read(sessionProvider.notifier).movePort();
                   if (dir == 'starboard') await ref.read(sessionProvider.notifier).moveStarboard();
@@ -300,7 +381,7 @@ class ShipControlWheel extends StatelessWidget {
             width: wheelSize + 20,
             height: wheelSize + 20,
             decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.2),
+              color: Colors.black.withOpacity(0.2),
               shape: BoxShape.circle,
             ),
           ),
@@ -381,7 +462,7 @@ class _DirectionArrow extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              color: isDisabled ? Colors.grey.withValues(alpha: 0.5) : Colors.teal.shade700,
+              color: isDisabled ? Colors.grey.withOpacity(0.5) : Colors.teal.shade700,
               shape: BoxShape.circle,
               border: Border.all(color: Colors.white24, width: 2),
               boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2))],

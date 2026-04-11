@@ -155,6 +155,7 @@ class SessionState {
     int? hullLevel,
     int? sailsLevel,
     int? cargoLevel,
+    List<Quest>? quests,
   }) {
     return SessionState(
       sessionId: sessionId ?? this.sessionId,

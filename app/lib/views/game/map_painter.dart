@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import '../../models/session_model.dart';
 
@@ -6,38 +7,48 @@ class MapPainter extends CustomPainter {
   final SessionState session;
   final double tileSize;
   final double animationValue;
+  final ui.Image? background;
+  final ui.Image? shipImage;
+  final ui.Image? islandImage;
+  final ui.Image? compassImage;
 
   MapPainter({
     required this.session,
     required this.animationValue,
     this.tileSize = 64.0,
+    this.background,
+    this.shipImage,
+    this.islandImage,
+    this.compassImage,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paintWater = Paint()..color = const Color(0xFF003366); // Bleu profond
-    final paintShallow = Paint()..color = const Color(0xFF00ACC1); // Turquoise/Cyan
-    final paintSand = Paint()..color = Colors.amber.shade200;
-    final paintGrass = Paint()..color = Colors.green.shade600;
-    final paintForest = Paint()..color = Colors.green.shade900;
-    final paintReef = Paint()..color = Colors.grey.shade800;
+    final paintWater = Paint()..color = const Color(0xFF003366);
     final paintIsland = Paint()..color = Colors.deepOrange.shade300;
-    final paintContinent = Paint()..color = Colors.brown.shade800;
-    final paintPort = Paint()..color = Colors.brown.shade400;
 
-    final paintSnow = Paint()..color = Colors.white;
-    final paintIce = Paint()..color = Colors.cyan.shade100;
-    final paintJungle = Paint()..color = const Color(0xFF1B5E20); // Vert très profond
-    final paintSwamp = Paint()..color = const Color(0xFF3E2723); // Brun maraîcher
-
-    final paintVolcano = Paint()..color = Colors.grey.shade900;
-    final paintLava = Paint()..color = Colors.orangeAccent;
-    final paintTemple = Paint()..color = Colors.amber.shade700;
-    final paintShipwreck = Paint()..color = Colors.brown.shade300;
-    final paintPirate = Paint()..color = Colors.black87;
+    // Dessin du fond parchemin (optionnel si on utilise l'image)
+    if (background != null) {
+      canvas.drawImageRect(
+        background!,
+        Rect.fromLTWH(0, 0, background!.width.toDouble(), background!.height.toDouble()),
+        Rect.fromLTWH(0, 0, size.width, size.height),
+        Paint()..filterQuality = ui.FilterQuality.medium,
+      );
+    } else {
+      canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), Paint()..color = const Color(0xFFE5D3B3));
+    }
 
     // Rayon de vision (5x5 centrée sur le navire)
     const int visionRadius = 2;
+    const double gridPadding = 20.0; // Espace pour les chiffres sur les axes
+    final double actualTileSize = (size.width - gridPadding) / 5;
+
+    // Dessin des axes (1-5)
+    _drawGridLabels(canvas, actualTileSize, gridPadding);
+
+    canvas.save();
+    canvas.translate(gridPadding, gridPadding);
 
     for (int dx = -visionRadius; dx <= visionRadius; dx++) {
       for (int dy = -visionRadius; dy <= visionRadius; dy++) {
@@ -45,48 +56,40 @@ class MapPainter extends CustomPainter {
         int targetY = session.y + dy;
 
         final rect = Rect.fromLTWH(
-          (dx + visionRadius) * tileSize, 
-          (dy + visionRadius) * tileSize, 
-          tileSize, 
-          tileSize
+          (dx + visionRadius) * actualTileSize, 
+          (dy + visionRadius) * actualTileSize, 
+          actualTileSize, 
+          actualTileSize
         );
 
         // Si hors limites, on dessine du vide ou de l'eau
         if (targetX < 0 || targetX >= 50 || targetY < 0 || targetY >= 50) {
-          canvas.drawRect(rect, paintWater);
+          canvas.drawRect(rect, paintWater..color = const Color(0xFF003366).withOpacity(0.5));
           _drawWaves(canvas, rect, animationValue, targetX, targetY);
           continue;
         }
 
         TileType tile = session.map[targetX][targetY];
-        Paint currentPaint;
-
-        switch (tile) {
-          case TileType.sea: currentPaint = paintWater; break;
-          case TileType.shallow: currentPaint = paintShallow; break;
-          case TileType.sand: currentPaint = paintSand; break;
-          case TileType.grass: currentPaint = paintGrass; break;
-          case TileType.forest: currentPaint = paintForest; break;
-          case TileType.reef: currentPaint = paintReef; break;
-          case TileType.island: currentPaint = paintIsland; break;
-          case TileType.continent: currentPaint = paintContinent; break;
-          case TileType.port: currentPaint = paintPort; break;
-          case TileType.fishing: currentPaint = paintWater; break;
-          case TileType.snow: currentPaint = paintSnow; break;
-          case TileType.ice: currentPaint = paintIce; break;
-          case TileType.jungle: currentPaint = paintJungle; break;
-          case TileType.swamp: currentPaint = paintSwamp; break;
-          case TileType.volcano: currentPaint = paintVolcano; break;
-          case TileType.temple: currentPaint = paintTemple; break;
-          case TileType.shipwreck: currentPaint = paintWater; break; // L'épave est sur l'eau
-          case TileType.pirate: currentPaint = paintWater; break; // Le pirate est sur l'eau
+        
+        // Dessin de l'eau stylisée
+        if (tile == TileType.sea || tile == TileType.shallow || tile == TileType.fishing || tile == TileType.shipwreck || tile == TileType.pirate) {
+           canvas.drawRect(rect, paintWater..color = (tile == TileType.shallow ? const Color(0xFF00ACC1) : const Color(0xFF003366)).withOpacity(0.3));
+           _drawWaves(canvas, rect, animationValue, targetX, targetY);
+        } else {
+           // Autres types de sol (sable, herbe, etc.)
+           _drawLand(canvas, rect, tile);
         }
 
-        canvas.drawRect(rect, currentPaint);
-        
-        // Animation des vagues sur l'eau
-        if (tile == TileType.sea || tile == TileType.shallow) {
-          _drawWaves(canvas, rect, animationValue, targetX, targetY);
+        // Cas spécifiques pour les sprites
+        if (tile == TileType.island && islandImage != null) {
+          canvas.drawImageRect(
+            islandImage!,
+            Rect.fromLTWH(0, 0, islandImage!.width.toDouble(), islandImage!.height.toDouble()),
+            rect.deflate(4),
+            Paint()..filterQuality = ui.FilterQuality.medium,
+          );
+        } else if (tile == TileType.island) {
+          canvas.drawRect(rect, paintIsland);
         }
 
         if (tile == TileType.port) {
@@ -109,21 +112,33 @@ class MapPainter extends CustomPainter {
           _drawPirateShip(canvas, rect);
         }
 
-        // Détails spécifiques pour la pêche
         if (tile == TileType.fishing) {
           _drawFishingSpot(canvas, rect, animationValue);
         }
         
-        // Bordure subtile pour les cases
-        canvas.drawRect(rect, Paint()..color = Colors.white10..style = PaintingStyle.stroke);
+        // Bordure de grille fine
+        canvas.drawRect(rect, Paint()..color = Colors.black26..style = PaintingStyle.stroke..strokeWidth = 0.5);
       }
     }
 
     // Dessin du Navire au centre
-    _drawShip(canvas, visionRadius * tileSize, visionRadius * tileSize, tileSize);
+    _drawShipSprite(canvas, (visionRadius * actualTileSize), (visionRadius * actualTileSize), actualTileSize);
+
+    canvas.restore();
+
+    // Boussole dans le coin
+    if (compassImage != null) {
+      final double compassSize = size.width * 0.25;
+      canvas.drawImageRect(
+        compassImage!,
+        Rect.fromLTWH(0, 0, compassImage!.width.toDouble(), compassImage!.height.toDouble()),
+        Rect.fromLTWH(size.width - compassSize - 10, size.height - compassSize - 10, compassSize, compassSize),
+        Paint()..filterQuality = ui.FilterQuality.medium,
+      );
+    }
 
     // Dessin des indices de découverte (US04)
-    _drawDiscoveryIndices(canvas, visionRadius, tileSize);
+    _drawDiscoveryIndices(canvas, visionRadius, actualTileSize, gridPadding);
 
     // Dessin de la météo (US10)
     _drawWeather(canvas, size, visionRadius);
@@ -167,31 +182,121 @@ class MapPainter extends CustomPainter {
     canvas.drawLine(rect.topRight + const Offset(-5, 5), rect.bottomRight + const Offset(-5, -5), detailPaint);
   }
 
-  void _drawShip(Canvas canvas, double offsetX, double offsetY, double size) {
+  void _drawGridLabels(Canvas canvas, double tileSize, double padding) {
+    const textStyle = TextStyle(color: Colors.black87, fontSize: 14, fontWeight: FontWeight.bold);
+    for (int i = 1; i <= 5; i++) {
+       // Labels colonnes (Haut)
+       final textPainterX = TextPainter(
+         text: TextSpan(text: '$i', style: textStyle),
+         textDirection: TextDirection.ltr,
+       )..layout();
+       textPainterX.paint(canvas, Offset(padding + (i - 1) * tileSize + (tileSize - textPainterX.width) / 2, (padding - textPainterX.height) / 2));
+
+       // Labels lignes (Gauche)
+       final textPainterY = TextPainter(
+         text: TextSpan(text: '$i', style: textStyle),
+         textDirection: TextDirection.ltr,
+       )..layout();
+       textPainterY.paint(canvas, Offset((padding - textPainterY.width) / 2, padding + (i - 1) * tileSize + (tileSize - textPainterY.height) / 2));
+    }
+  }
+
+  void _drawLand(Canvas canvas, Rect rect, TileType tile) {
+    final paint = Paint();
+    switch (tile) {
+      case TileType.sand: paint.color = Colors.amber.shade200; break;
+      case TileType.grass: paint.color = Colors.green.shade600; break;
+      case TileType.forest: paint.color = Colors.green.shade900; break;
+      case TileType.reef: paint.color = Colors.grey.shade800; break;
+      case TileType.continent: paint.color = Colors.brown.shade800; break;
+      case TileType.snow: paint.color = Colors.white; break;
+      case TileType.ice: paint.color = Colors.cyan.shade100; break;
+      case TileType.jungle: paint.color = const Color(0xFF1B5E20); break;
+      case TileType.swamp: paint.color = const Color(0xFF3E2723); break;
+      default: paint.color = Colors.transparent;
+    }
+    canvas.drawRRect(RRect.fromRectAndRadius(rect.deflate(1), const Radius.circular(4)), paint);
+  }
+
+  void _drawShipSprite(Canvas canvas, double offsetX, double offsetY, double size) {
     final shipCenter = Offset(offsetX + size / 2, offsetY + size / 2);
-    final shipPaint = Paint()..color = Colors.white;
     
     canvas.save();
     canvas.translate(shipCenter.dx, shipCenter.dy);
     canvas.rotate(session.orientation * pi / 180);
 
+    if (shipImage != null) {
+      canvas.drawImageRect(
+        shipImage!,
+        Rect.fromLTWH(0, 0, shipImage!.width.toDouble(), shipImage!.height.toDouble()),
+        Rect.fromCenter(center: Offset.zero, width: size * 0.8, height: size * 1.0),
+        Paint()..filterQuality = ui.FilterQuality.medium,
+      );
+    } else {
+      // Évolution Visuelle selon hullLevel
+      if (session.hullLevel <= 2) {
+        _drawSloop(canvas, size);
+      } else if (session.hullLevel <= 4) {
+        _drawBrig(canvas, size);
+      } else {
+        _drawFrigate(canvas, size);
+      }
+    }
+
+    canvas.restore();
+  }
+
+  void _drawSloop(Canvas canvas, double size) {
+    final paint = Paint()..color = Colors.white;
     final path = Path();
     path.moveTo(0, -size / 3);
     path.lineTo(size / 4, size / 4);
     path.lineTo(-size / 4, size / 4);
     path.close();
-
-    canvas.drawPath(path, shipPaint);
-    canvas.drawRect(Rect.fromLTWH(-2, -5, 4, 15), Paint()..color = Colors.brown);
-
-    canvas.restore();
+    canvas.drawPath(path, paint);
+    
+    // Mât unique
+    canvas.drawRect(Rect.fromLTWH(-1, -size/4, 2, size/2), Paint()..color = Colors.brown);
   }
 
-  void _drawDiscoveryIndices(Canvas canvas, int visionRadius, double tileSize) {
+  void _drawBrig(Canvas canvas, double size) {
+    final paint = Paint()..color = Colors.white;
+    final path = Path();
+    path.moveTo(0, -size / 2.2);
+    path.lineTo(size / 3.5, size / 3.5);
+    path.lineTo(-size / 3.5, size / 3.5);
+    path.close();
+    canvas.drawPath(path, paint);
+    
+    // Deux mâts
+    canvas.drawRect(Rect.fromLTWH(-size/6, -size/5, 2, size/2.5), Paint()..color = Colors.brown);
+    canvas.drawRect(Rect.fromLTWH(size/6, -size/10, 2, size/2.5), Paint()..color = Colors.brown);
+  }
+
+  void _drawFrigate(Canvas canvas, double size) {
+    final paint = Paint()..color = Colors.white;
+    final path = Path();
+    path.moveTo(0, -size / 1.8);
+    path.lineTo(size / 2.5, size / 3);
+    path.lineTo(-size / 2.5, size / 3);
+    path.close();
+    canvas.drawPath(path, paint..style = PaintingStyle.fill);
+    canvas.drawPath(path, Paint()..color = Colors.black45..style = PaintingStyle.stroke..strokeWidth = 1);
+    
+    // Trois mâts et détails de proue
+    canvas.drawRect(Rect.fromLTWH(-size/4, -size/6, 2, size/2.5), Paint()..color = Colors.brown);
+    canvas.drawRect(Rect.fromLTWH(0, -size/4, 2, size/2), Paint()..color = Colors.brown);
+    canvas.drawRect(Rect.fromLTWH(size/4, -size/6, 2, size/2.5), Paint()..color = Colors.brown);
+    
+    // Drapeaux (micro-détails)
+    canvas.drawRect(Rect.fromLTWH(1, -size/4, 4, 3), Paint()..color = Colors.red);
+  }
+
+  void _drawDiscoveryIndices(Canvas canvas, int visionRadius, double tileSize, double padding) {
     if (session.discoveredIslandCoords.isEmpty) return;
 
     final paintIndex = Paint()
-      ..color = Colors.tealAccent.withValues(alpha: 0.8)
+      ..color = Colors.tealAccent.withOpacity(0.8)
       ..style = PaintingStyle.fill;
 
     for (var coord in session.discoveredIslandCoords) {
@@ -212,11 +317,11 @@ class MapPainter extends CustomPainter {
         edgeX = (edgeX / maxCoord) * (visionRadius + 0.5) * tileSize;
         edgeY = (edgeY / maxCoord) * (visionRadius + 0.5) * tileSize;
 
-        final center = Offset((visionRadius * tileSize) + edgeX + tileSize/2, (visionRadius * tileSize) + edgeY + tileSize/2);
+        final center = Offset(padding + (visionRadius * tileSize) + edgeX + tileSize/2, padding + (visionRadius * tileSize) + edgeY + tileSize/2);
         
         // Dessiner un petit cercle scintillant ou une boussole
         canvas.drawCircle(center, 6, paintIndex);
-        canvas.drawCircle(center, 12, Paint()..color = Colors.tealAccent.withValues(alpha: 0.2)..style = PaintingStyle.stroke..strokeWidth = 2);
+        canvas.drawCircle(center, 12, Paint()..color = Colors.tealAccent.withOpacity(0.2)..style = PaintingStyle.stroke..strokeWidth = 2);
       }
     }
   }
@@ -320,25 +425,31 @@ class MapPainter extends CustomPainter {
 
   void _drawRain(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.blue.withValues(alpha: 0.3)
-      ..strokeWidth = 1.5;
+      ..color = Colors.blue.withOpacity(0.4)
+      ..strokeWidth = 2.0;
+
+    // Éclairs (Flash blanc aléatoire)
+    final randLightning = Random(session.x + session.y + (animationValue * 10).toInt());
+    if (randLightning.nextDouble() > 0.98) {
+      canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), Paint()..color = Colors.white.withOpacity(0.3));
+    }
     
     final rand = Random(42);
-    for (int i = 0; i < 40; i++) {
+    for (int i = 0; i < 60; i++) {
       final x = rand.nextDouble() * size.width;
-      final yStart = rand.nextDouble() * size.height;
-      final yEnd = yStart + 15 + (animationValue * 5); // Animation
+      final yStart = (rand.nextDouble() * size.height + (animationValue * 300)) % size.height;
+      final yEnd = yStart + 20; 
       canvas.drawLine(Offset(x, yStart), Offset(x - 5, yEnd), paint);
     }
   }
 
   void _drawSnow(Canvas canvas, Size size) {
-    final paint = Paint()..color = Colors.white.withValues(alpha: 0.6);
+    final paint = Paint()..color = Colors.white.withOpacity(0.8);
     final rand = Random(123);
-    for (int i = 0; i < 50; i++) {
-      final x = rand.nextDouble() * size.width;
-      final y = (rand.nextDouble() * size.height + (animationValue * 50)) % size.height;
-      canvas.drawCircle(Offset(x, y), 1.5, paint);
+    for (int i = 0; i < 80; i++) {
+      final x = (rand.nextDouble() * size.width + (animationValue * 30)) % size.width; // Vent latéral
+      final y = (rand.nextDouble() * size.height + (animationValue * 100)) % size.height;
+      canvas.drawCircle(Offset(x, y), 2.0, paint);
     }
   }
 
@@ -357,7 +468,7 @@ class MapPainter extends CustomPainter {
           rand.nextDouble() * size.width + sin(animationValue * pi) * 20,
           rand.nextDouble() * size.height
         );
-        canvas.drawCircle(center, 40, paint..color = Colors.white.withValues(alpha: 0.1));
+        canvas.drawCircle(center, 40, paint..color = Colors.white.withOpacity(0.1));
     }
   }
 

@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/session_provider.dart';
 
@@ -246,33 +247,38 @@ class _CrateWidgetState extends State<_CrateWidget> {
     return GestureDetector(
       onTap: () {
         if (!widget.content.revealed) {
+          HapticFeedback.mediumImpact();
           setState(() => widget.content.revealed = true);
           widget.onRevealed(widget.content);
         }
       },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        decoration: BoxDecoration(
-          color: widget.content.revealed ? Colors.white10 : Colors.brown.shade800,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: widget.content.revealed ? widget.content.color : Colors.brown.shade400, width: 2),
-          boxShadow: widget.content.revealed ? [BoxShadow(color: widget.content.color.withValues(alpha: 0.5), blurRadius: 10)] : [],
+      child: AnimatedScale(
+        scale: widget.content.revealed ? 1.05 : 1.0,
+        duration: const Duration(milliseconds: 200),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          decoration: BoxDecoration(
+            color: widget.content.revealed ? Colors.white10 : Colors.brown.shade800,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: widget.content.revealed ? widget.content.color : Colors.brown.shade400, width: 2),
+            boxShadow: widget.content.revealed ? [BoxShadow(color: widget.content.color.withOpacity(0.5), blurRadius: 10)] : [],
+          ),
+          child: widget.content.revealed
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(widget.content.icon, color: widget.content.color, size: 32),
+                    const SizedBox(height: 4),
+                    Text(
+                      widget.content.label ?? '+${widget.content.value}',
+                      style: TextStyle(color: widget.content.color, fontWeight: FontWeight.bold, fontSize: 12),
+                    ),
+                  ],
+                )
+              : const Center(
+                  child: Icon(Icons.inventory_2, color: Colors.white24, size: 40),
+                ),
         ),
-        child: widget.content.revealed
-            ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(widget.content.icon, color: widget.content.color, size: 32),
-                  const SizedBox(height: 4),
-                  Text(
-                    widget.content.label ?? '+${widget.content.value}',
-                    style: TextStyle(color: widget.content.color, fontWeight: FontWeight.bold, fontSize: 12),
-                  ),
-                ],
-              )
-            : const Center(
-                child: Icon(Icons.inventory_2, color: Colors.white24, size: 40),
-              ),
       ),
     );
   }

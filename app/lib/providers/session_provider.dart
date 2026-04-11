@@ -35,7 +35,7 @@ class SessionNotifier extends Notifier<SessionState?> {
         provisions: startingProvisions,
         orVolatil: 0,
         boisCharpente: startingBois,
-        map: map,
+        map: _generateMap(seed: seed),
         startTime: DateTime.now(),
         quests: [
           Quest(id: "explore_islands", title: "Explorateur en herbe", description: "Découvrez 3 îles inexplorées.", currentValue: 0, targetValue: 3, rewardType: RewardType.keyCopper, rewardAmount: 1),
