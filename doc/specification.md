@@ -2,7 +2,7 @@
 
 ## 1. Introduction
 
-**L'Archipel de la Fortune** est un jeu d'exploration et de gestion de ressources dont le but est d'explorer un océan généré de manière procédurale pour amasser des richesses et des trésors perdus. Le joueur incarne un Capitaine de navire naviguant à l'ère des grandes découvertes. Chaque expédition est un voyage sans retour possible nécessitant une gestion rigoureuse des vivres (Provisions) et des risques liés à la navigation.
+**L'Archipel de la Fortune** est un jeu d'exploration et de gestion de ressources dont le but est d'explorer un océan généré de manière procédurale pour amasser des richesses et des trésors perdus. Le joueur incarne un Capitaine de navire naviguant à l'ère des grandes découvertes. Chaque expédition est un voyage sans retour possible nécessitant une gestion rigoureuse des vivres (Provisions) et des risques liés à la navigation. Beaucoup de hazard et trés trés peu de stratégie déterminent le succès ou l'échec du joueur. (C'est un jeu de hasard)
 
 Ce document décrit les spécifications techniques et les règles métiers nécessaires pour développer ce jeu à la fois sur le **Web** et sur **Android** en utilisant le framework **Flutter**.
 
@@ -10,13 +10,13 @@ Ce document décrit les spécifications techniques et les règles métiers néce
 
 ## 2. Le Modèle de Jeu et l'Économie
 
-L'économie du jeu repose sur une combinaison de ressources persistantes (conservées entre chaque session) et volatiles (liées à la session en cours).
+L'économie du jeu repose sur une combinaison de ressources persistantes (conservées entre chaque session : les piéces d'or) et volatiles (tout le reste, lié à la session en cours).
 
 ### 2.1 Les Ressources
 
 - **Pièces d'Or Sécurisées (Permanentes) :** Richesse totale du joueur, sauvegardée sur son profil (Firebase/Firestore). Elles sont utilisées pour préparer l'expédition ou acheter des provisions depuis les banques.
 - **Or en main (Volatil) :** Richesses récoltées durant l'expédition courante. Elles sont stockées sur le navire et peuvent être perdues en cas de naufrage (Game Over).
-- **Les Provisions (🍎) :** Denrées achetables avant ou pendant un voyage. Chaque déplacement du navire consomme exactement 1 Provision. Si les provisions tombent à 0 en mer, le navire est perdu (Famine).
+- **Les Provisions (🍎) :** Denrées achetables au début et pendant un voyage. Chaque déplacement du navire consomme exactement 1 Provision. Si les provisions tombent à 0 en mer, le navire est perdu (Famine  donc Game Over).
 - **Le Bois de Charpente (Joker) :** Ressource volatile servant de "bouclier". À l'impact avec un Récif, le bois est consommé pour sauver le bateau du naufrage.
 
 ---
@@ -24,7 +24,8 @@ L'économie du jeu repose sur une combinaison de ressources persistantes (conser
 ## 3. Le Déroulement du Jeu
 
 ### Phase 1 : Le Port de Départ
-Le jeu commence dans une baie sécurisée (Port de Départ).
+
+Le jeu commence sur une ile sécurisée (Port de Départ) à un endroit aléatoire de la carte.
 - **Investissement initial :** Le joueur dépense ses Pièces d'Or pour acheter des Provisions.
 - **Récompense de départ :** Le joueur a droit à un "grattage" gratuit de caisses de ravitaillement pour obtenir un petit bonus (Provisions additionnelles ou Bois de Charpente).
 
@@ -32,7 +33,7 @@ Le jeu commence dans une baie sécurisée (Port de Départ).
 - **Carte :** Matrice générée de **36x36** cases. Elle n'est générée et connue que côté serveur (Anti-Cheat).
 - **Vision (Limitation) :** Le joueur n'a qu'un aperçu d'une grille **5x5** autour du navire. Le reste est caché (Brouillard de guerre).
 - **Position d'affichage :** Le navire reste fixe au centre de la vue. Ce sont les éléments de la carte qui glissent.
-- **Les Dangers (Récifs) :** Naviguer sur un récif coule automatiquement le navire (Game Over immédiat) à moins de posséder du Bois de Charpente.
+- **Les Dangers (Récifs) :** Naviguer sur un récif à 50% de chance de détruire le navire (Game Over) à moins de posséder du Bois de Charpente, il est alors automatiquement consommé si besoin.
 
 **Mouvements & Navigation relative (Coût : 1 Provision)** :
 Aucun retour en arrière n'est permis. Le jeu se joue sur une rotation de 90° :
