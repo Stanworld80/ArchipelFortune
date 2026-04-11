@@ -57,20 +57,18 @@ jobs:
             --dart-define=APP_ENV=dev \
             --dart-define=SUPER_ADMIN_EMAIL=stanworld@gmail.com
 
-      - name: 🔥 Deploy to Firebase Dev
+      - name: 🔥 Firebase Deploy & Distribute
         run: |
-          npm install -g firebase-tools
           echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_DEV }}' > firebase-sa-dev.json
           export GOOGLE_APPLICATION_CREDENTIALS=firebase-sa-dev.json
-          # Note: deploy hosting and rules to dev project
-          firebase deploy --only hosting,firestore:rules --project archipel-fortune-dev
-          rm firebase-sa-dev.json
-
-      - name: 🚀 Distribute Android via App Distribution
-        run: |
-          firebase appdistribution:distribute app/build/app/outputs/flutter-apk/app-debug.apk \
+          
+          # Deploy hosting and rules
+          npx firebase-tools deploy --only hosting,firestore:rules --project archipel-fortune-dev
+          
+          # Distribute Android APK
+          npx firebase-tools appdistribution:distribute app/build/app/outputs/flutter-apk/app-debug.apk \
             --app "${{ secrets.FIREBASE_ANDROID_APP_ID_DEV }}" \
             --groups "dev-testers" \
             --project archipel-fortune-dev
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          
+          rm firebase-sa-dev.json
