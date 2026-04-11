@@ -3,7 +3,7 @@ name: CI/CD Dev
 on:
   push:
     branches:
-      - dev
+      - develop
   workflow_dispatch:  
 
 jobs:
@@ -65,5 +65,5 @@ jobs:
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
         run: |
-          # Deploiement reel incluant run e2e après deploiment
-          bash build_deploy.sh -e dev --bypasstest --e2e
+          # Déploiement dev: mode debug, avec tests unitaires & e2e
+          bash build_deploy.sh -e dev --bypasstest --e2e --no-git

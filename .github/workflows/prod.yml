@@ -41,5 +41,5 @@ jobs:
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
         run: |
-          # Déploiement prod: mode release, AUCUN test (via --bypasstest)
-          bash build_deploy.sh -e prod -m release --bypasstest
+          # Déploiement prod: mode release, avec tests unitaires obligatoires
+          bash build_deploy.sh -e prod -m release --bypasstest --no-git

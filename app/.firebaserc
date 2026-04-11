@@ -1,5 +1,6 @@
 {
-  "projects": {},
-  "targets": {},
-  "etags": {}
+  "projects": {
+    "dev": "archipel-fortune-dev",
+    "prod": "archipel-fortune-prod"
+  }
 }

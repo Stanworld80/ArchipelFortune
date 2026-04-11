@@ -60,6 +60,7 @@ BYPASS_TESTS=false
 SPECIFIC_ANDROID_BUILD=""
 VERBOSE_MODE=false
 RUN_E2E=false
+NO_GIT=false
 
 # L'application Flutter a été générée dans le sous-dossier 'app'
 cd app || exit 1
@@ -67,7 +68,7 @@ cd app || exit 1
 
 # --- Fonctions ---
 print_usage() {
-    echo "Usage: ./build_deploy.sh [-e <ENV>] [-m <MODE>] [-p <PLATFORM>] [-a <ANDROID_TYPE>] [--buildonly] [--noclean] [--bypasstest] [-v] [-h]"
+    echo "Usage: ./build_deploy.sh [-e <ENV>] [-m <MODE>] [-p <PLATFORM>] [-a <ANDROID_TYPE>] [--buildonly] [--noclean] [--bypasstest] [--no-git] [-v] [-h]"
     echo ""
     echo "Options:"
     echo "  -e <ENV>                Spécifie l'environnement : 'dev' (défaut), 'staging', ou 'prod'."
@@ -80,6 +81,7 @@ print_usage() {
     echo "  --noclean               Désactive 'flutter clean' avant la compilation."
     echo "  --bypasstest            Évite l'exécution des tests unitaires pour 'dev' et 'staging'. Les tests sont obligatoires pour 'prod'."
     echo "  --e2e                   Lance les tests Playwright E2E après le deploy web (dev/staging uniquement)."
+    echo "  --no-git                Désactive les opérations Git (commit, tag, push)."
     echo "  -v, --verbose           Active le mode verbeux pour afficher les détails des commandes exécutées."
     echo "  -h, --help              Affiche ce message d'aide."
 }
@@ -105,6 +107,7 @@ while [[ "$#" -gt 0 ]]; do
         --noclean) CLEAN_BUILD=false ;;
         --bypasstest) BYPASS_TESTS=true ;;
         --e2e) RUN_E2E=true ;;
+        --no-git) NO_GIT=true ;;
         -v|--verbose) VERBOSE_MODE=true ;;
         -h|--help) print_usage; exit 0 ;;
         *) echo "Erreur : Paramètre inconnu '$1'"; print_usage; exit 1 ;;
@@ -204,11 +207,17 @@ if [[ "$VERSION_NUMBER" == *"+"* ]]; then
 else
     BUILD_NUMBER=0
 fi
-NEW_BUILD_NUMBER=$((BUILD_NUMBER + 1))
-NEW_VERSION="$VERSION_NAME+$NEW_BUILD_NUMBER"
-execute_verbose "Mise à jour de pubspec.yaml" sed -i.bak "s/version: $VERSION_NUMBER/version: $NEW_VERSION/" pubspec.yaml && rm pubspec.yaml.bak
-echo "Version mise à jour dans pubspec.yaml : $NEW_VERSION"
-TAG_NAME="$NEW_VERSION"
+if [ "$NO_GIT" == false ]; then
+    NEW_BUILD_NUMBER=$((BUILD_NUMBER + 1))
+    NEW_VERSION="$VERSION_NAME+$NEW_BUILD_NUMBER"
+    execute_verbose "Mise à jour de pubspec.yaml" sed -i.bak "s/version: $VERSION_NUMBER/version: $NEW_VERSION/" pubspec.yaml && rm pubspec.yaml.bak
+    echo "Version mise à jour dans pubspec.yaml : $NEW_VERSION"
+    TAG_NAME="$NEW_VERSION"
+else
+    echo "Versionnement Git ignoré (via --no-git). Utilisation de la version actuelle: $VERSION_NUMBER"
+    TAG_NAME="$VERSION_NUMBER"
+    NEW_BUILD_NUMBER="$BUILD_NUMBER"
+fi
 
 # 3. Préparation des fichiers de configuration par environnement
 echo "-> Étape 3/6 : Préparation des fichiers de configuration..."
@@ -316,7 +325,9 @@ fi
 
 # 2. Opérations Git
 echo "-> Étape 2/3 : Opérations Git (commit et tag)..."
-if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+if [ "$NO_GIT" == true ]; then
+    echo "   Opérations Git ignorées (via --no-git)."
+elif git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
     execute_verbose "Ajout pubspec.yaml" git add pubspec.yaml
     execute_verbose "Commit version" git commit -m "chore: Incrémentation de la version à $TAG_NAME"
     
