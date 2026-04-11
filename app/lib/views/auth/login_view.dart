@@ -120,7 +120,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                   constraints: const BoxConstraints(maxWidth: 400),
                   child: Card(
                     elevation: 12,
-                    color: Colors.white.withValues(alpha: 0.95),
+                    color: Colors.white.withOpacity(0.95),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                     margin: const EdgeInsets.symmetric(horizontal: 20),
                     child: Padding(

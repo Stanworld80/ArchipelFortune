@@ -71,10 +71,10 @@ class CollectionsView extends ConsumerWidget {
 
             return Card(
               margin: const EdgeInsets.only(bottom: 24),
-              color: Colors.white.withValues(alpha: 0.05),
+              color: Colors.white.withOpacity(0.05),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
-                side: BorderSide(color: (panoplie['color'] as Color).withValues(alpha: 0.5), width: 1),
+                side: BorderSide(color: (panoplie['color'] as Color).withOpacity(0.5), width: 1),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
@@ -95,7 +95,7 @@ class CollectionsView extends ConsumerWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                           decoration: BoxDecoration(
-                            color: (panoplie['color'] as Color).withValues(alpha: 0.2),
+                            color: (panoplie['color'] as Color).withOpacity(0.2),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
@@ -130,7 +130,7 @@ class CollectionsView extends ConsumerWidget {
                               width: 60,
                               height: 60,
                               decoration: BoxDecoration(
-                                color: isCollected ? (panoplie['color'] as Color).withValues(alpha: 0.2) : Colors.black26,
+                                color: isCollected ? (panoplie['color'] as Color).withOpacity(0.2) : Colors.black26,
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: isCollected ? panoplie['color'] as Color : Colors.white10,
