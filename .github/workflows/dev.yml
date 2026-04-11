@@ -66,8 +66,11 @@ jobs:
           npx firebase-tools deploy --only hosting,firestore:rules --project archipel-fortune-dev
           
           # Distribute Android APK
+          APP_ID="${{ secrets.FIREBASE_ANDROID_APP_ID_DEV }}"
+          echo "Distributing to App ID ending in: ${APP_ID: -8}"
+          
           npx firebase-tools appdistribution:distribute app/build/app/outputs/flutter-apk/app-debug.apk \
-            --app "${{ secrets.FIREBASE_ANDROID_APP_ID_DEV }}" \
+            --app "$APP_ID" \
             --groups "dev-testers" \
             --project archipel-fortune-dev
           

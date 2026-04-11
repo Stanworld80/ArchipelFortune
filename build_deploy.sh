@@ -33,9 +33,9 @@ GOOGLE_SERVICES_JSON_PROD_PATH="android/app/google-services.prod.json"
 ANDROID_TARGET_GOOGLE_SERVICES_PATH="android/app/google-services.json"
 
 # IDs d'application Android Firebase par environnement
-FIREBASE_ANDROID_APP_ID_DEV="1:83241971458:android:dde10259edb60d45711c1b"
+FIREBASE_ANDROID_APP_ID_DEV="1:1025390075112:android:a3a175d5e0c63cf26bfd5d"
 FIREBASE_ANDROID_APP_ID_STAGING="1:590952422810:android:7ffb5edc9c37b3334aae23"
-FIREBASE_ANDROID_APP_ID_PROD="1:48301164525:android:c3713960cdefdbb28589e4"
+FIREBASE_ANDROID_APP_ID_PROD="1:417958901427:android:afebbbc0aa7ded9b0762c6"
 
 # Groupes de testeurs pour Firebase App Distribution
 TESTER_GROUPS_DEV="dev-testers"

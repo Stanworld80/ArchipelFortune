@@ -82,8 +82,11 @@ jobs:
           npx firebase-tools deploy --only hosting,firestore:rules --project archipel-fortune-stg
           
           # Distribute Android App Bundle
+          APP_ID="${{ secrets.FIREBASE_ANDROID_APP_ID_STAGING }}"
+          echo "Distributing to App ID ending in: ${APP_ID: -8}"
+          
           npx firebase-tools appdistribution:distribute app/build/app/outputs/bundle/release/app-release.aab \
-            --app "${{ secrets.FIREBASE_ANDROID_APP_ID_STAGING }}" \
+            --app "$APP_ID" \
             --groups "uat-testers" \
             --project archipel-fortune-stg
           
