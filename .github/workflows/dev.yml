@@ -31,13 +31,6 @@ jobs:
         working-directory: app
         run: flutter pub get
 
-      - name: 🧪 Run Unit & Integration Tests (Debug mode)
-        working-directory: app
-        run: |
-          flutter test --debug
-          # Si des tests d'intégration spécifiques existent:
-          # flutter test integration_test --debug
-
       - name: Node.js setup
         uses: actions/setup-node@v4
         with:

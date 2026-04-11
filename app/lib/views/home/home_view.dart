@@ -53,7 +53,6 @@ class _HomeViewState extends ConsumerState<HomeView>
         leadingWidth: 0,
         title: null,
         actions: [
-          // Admin + logout menu
           userProfileAsync.maybeWhen(
             data: (profile) => profile == null
                 ? const SizedBox.shrink()
@@ -89,7 +88,6 @@ class _HomeViewState extends ConsumerState<HomeView>
                         ),
                       ),
                     ),
-<<<<<<< HEAD
                     itemBuilder: (context) => [
                       if (profile.role == 'admin' ||
                           profile.role == 'superAdmin')
@@ -100,104 +98,6 @@ class _HomeViewState extends ConsumerState<HomeView>
                                 color: Color(0xFF3D2B1F)),
                             title: Text('Panel Admin'),
                             contentPadding: EdgeInsets.zero,
-=======
-                  ),
-                const PopupMenuItem<String>(
-                  value: 'logout',
-                  child: ListTile(
-                    leading: Icon(Icons.logout, color: Colors.red),
-                    title: Text('Déconnexion'),
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                ),
-              ],
-            ),
-            orElse: () => const SizedBox.shrink(),
-          ),
-          const SizedBox(width: 8),
-          IconButton(
-            icon: const Icon(Icons.collections_bookmark, color: Colors.amber),
-            tooltip: 'Mes Collections',
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const CollectionsView()),
-              );
-            },
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      extendBodyBehindAppBar: true, 
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF004D40), // Dark Teal
-              Color(0xFF00796B), // Medium Teal
-              Color(0xFF009688), // Teal
-            ],
-          ),
-        ),
-        child: userProfileAsync.when(
-          data: (profile) {
-            if (profile == null) {
-              return const Center(child: Text('Profil non trouvé.', style: TextStyle(color: Colors.white)));
-            }
-            return Center(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(32.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ShaderMask(
-                        shaderCallback: (bounds) => const LinearGradient(
-                          colors: [Colors.amberAccent, Colors.orange],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        ).createShader(bounds),
-                        child: const Text(
-                          'Archipel de la Fortune !!',
-                          style: TextStyle(
-                            fontSize: 48,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      const SizedBox(height: 60),
-                      Text(
-                        'Bienvenue, ${profile.displayName} !', 
-                        style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 20),
-                      Card(
-                        color: Colors.white.withOpacity(0.1),
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24), side: const BorderSide(color: Colors.amber, width: 2)),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 24.0),
-                          child: Column(
-                            children: [
-                              Text('Rôle: ${profile.role}', style: const TextStyle(fontSize: 20, color: Colors.white70)),
-                              const SizedBox(height: 8),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.monetization_on, color: Colors.amber, size: 28),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    '${profile.piecesOr} Pièces d\'Or',
-                                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.amber),
-                                  ),
-                                ],
-                              ),
-                            ],
->>>>>>> develop
                           ),
                         ),
                       const PopupMenuItem<String>(
@@ -213,6 +113,17 @@ class _HomeViewState extends ConsumerState<HomeView>
                   ),
             orElse: () => const SizedBox.shrink(),
           ),
+          const SizedBox(width: 8),
+          IconButton(
+            icon: const Icon(Icons.collections_bookmark, color: Colors.amber),
+            tooltip: 'Mes Collections',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const CollectionsView()),
+              );
+            },
+          ),
+          const SizedBox(width: 8),
         ],
       ),
       body: Stack(
@@ -465,7 +376,7 @@ class _HomeViewState extends ConsumerState<HomeView>
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
+                   Text(
                     'Combien de provisions et de bois souhaitez-vous emporter ?',
                     style: GoogleFonts.crimsonText(
                         color: Colors.white70, fontSize: 16),
@@ -627,9 +538,9 @@ class _PlayerCard extends StatelessWidget {
         vertical: 16,
       ),
       decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.35),
+        color: Colors.black.withOpacity(0.35),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFD4AF37).withValues(alpha: 0.5)),
+        border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.5)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x44D4AF37),
