@@ -1,0 +1,68 @@
+name: CI/CD Dev
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build-test-deploy-dev:
+    name: Build, Test & Deploy to Dev
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: 🦅 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: '3.19.x'
+
+      - name: 📦 Install dependencies
+        working-directory: app
+        run: flutter pub get
+
+      - name: 🧪 Run Unit & Integration Tests (Debug mode)
+        working-directory: app
+        run: |
+          flutter test --debug
+          # Si des tests d'intégration spécifiques existent:
+          # flutter test integration_test --debug
+
+      - name: Node.js setup
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install E2E dependencies
+        working-directory: tests_e2e
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        working-directory: tests_e2e
+        run: npx playwright install --with-deps
+
+      - name: 🏗️ Build App (Debug)
+        run: |
+          # Compilation debug pour le web et l'apk
+          bash build_deploy.sh --buildonly -e dev -p web -p android
+
+      # Pour lancer les tests E2E sur l'app compilée, il faudrait la servir ou utiliser le build
+      #- name: 🎭 Run E2E Tests
+      #  working-directory: tests_e2e
+      #  run: npx playwright test
+
+      - name: 🚀 Deploy to Dev
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          # Deploiement reel incluant run e2e après deploiment
+          bash build_deploy.sh -e dev --bypasstest --e2e

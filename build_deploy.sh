@@ -12,7 +12,7 @@
 # --- Configuration des Environnements ---
 # IDs de projet Firebase
 FIREBASE_PROJECT_ID_DEV="archipel-fortune-dev"
-FIREBASE_PROJECT_ID_STAGING="archipel-fortune-staging"
+FIREBASE_PROJECT_ID_STAGING="archipel-fortune-stg"
 FIREBASE_PROJECT_ID_PROD="archipel-fortune-prod"
 
 # Fichiers de configuration Firebase pour le déploiement Hosting/Functions
@@ -34,7 +34,7 @@ ANDROID_TARGET_GOOGLE_SERVICES_PATH="android/app/google-services.json"
 
 # IDs d'application Android Firebase par environnement
 FIREBASE_ANDROID_APP_ID_DEV="1:83241971458:android:dde10259edb60d45711c1b"
-FIREBASE_ANDROID_APP_ID_STAGING="1:344541548510:android:631fa078fb9926677d174f"
+FIREBASE_ANDROID_APP_ID_STAGING="1:590952422810:android:7ffb5edc9c37b3334aae23"
 FIREBASE_ANDROID_APP_ID_PROD="1:48301164525:android:c3713960cdefdbb28589e4"
 
 # Groupes de testeurs pour Firebase App Distribution
@@ -59,6 +59,7 @@ CLEAN_BUILD=true
 BYPASS_TESTS=false
 SPECIFIC_ANDROID_BUILD=""
 VERBOSE_MODE=false
+RUN_E2E=false
 
 # L'application Flutter a été générée dans le sous-dossier 'app'
 cd app || exit 1
@@ -78,6 +79,7 @@ print_usage() {
     echo "  --buildonly             Compile uniquement, sans déploiement ni opérations Git."
     echo "  --noclean               Désactive 'flutter clean' avant la compilation."
     echo "  --bypasstest            Évite l'exécution des tests unitaires pour 'dev' et 'staging'. Les tests sont obligatoires pour 'prod'."
+    echo "  --e2e                   Lance les tests Playwright E2E après le deploy web (dev/staging uniquement)."
     echo "  -v, --verbose           Active le mode verbeux pour afficher les détails des commandes exécutées."
     echo "  -h, --help              Affiche ce message d'aide."
 }
@@ -102,6 +104,7 @@ while [[ "$#" -gt 0 ]]; do
         --buildonly) BUILD_ONLY=true ;;
         --noclean) CLEAN_BUILD=false ;;
         --bypasstest) BYPASS_TESTS=true ;;
+        --e2e) RUN_E2E=true ;;
         -v|--verbose) VERBOSE_MODE=true ;;
         -h|--help) print_usage; exit 0 ;;
         *) echo "Erreur : Paramètre inconnu '$1'"; print_usage; exit 1 ;;
@@ -174,10 +177,10 @@ if [[ " ${PLATFORMS[*]} " =~ " android " ]]; then
 fi
 echo "  Déploiement     : $(if $BUILD_ONLY; then echo "Non (buildonly)"; else echo "Oui"; fi)"
 echo "  Nettoyage       : $(if $CLEAN_BUILD; then echo "Oui"; else echo "Non"; fi)"
-if [ "$ENVIRONMENT" == "prod" ]; then
-    echo "  Tests unitaires : Activés (obligatoire pour prod)"
+if [ "$BYPASS_TESTS" == true ]; then
+    echo "  Tests          : Désactivés (bypass)"
 else
-    echo "  Tests unitaires : $(if $BYPASS_TESTS; then echo "Désactivés (bypass)"; else echo "Activés"; fi)"
+    echo "  Tests          : Activés"
 fi
 echo "  Mode Verbeux    : $VERBOSE_MODE"
 echo "--------------------------------------------------"
@@ -236,7 +239,7 @@ fi
 
 # 5. Exécution des tests unitaires (si nécessaire)
 RUN_TESTS=true
-if [[ "$ENVIRONMENT" != "prod" && "$BYPASS_TESTS" == true ]]; then
+if [[ "$BYPASS_TESTS" == true ]]; then
     RUN_TESTS=false
 fi
 
@@ -339,9 +342,15 @@ else
 fi
 
 # 3. Logique de déploiement
-echo "-> Étape 3/3 : Déploiement..."
-    echo "   - Déploiement complet vers Firebase (Hosting, Functions, Firestore) (Projet: $CURRENT_FIREBASE_PROJECT_ID)..."
-    execute_verbose "Déploiement Firebase " firebase deploy --only hosting,functions,firestore -P "$CURRENT_FIREBASE_PROJECT_ID"
+echo "--> Étape 3/3 : Déploiement..."
+if [[ " ${PLATFORMS[*]} " =~ " web " ]]; then
+    if [ "$ENVIRONMENT" == "prod" ]; then
+        DEPLOY_TARGETS="hosting,firestore"
+    else
+        DEPLOY_TARGETS="hosting,functions,firestore"
+    fi
+    echo "   - Déploiement Firebase [$DEPLOY_TARGETS] (Projet: $CURRENT_FIREBASE_PROJECT_ID)..."
+    execute_verbose "Déploiement Firebase" firebase deploy --only "$DEPLOY_TARGETS" -P "$CURRENT_FIREBASE_PROJECT_ID"
     if [ $? -ne 0 ]; then echo "ERREUR : Le déploiement Firebase a échoué."; else echo "   Déploiement réussi."; fi
 fi
 
@@ -358,6 +367,31 @@ if [[ " ${PLATFORMS[*]} " =~ " android " ]]; then
     elif [ "$ENVIRONMENT" == "prod" ]; then
         echo "   - Déploiement Android pour 'prod' : l'artefact AAB est prêt pour une publication manuelle."
         echo "     Chemin de l'AAB : build/app/outputs/bundle/release/ArchipelFortune-$TAG_NAME.aab"
+    fi
+fi
+
+# --- Tests E2E Playwright (dev/staging uniquement) ---
+if [ "$RUN_E2E" = true ] && [[ " ${PLATFORMS[*]} " =~ " web " ]]; then
+    if [ "$ENVIRONMENT" == "prod" ]; then
+        echo "AVERTISSEMENT : Les tests E2E ne sont pas autorisés en prod. Ignoré."
+    else
+        echo "--> Tests E2E Playwright..."
+        E2E_DIR="$(dirname "$(pwd)")/tests_e2e"
+        if [ -d "$E2E_DIR" ]; then
+            case "$ENVIRONMENT" in
+                dev)     E2E_BASE_URL="https://archipel-fortune-dev.web.app" ;;
+                staging) E2E_BASE_URL="https://archipel-fortune-stg.web.app" ;;
+            esac
+            echo "   Target URL: $E2E_BASE_URL"
+            PLAYWRIGHT_BASE_URL="$E2E_BASE_URL" npx --prefix "$E2E_DIR" playwright test
+            if [ $? -ne 0 ]; then
+                echo "AVERTISSEMENT : Les tests E2E ont échoué. Consultez tests_e2e/playwright-report/"
+            else
+                echo "   Tests E2E réussis."
+            fi
+        else
+            echo "   AVERTISSEMENT : Dossier tests_e2e/ introuvable. Tests E2E ignorés."
+        fi
     fi
 fi
 

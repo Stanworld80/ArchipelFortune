@@ -6,7 +6,80 @@ enum TileType {
   forest,
   reef,
   island,
-  continent
+  continent,
+  port,
+  fishing,
+  snow,
+  ice,
+  jungle,
+  swamp,
+  temple,
+  volcano,
+  shipwreck,
+  pirate
+}
+
+enum RewardType { gold, wood, provisions, keyCopper, keySilver, keyGold }
+
+class Quest {
+  final String id;
+  final String title;
+  final String description;
+  final int currentValue;
+  final int targetValue;
+  final bool isCompleted;
+  final RewardType rewardType;
+  final int rewardAmount;
+
+  Quest({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.currentValue,
+    required this.targetValue,
+    this.isCompleted = false,
+    required this.rewardType,
+    required this.rewardAmount,
+  });
+
+  Quest copyWith({int? currentValue, bool? isCompleted}) {
+    return Quest(
+      id: id,
+      title: title,
+      description: description,
+      currentValue: currentValue ?? this.currentValue,
+      targetValue: targetValue,
+      isCompleted: isCompleted ?? this.isCompleted,
+      rewardType: rewardType,
+      rewardAmount: rewardAmount,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'currentValue': currentValue,
+      'targetValue': targetValue,
+      'isCompleted': isCompleted,
+      'rewardType': rewardType.index,
+      'rewardAmount': rewardAmount,
+    };
+  }
+
+  factory Quest.fromMap(Map<String, dynamic> map) {
+    return Quest(
+      id: map['id'],
+      title: map['title'],
+      description: map['description'],
+      currentValue: map['currentValue'],
+      targetValue: map['targetValue'],
+      isCompleted: map['isCompleted'],
+      rewardType: RewardType.values[map['rewardType']],
+      rewardAmount: map['rewardAmount'],
+    );
+  }
 }
 
 class SessionState {
@@ -28,6 +101,11 @@ class SessionState {
   final bool isGameOver;
   final String? statusMessage;
   final Map<String, int> collections; // Ex: {"panoplie_pirate": 2}
+  final List<Map<String, int>> discoveredIslandCoords; // Liste de {x, y}
+  final int hullLevel;
+  final int sailsLevel;
+  final int cargoLevel;
+  final List<Quest> quests;
 
   SessionState({
     this.sessionId,
@@ -48,6 +126,11 @@ class SessionState {
     this.isGameOver = false,
     this.statusMessage,
     this.collections = const {},
+    this.discoveredIslandCoords = const [],
+    this.hullLevel = 1,
+    this.sailsLevel = 1,
+    this.cargoLevel = 1,
+    this.quests = const [],
   });
 
   SessionState copyWith({
@@ -68,6 +151,10 @@ class SessionState {
     bool? isGameOver,
     String? statusMessage,
     String? sessionId,
+    List<Map<String, int>>? discoveredIslandCoords,
+    int? hullLevel,
+    int? sailsLevel,
+    int? cargoLevel,
   }) {
     return SessionState(
       sessionId: sessionId ?? this.sessionId,
@@ -88,6 +175,11 @@ class SessionState {
       startTime: this.startTime,
       isGameOver: isGameOver ?? this.isGameOver,
       statusMessage: statusMessage ?? this.statusMessage,
+      discoveredIslandCoords: discoveredIslandCoords ?? this.discoveredIslandCoords,
+      hullLevel: hullLevel ?? this.hullLevel,
+      sailsLevel: sailsLevel ?? this.sailsLevel,
+      cargoLevel: cargoLevel ?? this.cargoLevel,
+      quests: quests ?? this.quests,
     );
   }
   Map<String, dynamic> toMap() {
@@ -110,13 +202,18 @@ class SessionState {
       'isGameOver': isGameOver,
       'statusMessage': statusMessage,
       'collections': collections,
+      'discoveredIslandCoords': discoveredIslandCoords,
+      'hullLevel': hullLevel,
+      'sailsLevel': sailsLevel,
+      'cargoLevel': cargoLevel,
+      'quests': quests.map((q) => q.toMap()).toList(),
     };
   }
 
   factory SessionState.fromMap(Map<String, dynamic> mapData, {String? id}) {
     final List<dynamic> flatMap = mapData['map'] as List<dynamic>;
-    // On assume une taille fixe de 36 pour l'Archipel (MAP_SIZE coté serveur)
-    const int size = 36;
+    // On assume une taille fixe de 50 pour l'Archipel (MAP_SIZE coté serveur)
+    const int size = 50;
     final List<List<TileType>> reconstructedMap = List.generate(size, (i) {
       return List.generate(size, (j) {
         final int index = flatMap[i * size + j] as int;
@@ -145,6 +242,11 @@ class SessionState {
       isGameOver: mapData['isGameOver'] ?? false,
       statusMessage: mapData['statusMessage'],
       collections: Map<String, int>.from(mapData['collections'] ?? {}),
+      discoveredIslandCoords: (mapData['discoveredIslandCoords'] as List? ?? []).map((e) => Map<String, int>.from(e as Map)).toList(),
+      hullLevel: mapData['hullLevel']?.toInt() ?? 1,
+      sailsLevel: mapData['sailsLevel']?.toInt() ?? 1,
+      cargoLevel: mapData['cargoLevel']?.toInt() ?? 1,
+      quests: (mapData['quests'] as List? ?? []).map((q) => Quest.fromMap(q)).toList(),
     );
   }
 }

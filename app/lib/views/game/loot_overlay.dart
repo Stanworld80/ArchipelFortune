@@ -52,7 +52,7 @@ class _LootOverlayState extends State<LootOverlay> {
         return _CrateContent(type: 'item', value: 1, icon: Icons.auto_awesome, color: Colors.purple, label: item, itemId: item.toLowerCase().replaceAll(' ', '_'));
       }
 
-      return _CrateContent(type: 'treasure', value: 0, icon: Icons.star, color: Colors.cyan, label: "Trésor !");
+      return _CrateContent(type: 'map', value: 1, icon: Icons.map, color: Colors.tealAccent, label: "Carte mystérieuse");
     });
     _allRevealed = false;
     _isAutoRevealing = false;
@@ -180,6 +180,9 @@ class _LootOverlayState extends State<LootOverlay> {
                               keyType: crate.keyType,
                               itemId: crate.itemId,
                             );
+                          }
+                          if (crate.type == 'map') {
+                            ref.read(sessionProvider.notifier).addDiscoveryMap();
                           }
                         }
 
