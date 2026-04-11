@@ -12,7 +12,20 @@
           "package_name": "fr.stanislasselleinformatique.archipelfortune"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "417958901427-j536mbopd2jg7ppcd8q5vpsv1inj1oo7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "fr.stanislasselleinformatique.archipelfortune",
+            "certificate_hash": "b1ac12b7a9df209a710163dbd6e3b18773357467"
+          }
+        },
+        {
+          "client_id": "417958901427-c88hjkvao549h2fpl5jn5bum21b735hl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyC2v0s8n8XsYLgnihBg2TGxzHLaMSnudsY"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "417958901427-c88hjkvao549h2fpl5jn5bum21b735hl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
