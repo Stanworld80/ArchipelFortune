@@ -56,8 +56,7 @@ jobs:
         run: |
           flutter build web --release \
             --dart-define=APP_ENV=prod \
-            --dart-define=SUPER_ADMIN_EMAIL=stanworld@gmail.com \
-            --web-renderer html
+            --dart-define=SUPER_ADMIN_EMAIL=stanworld@gmail.com
 
       # ─── Firebase Deploy (Firestore Rules + Hosting) ──────────────────────────
       - name: 🔥 Deploy Firestore Rules & Web Hosting to Prod
