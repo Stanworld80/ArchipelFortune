@@ -1,0 +1,65 @@
+name: CI/CD Staging
+
+on:
+  push:
+    branches:
+      - staging
+
+jobs:
+  build-test-deploy-staging:
+    name: Build, Test & Deploy to Staging
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: 🦅 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: '3.19.x'
+
+      - name: 📦 Install dependencies
+        working-directory: app
+        run: flutter pub get
+
+      - name: 🔑 Setup Keystore
+        run: |
+          # Nécessaire pour signer Android en release mode
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-keystore.jks || true
+          echo "${{ secrets.KEY_PROPERTIES_STAGING }}" | base64 --decode > android/key.staging.properties || true
+
+      - name: 🧪 Run Unit & Integration Tests (Release mode)
+        working-directory: app
+        run: |
+          # Test en mode release n'est pas typiquement supporté pour les tests unitaires purs avec flutter test, mais on les passe normalement :
+          flutter test
+          # Si des tests d'intégration existent :
+          # flutter test integration_test
+
+      - name: Node.js setup
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install E2E dependencies
+        working-directory: tests_e2e
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        working-directory: tests_e2e
+        run: npx playwright install --with-deps
+
+      - name: 🚀 Deploy to Staging
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          # build et deploy staging avec mode release et tests e2e
+          bash build_deploy.sh -e staging -m release --e2e --bypasstest

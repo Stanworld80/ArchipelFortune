@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "playwright test",
+    "test:dev": "PLAYWRIGHT_BASE_URL=https://archipel-fortune-dev.web.app playwright test",
+    "test:staging": "PLAYWRIGHT_BASE_URL=https://archipel-fortune-staging.web.app playwright test",
+    "test:local": "PLAYWRIGHT_BASE_URL=http://localhost:5000 playwright test",
+    "report": "playwright show-report"
   },
   "keywords": [],
   "author": "",

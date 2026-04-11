@@ -4,17 +4,41 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'map_painter.dart';
 import 'loot_overlay.dart';
 import 'bank_overlay.dart';
+import 'fishing_overlay.dart';
 import '../../providers/session_provider.dart';
 import '../../models/session_model.dart';
+import 'upgrade_shop_view.dart';
+import 'quest_log_view.dart';
 
-class GameDashboardView extends ConsumerWidget {
+class GameDashboardView extends ConsumerStatefulWidget {
   const GameDashboardView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<GameDashboardView> createState() => _GameDashboardViewState();
+}
+
+class _GameDashboardViewState extends ConsumerState<GameDashboardView> with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 5),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final session = ref.watch(sessionProvider);
 
-    // Si on arrive ici sans session (ex: refresh), on redirige ou on affiche une erreur
     if (session == null) {
       return Scaffold(
         body: Center(
@@ -59,8 +83,17 @@ class GameDashboardView extends ConsumerWidget {
               child: Center(
                 child: AspectRatio(
                   aspectRatio: 1,
-                  child: CustomPaint(
-                    painter: MapPainter(session: session, tileSize: MediaQuery.of(context).size.shortestSide / 5),
+                  child: AnimatedBuilder(
+                    animation: _animationController,
+                    builder: (context, child) {
+                      return CustomPaint(
+                        painter: MapPainter(
+                          session: session, 
+                          tileSize: MediaQuery.of(context).size.shortestSide / 5,
+                          animationValue: _animationController.value,
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),
@@ -105,6 +138,44 @@ class GameDashboardView extends ConsumerWidget {
                   const SizedBox(height: 4),
                   Text('OR EN MAIN: ${session.orVolatil} 🪙', style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
                   Text('LUMBER: ${session.boisCharpente} 🪵', style: const TextStyle(color: Colors.brown)),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: () => showModalBottomSheet(
+                          context: context,
+                          backgroundColor: Colors.transparent,
+                          isScrollControlled: true,
+                          builder: (context) => const UpgradeShopView(),
+                        ),
+                        icon: const Icon(Icons.build, size: 14),
+                        label: const Text("AMÉLIORER"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.amber,
+                          foregroundColor: Colors.black,
+                          textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton.icon(
+                        onPressed: () => showModalBottomSheet(
+                          context: context,
+                          backgroundColor: Colors.transparent,
+                          isScrollControlled: true,
+                          builder: (context) => const QuestLogView(),
+                        ),
+                        icon: const Icon(Icons.history_edu, size: 14),
+                        label: const Text("JOURNAL"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFE5D3B3),
+                          foregroundColor: const Color(0xFF5D4037),
+                          textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -166,9 +237,15 @@ class GameDashboardView extends ConsumerWidget {
 
           // --- NOUVEAUX OVERLAYS D'ESCALE ---
           
-          // Phase de Butin (Grattage)
+          // Phase de Butin (Grattage sur les îles)
           if (session.isAtStopover && session.lootRemaining > 0)
-            const Positioned.fill(child: LootOverlay()),
+            Builder(builder: (context) {
+              final currentTile = session.map[session.x][session.y];
+              if (currentTile == TileType.fishing) {
+                return const Positioned.fill(child: FishingOverlay());
+              }
+              return const Positioned.fill(child: LootOverlay());
+            }),
 
           // Phase de Banque et Ravitaillement
           if (session.isAtStopover && session.lootRemaining == 0)
@@ -188,7 +265,7 @@ class ShipControlWheel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const double wheelSize = 130;
-    const int mapSize = 36;
+    const int mapSize = 50;
 
     // Helper to check if a direction is "Reverse"
     bool isReverse(int arrowAngle) {

@@ -10,7 +10,7 @@ const db = getFirestore();
 setGlobalOptions({ region: "us-central1" });
 
 // Constantes partagées avec le client
-const MAP_SIZE = 36;
+const MAP_SIZE = 50;
 
 const TileType = {
   sea: 0,
@@ -20,7 +20,17 @@ const TileType = {
   forest: 4,
   reef: 5,
   island: 6,
-  continent: 7
+  continent: 7,
+  port: 8,
+  fishing: 9,
+  snow: 10,
+  ice: 11,
+  jungle: 12,
+  swamp: 13,
+  temple: 14,
+  volcano: 15,
+  shipwreck: 16,
+  pirate: 17
 };
 
 exports.startExpedition = onCall(async (request) => {
@@ -129,13 +139,34 @@ exports.moveShip = onCall(async (request) => {
       update.isGameOver = true;
       update.statusMessage = "Naufrage sur un récif !";
     }
-  } else if (tileType === TileType.island || tileType === TileType.continent) {
+  } else if (tileType === TileType.island || tileType === TileType.port) {
     update.isAtStopover = true;
-    update.lootRemaining = (tileType === TileType.island) ? 5 : 15;
-    update.statusMessage = "Escale ! Butin récupéré (île explorée).";
+    update.lootRemaining = 5;
+    update.statusMessage = "Escale ! Butin récupéré.";
     
-    // Retirer l'île de la carte pour éviter d'être pillée plusieurs fois (se transforme en 'grass')
     session.map[nextX][nextY] = TileType.grass;
+    update.map = session.map.flat();
+  } else if (tileType === TileType.continent) {
+    update.isAtStopover = true;
+    update.lootRemaining = 15;
+    update.statusMessage = "Continent atteint ! Objectif final en vue.";
+    
+    // US06: Rendre tout le continent inexploitable après le premier loot
+    for (let r = 0; r < MAP_SIZE; r++) {
+      for (let c = 0; c < MAP_SIZE; c++) {
+        if (session.map[r][c] === TileType.continent) {
+          session.map[r][c] = TileType.grass;
+        }
+      }
+    }
+    update.map = session.map.flat();
+  } else if (tileType === TileType.fishing) {
+    update.isAtStopover = true;
+    update.lootRemaining = 1; // Un seul lancer de filet par défaut
+    update.statusMessage = "C'est l'heure de pêcher !";
+    
+    // On ne retire pas forcément le spot de pêche, ou on le transforme en mer
+    session.map[nextX][nextY] = TileType.sea;
     update.map = session.map.flat();
   }
 
@@ -165,7 +196,10 @@ function generateProceduralMap(seed) {
     }
     
     if (Math.abs(rx - startX) < 2 && Math.abs(ry - startY) < 2) continue;
-    spawnLand(map, rx, ry, TileType.island, rand);
+    
+    // US05: Attribution d'un biome (0: Tropical, 1: Nordique, 2: Jungle)
+    const biome = rand.nextInt(3);
+    spawnLand(map, rx, ry, TileType.island, biome, rand);
   }
 
   // Récifs
@@ -183,27 +217,99 @@ function generateProceduralMap(seed) {
     else if (edge === 2) applyContinent(map, 0, i);
     else if (edge === 3) applyContinent(map, MAP_SIZE - 1, i);
   }
+  
+  // Spots de pêche (15 spots aléatoires en mer)
+  for (let i = 0; i < 15; i++) {
+    const rx = rand.nextInt(MAP_SIZE);
+    const ry = rand.nextInt(MAP_SIZE);
+    if (map[rx][ry] === TileType.sea) map[rx][ry] = TileType.fishing;
+  }
+
+  // Épaves dérivantes (10 spots aléatoires en mer)
+  for (let i = 0; i < 10; i++) {
+    const rx = rand.nextInt(MAP_SIZE);
+    const ry = rand.nextInt(MAP_SIZE);
+    if (map[rx][ry] === TileType.sea) map[rx][ry] = TileType.shipwreck;
+  }
+
+  // Navires pirates (8 spots aléatoires en mer)
+  for (let i = 0; i < 8; i++) {
+    const rx = rand.nextInt(MAP_SIZE);
+    const ry = rand.nextInt(MAP_SIZE);
+    if (map[rx][ry] === TileType.sea) map[rx][ry] = TileType.pirate;
+  }
 
   // Flattening for easier storage if needed, but keeping as 2D for logic
   return map; 
 }
 
-function spawnLand(map, x, y, type, rand) {
-  const radius = 2;
-  for (let i = -radius - 1; i <= radius + 1; i++) {
-    for (let j = -radius - 1; j <= radius + 1; j++) {
+function spawnLand(map, x, y, type, biome, rand) {
+  const radius = 3;
+  let portPlaced = false;
+
+  // Définition des types selon le biome
+  let centerTile = type;
+  let beachTile = TileType.sand;
+  let extraTile = TileType.forest; // Par défaut jungle ou forêt
+
+  if (biome === 1) { // Nordique
+    centerTile = TileType.snow;
+    beachTile = TileType.ice;
+    extraTile = TileType.snow;
+  } else if (biome === 2) { // Jungle
+    centerTile = TileType.jungle;
+    beachTile = TileType.swamp;
+    extraTile = TileType.jungle;
+  }
+
+  for (let i = -radius; i <= radius; i++) {
+    for (let j = -radius; j <= radius; j++) {
       const nx = x + i;
       const ny = y + j;
       if (nx < 0 || nx >= MAP_SIZE || ny < 0 || ny >= MAP_SIZE) continue;
-      
+
       const dist = Math.sqrt(i * i + j * j);
-      if (dist < 0.8) map[nx][ny] = type;
-      else if (dist < 1.5) map[nx][ny] = TileType.forest;
-      else if (dist < 2.2) map[nx][ny] = TileType.grass;
-      else if (dist < 2.8) map[nx][ny] = TileType.sand;
-      else if (dist < 3.5) {
+      
+      // Centre de l'île / Forêt dense
+      if (dist < 1.2) {
+        // Chance de POI au centre (Volcan pour Tropical)
+        if (biome === 0 && rand.next() > 0.85) {
+          map[nx][ny] = TileType.volcano;
+        } else {
+          map[nx][ny] = centerTile;
+        }
+      } 
+      else if (dist < 1.8) {
+        // Placement d'UN port unique
+        if (!portPlaced && rand.next() > 0.6) {
+          map[nx][ny] = TileType.port;
+          portPlaced = true;
+        } else {
+          // Chance de Temple dans la jungle ou forêt
+          if ((biome === 2 || biome === 0) && rand.next() > 0.9) {
+            map[nx][ny] = TileType.temple;
+          } else {
+            map[nx][ny] = extraTile;
+          }
+        }
+      }
+      // Plages / Transition
+      else if (dist < 2.5) {
+        if (map[nx][ny] === TileType.sea) map[nx][ny] = beachTile;
+      }
+      // Eaux peu profondes (Shallow)
+      else if (dist < 3.2) {
         if (map[nx][ny] === TileType.sea) map[nx][ny] = TileType.shallow;
       }
+    }
+  }
+
+  // Sécurité: Si aucun port n'a été placé par probabilité, on en force un
+  if (!portPlaced) {
+    const nx = x + 1;
+    const ny = y;
+    if (nx >= 0 && nx < MAP_SIZE && ny >= 0 && ny < MAP_SIZE) {
+      map[nx][ny] = TileType.port;
     }
   }
 }
