@@ -3,8 +3,12 @@ service cloud.firestore {
   match /databases/{database}/documents {
     // Configuration pour la collection des utilisateurs
     match /users/{userId} {
-      // Tout le monde peut lire les profils (pour les listes admin)
-      allow read: if request.auth != null;
+      // Un utilisateur peut lire son propre profil
+      // Les admins peuvent lire tous les profils
+      allow read: if request.auth != null && (
+        request.auth.uid == userId ||
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'superAdmin']
+      );
       
       // Seul l'utilisateur peut créer son propre profil à l'inscription
       allow create: if request.auth != null && request.auth.uid == userId;
@@ -18,7 +22,7 @@ service cloud.firestore {
       );
     }
     
-    // Autres collections (si existantes)
+    // Autres collections (si existantes) - tout bloqué par défaut
     match /{path=**} {
       allow read, write: if false;
     }

@@ -54,3 +54,12 @@ jobs:
           releaseFiles: app/build/app/outputs/bundle/release/app-release.aab
           track: internal
           status: completed
+
+      - name: 🔥 Deploy Firestore Rules to Prod
+        run: |
+          npm install -g firebase-tools
+          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_PROD }}" > firebase-sa-prod.json
+          export GOOGLE_APPLICATION_CREDENTIALS=firebase-sa-prod.json
+          firebase use prod
+          firebase deploy --only firestore:rules --project archipel-fortune-prod
+          rm firebase-sa-prod.json

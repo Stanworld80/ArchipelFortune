@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "archipel-fortune-dev"
+    "default": "archipel-fortune-dev",
+    "dev": "archipel-fortune-dev",
+    "prod": "archipel-fortune-prod"
   }
 }
