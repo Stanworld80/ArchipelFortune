@@ -51,9 +51,17 @@ jobs:
             --build-number=${{ github.run_number }}
 
       # ─── Web Build (Prod) ─────────────────────────────────────────────────────
-      - name: 🌐 Build Web (Prod)
+      - name: 🌐 Configure & Build Web (Prod)
         working-directory: app
         run: |
+          # Générer index.html à partir du template
+          cp web/index-template.html web/index.html
+          sed -i "s|##GOOGLE_SIGNIN_CLIENT_ID_PLACEHOLDER##|48301164525-6lqqh5tc0m0jpsm4ovdpgalosve17a1m.apps.googleusercontent.com|g" web/index.html
+          
+          # S'assurer que la plateforme web est configurée
+          flutter create . --platforms web
+          
+          # Build
           flutter build web --release \
             --dart-define=APP_ENV=prod \
             --dart-define=SUPER_ADMIN_EMAIL=stanworld@gmail.com
