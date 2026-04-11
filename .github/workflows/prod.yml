@@ -9,7 +9,7 @@ on:
 
 jobs:
   build-and-deploy-prod:
-    name: Build & Deploy (Android + Web + Functions) to Prod
+    name: Build & Deploy (Android + Web) to Prod
     runs-on: ubuntu-latest
 
     steps:
@@ -22,12 +22,8 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: 🟢 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: functions/package-lock.json
+      # Note: Node.js and Functions deployment removed temporarily because prod project lacks billing.
+      # To enable functions, you must enable billing on the archipel-fortune-prod project.
 
       - name: 🦅 Setup Flutter
         uses: subosito/flutter-action@v2
@@ -38,10 +34,6 @@ jobs:
       - name: 📦 Install Flutter dependencies
         working-directory: app
         run: flutter pub get
-
-      - name: 📦 Install Functions dependencies
-        working-directory: functions
-        run: npm ci
 
       # ─── Android Build ───────────────────────────────────────────────────────
       - name: 🔑 Setup Keystore
@@ -79,14 +71,15 @@ jobs:
             --dart-define=SUPER_ADMIN_EMAIL=stanworld@gmail.com
 
       # ─── Firebase Deploy ──────────────────────────────────────────────────────
-      - name: 🔥 Deploy to Firebase (Rules, Indexes, Functions, Hosting)
+      - name: 🔥 Deploy to Firebase (Rules, Indexes, Hosting)
         run: |
           # Use npx to avoid global install overhead
           export GOOGLE_APPLICATION_CREDENTIALS=firebase-sa-prod.json
           echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_PROD }}' > firebase-sa-prod.json
           
+          # DEPLOY WITHOUT FUNCTIONS (Missing Billing on Prod project)
           npx firebase-tools deploy \
-            --only firestore:rules,firestore:indexes,functions,hosting \
+            --only firestore:rules,firestore:indexes,hosting \
             --project archipel-fortune-prod \
             --force
           
