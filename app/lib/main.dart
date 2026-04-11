@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'core/environment.dart';
 import 'firebase_options_dev.dart';
+import 'firebase_options_prod.dart';
 
 import 'providers/auth_provider.dart';
 import 'views/auth/login_view.dart';
@@ -26,10 +27,18 @@ void main() async {
         // Pour Android, cela chargera le fichier google-services.json que le script build_deploy.sh copie.
         await Firebase.initializeApp();
       }
+    } else if (AppEnvironment.isProd) {
+      if (kIsWeb) {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptionsProd.currentPlatform,
+        );
+      } else {
+        // Pour Android, google-services-prod.json est copié en google-services.json par le script/CI
+        await Firebase.initializeApp();
+      }
     } else {
-       // TODO: Gérer l'initialisation Staging / Prod avec les firebase_options correspondants
-       // Pour le moment en web on essaie l'initialisation par défaut ou un catch d'erreur
-       await Firebase.initializeApp();
+      // Staging : utilise les options par défaut (google-services.json copié par le script)
+      await Firebase.initializeApp();
     }
     debugPrint("Firebase Initialized Successfully.");
   } catch (e) {
