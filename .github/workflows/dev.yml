@@ -4,11 +4,11 @@ on:
   push:
     branches:
       - develop
-  workflow_dispatch:  
+  workflow_dispatch: 
 
 jobs:
   build-test-deploy-dev:
-    name: Build, Test & Deploy to Dev
+    name: Build, Test & Deploy (Android + Web) to Dev
     runs-on: ubuntu-latest
 
     steps:
@@ -25,38 +25,52 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          flutter-version: '3.x'
+          flutter-version: 'any'
 
       - name: 📦 Install dependencies
         working-directory: app
         run: flutter pub get
 
-      - name: Node.js setup
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install E2E dependencies
-        working-directory: tests_e2e
-        run: npm ci
-
-      - name: Install Playwright Browsers
-        working-directory: tests_e2e
-        run: npx playwright install --with-deps
-
-      - name: 🏗️ Build App (Debug)
+      - name: 🔑 Setup Google Services (Dev)
         run: |
-          # Compilation debug pour le web et l'apk
-          bash build_deploy.sh --buildonly -e dev -p web -p android
+          cp app/android/app/google-services.dev.json app/android/app/google-services.json
 
-      # Pour lancer les tests E2E sur l'app compilée, il faudrait la servir ou utiliser le build
-      #- name: 🎭 Run E2E Tests
-      #  working-directory: tests_e2e
-      #  run: npx playwright test
+      - name: 🏗️ Build Android APK (Debug/Dev)
+        working-directory: app
+        run: |
+          flutter build apk --debug \
+            --dart-define=APP_ENV=dev \
+            --dart-define=SUPER_ADMIN_EMAIL=stanworld@gmail.com
 
-      - name: 🚀 Deploy to Dev
+      - name: 🌐 Configure & Build Web (Dev)
+        working-directory: app
+        run: |
+          # Générer index.html à partir du template
+          cp web/index-template.html web/index.html
+          sed -i "s|##GOOGLE_SIGNIN_CLIENT_ID_PLACEHOLDER##|83241971458-14tiragdibb39tnm9op5nd6fqnm4ct53.apps.googleusercontent.com|g" web/index.html
+          
+          # S'assurer que la plateforme web est configurée
+          flutter create . --platforms web
+          
+          # Build
+          flutter build web --debug \
+            --dart-define=APP_ENV=dev \
+            --dart-define=SUPER_ADMIN_EMAIL=stanworld@gmail.com
+
+      - name: 🔥 Deploy to Firebase Dev
+        run: |
+          npm install -g firebase-tools
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_DEV }}' > firebase-sa-dev.json
+          export GOOGLE_APPLICATION_CREDENTIALS=firebase-sa-dev.json
+          # Note: deploy hosting and rules to dev project
+          firebase deploy --only hosting,firestore:rules --project archipel-fortune-dev
+          rm firebase-sa-dev.json
+
+      - name: 🚀 Distribute Android via App Distribution
+        run: |
+          firebase appdistribution:distribute app/build/app/outputs/flutter-apk/app-debug.apk \
+            --app "${{ secrets.FIREBASE_ANDROID_APP_ID_DEV }}" \
+            --groups "dev-testers" \
+            --project archipel-fortune-dev
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-        run: |
-          # Déploiement dev: mode debug, avec tests unitaires & e2e
-          bash build_deploy.sh -e dev --bypasstest --e2e --no-git
