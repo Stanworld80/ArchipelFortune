@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:ui';
 import '../../providers/auth_provider.dart';
+import '../../core/environment.dart';
 
 class LoginView extends ConsumerStatefulWidget {
   const LoginView({super.key});
@@ -98,19 +99,6 @@ class _LoginViewState extends ConsumerState<LoginView> {
             ),
           ),
 
-          // Static Compass Rose in background
-          Positioned(
-            top: -100,
-            right: -100,
-            child: Opacity(
-              opacity: 0.15,
-              child: Image.asset(
-                'assets/images/compass_rose.png',
-                width: 400,
-                height: 400,
-              ),
-            ),
-          ),
 
           // Main Content
           Center(
@@ -119,12 +107,6 @@ class _LoginViewState extends ConsumerState<LoginView> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo/Treasure Chest (Static)
-                  Image.asset(
-                    'assets/images/treasure_chest.png',
-                    height: 120,
-                  ),
-                  const SizedBox(height: 16),
                   
                   // Branding Title
                   ShaderMask(
@@ -211,6 +193,15 @@ class _LoginViewState extends ConsumerState<LoginView> {
                                     onPressed: _submit,
                                     label: _isLogin ? 'LANCER L\'AVENTURE' : 'SIGNER LE CONTRAT',
                                     isPrimary: true,
+                                    icon: Image.asset(
+                                      'assets/images/treasure_chest.png',
+                                      height: 28,
+                                      // Suggesting white as transparency by blending with white or using a color filter
+                                      // If the image is already PNG with transparency, this is perfect.
+                                      // If it has a white background, we attempt to blend it.
+                                      color: Colors.white.withOpacity(0.9),
+                                      colorBlendMode: BlendMode.modulate,
+                                    ),
                                   ),
                                   const SizedBox(height: 16),
                                   TextButton(
@@ -220,7 +211,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                                       });
                                     },
                                     child: Text(
-                                      _isLogin ? 'NOUVEAU RECRUT ? CRÉER UN PROFIL' : 'DÉJÀ MEMBRE ? SE CONNECTER',
+                                      _isLogin ? 'NOUVELLE RECRUE ? CRÉER UN PROFIL' : 'DÉJÀ MEMBRE ? SE CONNECTER',
                                       style: GoogleFonts.outfit(
                                         color: Colors.amber.shade100,
                                         fontWeight: FontWeight.w500,
@@ -256,10 +247,9 @@ class _LoginViewState extends ConsumerState<LoginView> {
 
                   const SizedBox(height: 48),
 
-                  // Footer
                   Text(
-                    "Version 0.1.3 • © 2026 Stanislas Selle Informatique",
-                    style: GoogleFonts.outfit(color: Colors.black.withOpacity(0.7), fontSize: 11, letterSpacing: 1),
+                    "Version ${AppEnvironment.version}+${AppEnvironment.buildNumber} • Mise à jour : ${AppEnvironment.lastUpdate} • © 2026 Stanislas Selle Informatique",
+                    style: GoogleFonts.outfit(color: Colors.black.withOpacity(0.7), fontSize: 10, letterSpacing: 0.5),
                   ),
                 ],
               ),

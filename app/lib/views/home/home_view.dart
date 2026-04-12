@@ -8,6 +8,7 @@ import '../game/collections_view.dart';
 import '../game/game_dashboard_view.dart';
 import '../../models/user_model.dart';
 import '../../core/widgets/sprite_button.dart';
+import '../../core/environment.dart';
 
 class HomeView extends ConsumerStatefulWidget {
   const HomeView({super.key});
@@ -326,6 +327,20 @@ class _HomeViewState extends ConsumerState<HomeView>
                         ),
 
                         const SizedBox(height: 24),
+
+                        // Footer (Version & Update Info)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 16.0),
+                          child: Text(
+                            "Version ${AppEnvironment.version}+${AppEnvironment.buildNumber} • Mise à jour : ${AppEnvironment.lastUpdate} • © 2026 SSI",
+                            style: GoogleFonts.outfit(
+                              color: Colors.white24,
+                              fontSize: 10,
+                              letterSpacing: 0.5,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
                       ],
                     );
                   },

@@ -1,6 +1,10 @@
 import 'package:flutter/foundation.dart';
 
 class AppEnvironment {
+  static const String version = '0.1.3';
+  static const String buildNumber = '11';
+  static const String lastUpdate = '12/04/2026 16:56';
+
   // Récupère la valeur de APP_ENV passée à la compilation (--dart-define=APP_ENV="dev")
   static const String envName = String.fromEnvironment('APP_ENV', defaultValue: 'dev');
 
