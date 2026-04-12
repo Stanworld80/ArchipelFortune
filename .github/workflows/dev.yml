@@ -7,97 +7,46 @@ on:
   workflow_dispatch: 
 
 jobs:
+  unit-tests:
+    name: 🧪 Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🦅 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: 'any'
+
+      - name: 📦 Install dependencies
+        working-directory: app
+        run: flutter pub get
+
+      - name: 🧪 Run Flutter tests
+        working-directory: app
+        run: flutter test
+
   build-android:
     name: 🏗️ Build Android (Dev)
+    needs: unit-tests
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
-
-      - name: ⚙️ Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-
-      - name: 🦅 Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-          flutter-version: 'any'
-
-      - name: 📦 Install dependencies
-        working-directory: app
-        run: flutter pub get
-
-      - name: 🔑 Setup Google Services (Dev)
-        run: |
-          cp app/android/app/google-services.dev.json app/android/app/google-services.json
-
-      - name: 🔑 Setup Keystore
-        run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/android/app/upload-keystore.jks
-
-      - name: 🏗️ Build Android APK (Release/Dev)
-        working-directory: app
-        env:
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEYSTORE_PATH: upload-keystore.jks
-        run: |
-          flutter build apk --release \
-            --dart-define=APP_ENV=dev \
-            --dart-define=SUPER_ADMIN_EMAIL=stanworld@gmail.com \
-            --build-number=${{ github.run_number }}
-
-      - name: 📤 Upload APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-apk-dev
-          path: app/build/app/outputs/flutter-apk/app-release.apk
-
+...
   build-web:
     name: 🌐 Build Web (Dev)
+    needs: unit-tests
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
-
-      - name: 🦅 Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-          flutter-version: 'any'
-
-      - name: 📦 Install dependencies
-        working-directory: app
-        run: flutter pub get
-
-      - name: 🌐 Configure & Build Web (Dev)
-        working-directory: app
-        run: |
-          # Générer index.html à partir du template
-          cp web/index-template.html web/index.html
-          sed -i "s|##GOOGLE_SIGNIN_CLIENT_ID_PLACEHOLDER##|83241971458-14tiragdibb39tnm9op5nd6fqnm4ct53.apps.googleusercontent.com|g" web/index.html
-          
-          # S'assurer que la plateforme web est configurée
-          flutter create . --platforms web
-          
-          # Build
-          flutter build web --debug \
-            --dart-define=APP_ENV=dev \
-            --dart-define=SUPER_ADMIN_EMAIL=stanworld@gmail.com
-
-      - name: 📤 Upload Web Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: web-build-dev
-          path: app/build/web
-
-  deploy:
-    name: 🚀 Deploy to Dev
-    needs: [build-android, build-web]
+...
+  deploy-app:
+    name: 📱 Deploy App to Tester (Dev)
+    needs: build-android
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout repository
@@ -108,6 +57,30 @@ jobs:
         with:
           name: android-apk-dev
           path: artifacts/android
+
+      - name: 🔑 Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DEV }}
+
+      - name: 🔥 Distribute Android APK
+        run: |
+          APP_ID="${{ secrets.FIREBASE_ANDROID_APP_ID_DEV }}"
+          RELEASE_NOTES="Dev Build: ${{ github.event.head_commit.message }}"
+          
+          npx firebase-tools appdistribution:distribute artifacts/android/app-release.apk \
+            --app "$APP_ID" \
+            --groups "dev-testers" \
+            --release-notes "$RELEASE_NOTES" \
+            --project archipel-fortune-dev
+
+  deploy-web:
+    name: 🌐 Deploy Web & Rules (Dev)
+    needs: build-web
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
 
       - name: 📥 Download Web Artifact
         uses: actions/download-artifact@v4
@@ -120,17 +93,6 @@ jobs:
         with:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DEV }}
 
-      - name: 🔥 Firebase Deploy & Distribute
+      - name: 🔥 Firebase Deploy Hosting & Rules
         run: |
-          # Deploy hosting and rules
           npx firebase-tools deploy --only hosting,firestore:rules --project archipel-fortune-dev
-          
-          # Distribute Android APK
-          APP_ID="${{ secrets.FIREBASE_ANDROID_APP_ID_DEV }}"
-          RELEASE_NOTES="Dev Build: ${{ github.event.head_commit.message }}"
-          
-          npx firebase-tools appdistribution:distribute artifacts/android/app-release.apk \
-            --app "$APP_ID" \
-            --groups "dev-testers" \
-            --release-notes "$RELEASE_NOTES" \
-            --project archipel-fortune-dev

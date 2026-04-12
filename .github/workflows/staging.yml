@@ -7,103 +7,46 @@ on:
   workflow_dispatch: 
 
 jobs:
+  unit-tests:
+    name: 🧪 Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🦅 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: 'any'
+
+      - name: 📦 Install dependencies
+        working-directory: app
+        run: flutter pub get
+
+      - name: 🧪 Run Flutter tests
+        working-directory: app
+        run: flutter test
+
   build-android:
     name: 🏗️ Build Android (Staging)
+    needs: unit-tests
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
-
-      - name: ⚙️ Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-
-      - name: 🦅 Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-          flutter-version: 'any'
-
-      - name: 📦 Install dependencies
-        working-directory: app
-        run: flutter pub get
-
-      - name: 🔑 Setup Google Services (Staging)
-        run: |
-          # Fallback to dev if staging is missing, until the user provides google-services.staging.json
-          if [ -f app/android/app/google-services.staging.json ]; then
-            cp app/android/app/google-services.staging.json app/android/app/google-services.json
-          else
-            echo "WARNING: google-services.staging.json missing, falling back to dev version"
-            cp app/android/app/google-services.dev.json app/android/app/google-services.json
-          fi
-
-      - name: 🔑 Setup Keystore
-        run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/android/app/upload-keystore.jks
-
-      - name: 🏗️ Build App Bundle (AAB - Staging)
-        working-directory: app
-        env:
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEYSTORE_PATH: upload-keystore.jks
-        run: |
-          flutter build appbundle --release \
-            --dart-define=APP_ENV=staging \
-            --dart-define=SUPER_ADMIN_EMAIL=stanworld@gmail.com \
-            --build-number=${{ github.run_number }}
-
-      - name: 📤 Upload AAB Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-aab-stg
-          path: app/build/app/outputs/bundle/release/app-release.aab
-
+...
   build-web:
     name: 🌐 Build Web (Staging)
+    needs: unit-tests
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
-
-      - name: 🦅 Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-          flutter-version: 'any'
-
-      - name: 📦 Install dependencies
-        working-directory: app
-        run: flutter pub get
-
-      - name: 🌐 Configure & Build Web (Staging)
-        working-directory: app
-        run: |
-          # Générer index.html à partir du template
-          cp web/index-template.html web/index.html
-          sed -i "s|##GOOGLE_SIGNIN_CLIENT_ID_PLACEHOLDER##|344541548510-k1vncr9ufjii7r3k4425p8sqgq5p47r6.apps.googleusercontent.com|g" web/index.html
-          
-          # S'assurer que la plateforme web est configurée
-          flutter create . --platforms web
-          
-          # Build
-          flutter build web --release \
-            --dart-define=APP_ENV=staging \
-            --dart-define=SUPER_ADMIN_EMAIL=stanworld@gmail.com
-
-      - name: 📤 Upload Web Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: web-build-stg
-          path: app/build/web
-
-  deploy:
-    name: 🚀 Deploy to Staging
-    needs: [build-android, build-web]
+...
+  deploy-app:
+    name: 📱 Deploy App to Tester (Staging)
+    needs: build-android
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout repository
@@ -114,6 +57,28 @@ jobs:
         with:
           name: android-aab-stg
           path: artifacts/android
+
+      - name: 🔑 Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_STAGING }}
+
+      - name: 🔥 Distribute Android App Bundle
+        run: |
+          APP_ID="${{ secrets.FIREBASE_ANDROID_APP_ID_STAGING }}"
+          
+          npx firebase-tools appdistribution:distribute artifacts/android/app-release.aab \
+            --app "$APP_ID" \
+            --groups "uat-testers" \
+            --project archipel-fortune-stg
+
+  deploy-web:
+    name: 🌐 Deploy Web & Rules (Staging)
+    needs: build-web
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
 
       - name: 📥 Download Web Artifact
         uses: actions/download-artifact@v4
@@ -126,15 +91,6 @@ jobs:
         with:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_STAGING }}
 
-      - name: 🔥 Firebase Deploy & Distribute
+      - name: 🔥 Firebase Deploy Hosting & Rules
         run: |
-          # Deploy hosting and rules
           npx firebase-tools deploy --only hosting,firestore:rules --project archipel-fortune-stg
-          
-          # Distribute Android App Bundle
-          APP_ID="${{ secrets.FIREBASE_ANDROID_APP_ID_STAGING }}"
-          
-          npx firebase-tools appdistribution:distribute artifacts/android/app-release.aab \
-            --app "$APP_ID" \
-            --groups "uat-testers" \
-            --project archipel-fortune-stg
