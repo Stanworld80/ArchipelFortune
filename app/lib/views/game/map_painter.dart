@@ -27,16 +27,26 @@ class MapPainter extends CustomPainter {
     final paintWater = Paint()..color = const Color(0xFF003366);
     final paintIsland = Paint()..color = Colors.deepOrange.shade300;
 
-    // Dessin du fond parchemin (optionnel si on utilise l'image)
+    // Dessin du fond de mer (Scrolling UV mapping)
     if (background != null) {
+      final double worldSize = session.map.length.toDouble(); // Taille totale du monde
+      
+      // On calcule la région source dans l'image (0.0 à background.width/height)
+      // Clamping pour éviter les coordonnées négatives aux bords (x=0, y=0)
+      final double srcX = max(0.0, (session.x - 2) / worldSize * background!.width);
+      final double srcY = max(0.0, (session.y - 2) / worldSize * background!.height);
+      final double srcW = 5.0 / worldSize * background!.width;
+      final double srcH = 5.0 / worldSize * background!.height;
+
       canvas.drawImageRect(
         background!,
-        Rect.fromLTWH(0, 0, background!.width.toDouble(), background!.height.toDouble()),
+        Rect.fromLTWH(srcX, srcY, srcW, srcH),
         Rect.fromLTWH(0, 0, size.width, size.height),
         Paint()..filterQuality = ui.FilterQuality.medium,
       );
     } else {
-      canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), Paint()..color = const Color(0xFFE5D3B3));
+      // Par défaut si pas d'image
+      canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), Paint()..color = const Color(0xFF1E3A8A));
     }
 
     // Rayon de vision (5x5 centrée sur le navire)
@@ -63,7 +73,7 @@ class MapPainter extends CustomPainter {
         );
 
         // Si hors limites, on dessine du vide ou de l'eau
-        if (targetX < 0 || targetX >= 50 || targetY < 0 || targetY >= 50) {
+        if (targetX < 0 || targetX >= session.map.length || targetY < 0 || targetY >= session.map[0].length) {
           canvas.drawRect(rect, paintWater..color = const Color(0xFF003366).withOpacity(0.5));
           _drawWaves(canvas, rect, animationValue, targetX, targetY);
           continue;
@@ -73,7 +83,8 @@ class MapPainter extends CustomPainter {
         
         // Dessin de l'eau stylisée
         if (tile == TileType.sea || tile == TileType.shallow || tile == TileType.fishing || tile == TileType.shipwreck || tile == TileType.pirate) {
-           canvas.drawRect(rect, paintWater..color = (tile == TileType.shallow ? const Color(0xFF00ACC1) : const Color(0xFF003366)).withOpacity(0.3));
+           // On utilise des couleurs semi-transparentes pour laisser transparaître le fond mer.png
+           canvas.drawRect(rect, paintWater..color = (tile == TileType.shallow ? const Color(0xFF00ACC1) : Colors.transparent).withOpacity(tile == TileType.shallow ? 0.3 : 0.0));
            _drawWaves(canvas, rect, animationValue, targetX, targetY);
         } else {
            // Autres types de sol (sable, herbe, etc.)
@@ -226,11 +237,22 @@ class MapPainter extends CustomPainter {
     canvas.rotate(session.orientation * pi / 180);
 
     if (shipImage != null) {
+      // Filtre matriciel pour rendre le blanc transparent (Chroma Key sur le blanc)
+      // A' = 3*A - R - G - B (approximativement)
+      const ColorFilter whiteToTransparent = ColorFilter.matrix(<double>[
+        1, 0, 0, 0, 0,
+        0, 1, 0, 0, 0,
+        0, 0, 1, 0, 0,
+        -1, -1, -1, 3, 0,
+      ]);
+
       canvas.drawImageRect(
         shipImage!,
         Rect.fromLTWH(0, 0, shipImage!.width.toDouble(), shipImage!.height.toDouble()),
         Rect.fromCenter(center: Offset.zero, width: size * 0.8, height: size * 1.0),
-        Paint()..filterQuality = ui.FilterQuality.medium,
+        Paint()
+          ..filterQuality = ui.FilterQuality.medium
+          ..colorFilter = whiteToTransparent,
       );
     } else {
       // Évolution Visuelle selon hullLevel
@@ -410,7 +432,7 @@ class MapPainter extends CustomPainter {
   }
 
   void _drawWeather(Canvas canvas, Size size, int visionRadius) {
-    if (session.x < 0 || session.x >= 50 || session.y < 0 || session.y >= 50) return;
+    if (session.x < 0 || session.x >= session.map.length || session.y < 0 || session.y >= session.map[0].length) return;
     
     final currentTile = session.map[session.x][session.y];
     

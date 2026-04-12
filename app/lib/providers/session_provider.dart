@@ -15,7 +15,7 @@ class SessionNotifier extends Notifier<SessionState?> {
     return null;
   }
 
-  static const int mapSize = 50;
+  static const int mapSize = 36;
 
   Future<void> startNewSession({int startingProvisions = 20, int startingBois = 1, int? seed}) async {
     try {

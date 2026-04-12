@@ -130,79 +130,100 @@ class _LootOverlayState extends State<LootOverlay> {
               ),
             ),
             const SizedBox(height: 20),
-            if (!_allRevealed && !_isAutoRevealing)
-              ElevatedButton.icon(
-                icon: const Icon(Icons.flash_on),
-                label: const Text('AUTO-RÉVÉLER'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                ),
-                onPressed: _autoRevealAll,
-              ),
+            const SizedBox(height: 20),
             if (_isAutoRevealing && !_allRevealed)
-              const CircularProgressIndicator(color: Colors.amber),
+              const CircularProgressIndicator(color: Colors.amber, strokeWidth: 6),
             const SizedBox(height: 20),
             if (_allRevealed)
-              Consumer(builder: (context, ref, child) {
-                final session = ref.watch(sessionProvider);
-                return Column(
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(color: Colors.white10, borderRadius: BorderRadius.circular(12)),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(color: Colors.white10, borderRadius: BorderRadius.circular(12)),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _SummaryItem(value: _goldGained, icon: Icons.monetization_on, color: Colors.amber),
-                          const SizedBox(width: 20),
-                          _SummaryItem(value: _provGained, icon: Icons.apple, color: Colors.red),
-                          const SizedBox(width: 20),
-                          _SummaryItem(value: _woodGained, icon: Icons.handyman, color: Colors.brown),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.amber,
-                        foregroundColor: Colors.brown[900],
-                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                      ),
-                      onPressed: () {
-                        // Ajouter le butin à la cargaison
-                        ref.read(sessionProvider.notifier).addLootToCargaison(_goldGained, _provGained, _woodGained);
-                        
-                        // Ajouter les items spéciaux trouvés
-                        for (var crate in _crates) {
-                          if (crate.type == 'key' || crate.type == 'item') {
-                            ref.read(sessionProvider.notifier).addSpecialLoot(
-                              keyType: crate.keyType,
-                              itemId: crate.itemId,
-                            );
-                          }
-                          if (crate.type == 'map') {
-                            ref.read(sessionProvider.notifier).addDiscoveryMap();
-                          }
-                        }
-
-                        ref.read(sessionProvider.notifier).endLootSerie();
-                        
-                        if (session!.lootRemaining > 0) {
-                          setState(() => _generateCrates());
-                        }
-                      },
-                      child: Text(
-                        session!.lootRemaining > 1 
-                          ? 'SÉRIE SUIVANTE (${session.lootRemaining - 1} restantes)' 
-                          : 'TERMINER LA FOUILLE',
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                    ),
+                    _SummaryItem(value: _goldGained, icon: Icons.monetization_on, color: Colors.amber),
+                    const SizedBox(width: 20),
+                    _SummaryItem(value: _provGained, icon: Icons.apple, color: Colors.red),
+                    const SizedBox(width: 20),
+                    _SummaryItem(value: _woodGained, icon: Icons.handyman, color: Colors.brown),
                   ],
-                );
-              }),
+                ),
+              ),
+            const SizedBox(height: 30),
+            Consumer(builder: (context, ref, child) {
+              final session = ref.watch(sessionProvider);
+              if (session == null) return const SizedBox.shrink();
+
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // --- BOUTON AUTO ---
+                  _RoundActionButton(
+                    icon: Icons.flash_on,
+                    label: "AUTO",
+                    color: Colors.blueAccent,
+                    onPressed: (!_allRevealed && !_isAutoRevealing) ? _autoRevealAll : null,
+                  ),
+                  const SizedBox(width: 40),
+                  // --- BOUTON SUIVANT ---
+                  Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      _RoundActionButton(
+                        icon: session.lootRemaining > 1 ? Icons.arrow_forward : Icons.check,
+                        label: session.lootRemaining > 1 ? "SUIVANT" : "FIN",
+                        color: Colors.amber,
+                        onPressed: _allRevealed ? () {
+                          // Ajouter le butin à la cargaison
+                          ref.read(sessionProvider.notifier).addLootToCargaison(_goldGained, _provGained, _woodGained);
+                          
+                          // Ajouter les items spéciaux trouvés
+                          for (var crate in _crates) {
+                            if (crate.type == 'key' || crate.type == 'item') {
+                              ref.read(sessionProvider.notifier).addSpecialLoot(
+                                keyType: crate.keyType,
+                                itemId: crate.itemId,
+                              );
+                            }
+                            if (crate.type == 'map') {
+                              ref.read(sessionProvider.notifier).addDiscoveryMap();
+                            }
+                          }
+
+                          ref.read(sessionProvider.notifier).endLootSerie();
+                          
+                          if (session.lootRemaining > 1) {
+                            setState(() => _generateCrates());
+                          }
+                        } : null,
+                      ),
+                      if (session.lootRemaining > 1)
+                        Positioned(
+                          right: -5,
+                          top: -5,
+                          child: Container(
+                            width: 28,
+                            height: 28,
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 2),
+                              boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
+                            ),
+                            child: Center(
+                              child: Text(
+                                '${session.lootRemaining - 1}',
+                                style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              );
+            }),
+
           ],
         ),
       ),
@@ -229,6 +250,61 @@ class _CrateContent {
     this.keyType,
     this.itemId,
   });
+}
+
+class _RoundActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback? onPressed;
+
+  const _RoundActionButton({
+    required this.icon,
+    required this.label,
+    required this.color,
+    this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    bool isDisabled = onPressed == null;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onPressed,
+            borderRadius: BorderRadius.circular(40),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: 70,
+              height: 70,
+              decoration: BoxDecoration(
+                color: isDisabled ? Colors.grey.withValues(alpha: 0.2) : color,
+                shape: BoxShape.circle,
+                border: Border.all(color: isDisabled ? Colors.white10 : Colors.white24, width: 3),
+                boxShadow: isDisabled ? [] : [
+                  BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 12, spreadRadius: 2)
+                ],
+              ),
+              child: Icon(icon, color: isDisabled ? Colors.white24 : Colors.brown.shade900, size: 36),
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: TextStyle(
+            color: isDisabled ? Colors.white24 : Colors.white,
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1,
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class _CrateWidget extends StatefulWidget {
@@ -261,7 +337,7 @@ class _CrateWidgetState extends State<_CrateWidget> {
             color: widget.content.revealed ? Colors.white10 : Colors.brown.shade800,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: widget.content.revealed ? widget.content.color : Colors.brown.shade400, width: 2),
-            boxShadow: widget.content.revealed ? [BoxShadow(color: widget.content.color.withOpacity(0.5), blurRadius: 10)] : [],
+            boxShadow: widget.content.revealed ? [BoxShadow(color: widget.content.color.withValues(alpha: 0.5), blurRadius: 10)] : [],
           ),
           child: widget.content.revealed
               ? Column(

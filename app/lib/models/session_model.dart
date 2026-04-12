@@ -214,7 +214,7 @@ class SessionState {
   factory SessionState.fromMap(Map<String, dynamic> mapData, {String? id}) {
     final List<dynamic> flatMap = mapData['map'] as List<dynamic>;
     // On assume une taille fixe de 50 pour l'Archipel (MAP_SIZE coté serveur)
-    const int size = 50;
+    const int size = 36;
     final List<List<TileType>> reconstructedMap = List.generate(size, (i) {
       return List.generate(size, (j) {
         final int index = flatMap[i * size + j] as int;

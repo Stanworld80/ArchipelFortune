@@ -51,7 +51,7 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
   }
 
   Future<void> _loadAssets() async {
-    _mapBg = await _loadImage('assets/images/map_background.png');
+    _mapBg = await _loadImage('assets/images/mer.png');
     _shipIcon = await _loadImage('assets/images/ship_sprite2.png');
     _islandIcon = await _loadImage('assets/images/island_sprite.png');
     _compassIcon = await _loadImage('assets/images/compass_rose.png');
@@ -346,7 +346,7 @@ class ShipControlWheel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const double wheelSize = 130;
-    const int mapSize = 50;
+    const int mapSize = 36;
 
     // Helper to check if a direction is "Reverse"
     bool isReverse(int arrowAngle) {

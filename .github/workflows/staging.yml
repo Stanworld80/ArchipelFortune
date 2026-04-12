@@ -7,10 +7,9 @@ on:
   workflow_dispatch: 
 
 jobs:
-  build-test-deploy-staging:
-    name: Build, Test & Deploy (Android + Web) to Staging
+  build-android:
+    name: 🏗️ Build Android (Staging)
     runs-on: ubuntu-latest
-
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
@@ -58,6 +57,29 @@ jobs:
             --dart-define=SUPER_ADMIN_EMAIL=stanworld@gmail.com \
             --build-number=${{ github.run_number }}
 
+      - name: 📤 Upload AAB Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-aab-stg
+          path: app/build/app/outputs/bundle/release/app-release.aab
+
+  build-web:
+    name: 🌐 Build Web (Staging)
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🦅 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: 'any'
+
+      - name: 📦 Install dependencies
+        working-directory: app
+        run: flutter pub get
+
       - name: 🌐 Configure & Build Web (Staging)
         working-directory: app
         run: |
@@ -73,6 +95,32 @@ jobs:
             --dart-define=APP_ENV=staging \
             --dart-define=SUPER_ADMIN_EMAIL=stanworld@gmail.com
 
+      - name: 📤 Upload Web Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build-stg
+          path: app/build/web
+
+  deploy:
+    name: 🚀 Deploy to Staging
+    needs: [build-android, build-web]
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 📥 Download Android Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: android-aab-stg
+          path: artifacts/android
+
+      - name: 📥 Download Web Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: web-build-stg
+          path: app/build/web
+
       - name: 🔑 Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
@@ -85,9 +133,8 @@ jobs:
           
           # Distribute Android App Bundle
           APP_ID="${{ secrets.FIREBASE_ANDROID_APP_ID_STAGING }}"
-          echo "Distributing to App ID ending in: ${APP_ID: -8}"
           
-          npx firebase-tools appdistribution:distribute app/build/app/outputs/bundle/release/app-release.aab \
+          npx firebase-tools appdistribution:distribute artifacts/android/app-release.aab \
             --app "$APP_ID" \
             --groups "uat-testers" \
             --project archipel-fortune-stg
