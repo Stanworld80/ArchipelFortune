@@ -175,9 +175,18 @@ jobs:
         working-directory: functions
         run: npm ci
 
-      - name: 🔥 Firebase Deploy All (Dev)
+      - name: 🔥 Firebase Deploy Rules & Indexes (Dev)
         run: |
-          npx firebase-tools deploy --only hosting,firestore:rules,firestore:indexes,functions --project archipel-fortune-dev
+          npx firebase-tools deploy --only firestore:rules,firestore:indexes --project archipel-fortune-dev
+
+      - name: 🔥 Firebase Deploy Functions (Dev)
+        continue-on-error: true
+        run: |
+          npx firebase-tools deploy --only functions --project archipel-fortune-dev
+
+      - name: 🔥 Firebase Deploy Hosting (Dev)
+        run: |
+          npx firebase-tools deploy --only hosting --project archipel-fortune-dev
 
   e2e-tests:
     name: 🎭 E2E Tests (Dev)

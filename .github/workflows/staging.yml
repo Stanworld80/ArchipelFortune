@@ -180,9 +180,18 @@ jobs:
         working-directory: functions
         run: npm ci
 
-      - name: 🔥 Firebase Deploy All (Staging)
+      - name: 🔥 Firebase Deploy Rules & Indexes (Staging)
         run: |
-          npx firebase-tools deploy --only hosting,firestore:rules,firestore:indexes,functions --project archipel-fortune-staging
+          npx firebase-tools deploy --only firestore:rules,firestore:indexes --project archipel-fortune-staging
+
+      - name: 🔥 Firebase Deploy Functions (Staging)
+        continue-on-error: true
+        run: |
+          npx firebase-tools deploy --only functions --project archipel-fortune-staging
+
+      - name: 🔥 Firebase Deploy Hosting (Staging)
+        run: |
+          npx firebase-tools deploy --only hosting --project archipel-fortune-staging
 
   e2e-tests:
     name: 🎭 E2E Tests (Staging)
