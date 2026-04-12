@@ -220,6 +220,15 @@ class SessionNotifier extends Notifier<SessionState?> {
     final nextProvisions = (consumeProvision ? current.provisions - 1 : current.provisions).clamp(0, 999);
     final statusSuffix = consumeProvision ? "" : " (Vent favorable !)";
 
+    if (nextProvisions <= 0) {
+      state = current.copyWith(
+        isGameOver: true, 
+        statusMessage: "Famine ! Plus de provisions pour l'équipage.",
+        provisions: 0
+      );
+      return;
+    }
+
     if (tile == TileType.reef || tile == TileType.volcano) {
       if (current.boisCharpente > 0) {
         state = current.copyWith(
@@ -268,14 +277,19 @@ class SessionNotifier extends Notifier<SessionState?> {
             statusMessage: "Victoire sur les pirates ! +100 Or$statusSuffix",
           );
         } else {
+          final lostProvisions = (nextProvisions - 2).clamp(0, 999);
+          if (lostProvisions <= 0) {
+             state = current.copyWith(isGameOver: true, statusMessage: "Famine après combat !");
+             return;
+          }
           state = current.copyWith(
             x: nextX,
             y: nextY,
             orientation: newOrientation,
-            provisions: current.provisions - 3, // Lourde perte
+            provisions: lostProvisions,
             boisCharpente: (current.boisCharpente - 2).clamp(0, 999), 
             map: newMap,
-            statusMessage: "Défaite navale ! -3 Provisions, -2 Bois",
+            statusMessage: "Défaite navale ! -2 Provisions supplémentaires, -2 Bois",
           );
         }
         return;
@@ -290,7 +304,7 @@ class SessionNotifier extends Notifier<SessionState?> {
             x: nextX,
             y: nextY,
             orientation: newOrientation,
-            provisions: current.provisions - 1,
+            provisions: nextProvisions,
             isAtStopover: true,
             lootRemaining: (tile == TileType.temple) ? 10 : 5, // Bonus de loot pour le temple
             map: newMap,
@@ -315,7 +329,7 @@ class SessionNotifier extends Notifier<SessionState?> {
             x: nextX,
             y: nextY,
             orientation: newOrientation,
-            provisions: current.provisions - 1,
+            provisions: nextProvisions,
             isAtStopover: true,
             lootRemaining: 15,
             map: newMap,
@@ -332,7 +346,7 @@ class SessionNotifier extends Notifier<SessionState?> {
             x: nextX,
             y: nextY,
             orientation: newOrientation,
-            provisions: current.provisions - 1,
+            provisions: nextProvisions,
             isAtStopover: true,
             lootRemaining: 1, // Sera ajusté si item "filet supp" possédé
             map: newMap,
@@ -345,7 +359,8 @@ class SessionNotifier extends Notifier<SessionState?> {
       x: nextX,
       y: nextY,
       orientation: newOrientation,
-      provisions: current.provisions - 1,
+      provisions: nextProvisions,
+      statusMessage: "Pleine mer...$statusSuffix",
     );
   }
 

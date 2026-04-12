@@ -122,14 +122,21 @@ exports.moveShip = onCall(async (request) => {
     return { success: false, reason: "out_of_bounds" };
   }
 
-  const tileType = session.map[nextX][nextY];
+  const tileType = session.map[nextX * MAP_SIZE + nextY];
+  const nextProvisions = session.provisions - 1;
   let update = {
     x: nextX,
     y: nextY,
     orientation: nextOrientation,
-    provisions: FieldValue.increment(-1),
+    provisions: nextProvisions,
     statusMessage: ""
   };
+
+  if (nextProvisions <= 0) {
+    update.isGameOver = true;
+    update.statusMessage = "Famine ! Plus de provisions.";
+    update.provisions = 0;
+  }
 
   if (tileType === TileType.reef) {
     if (session.wood > 0) {

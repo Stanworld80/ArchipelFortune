@@ -51,11 +51,11 @@ class MapPainter extends CustomPainter {
 
     // Rayon de vision (5x5 centrée sur le navire)
     const int visionRadius = 2;
-    const double gridPadding = 20.0; // Espace pour les chiffres sur les axes
+    const double gridPadding = 0.0; // Espace supprimé pour les chiffres sur les axes
     final double actualTileSize = (size.width - gridPadding) / 5;
 
     // Dessin des axes (1-5)
-    _drawGridLabels(canvas, actualTileSize, gridPadding);
+    // _drawGridLabels(canvas, actualTileSize, gridPadding);
 
     canvas.save();
     canvas.translate(gridPadding, gridPadding);
@@ -137,7 +137,7 @@ class MapPainter extends CustomPainter {
 
     canvas.restore();
 
-    // Boussole dans le coin
+    /* 
     if (compassImage != null) {
       final double compassSize = size.width * 0.25;
       canvas.drawImageRect(
@@ -147,6 +147,7 @@ class MapPainter extends CustomPainter {
         Paint()..filterQuality = ui.FilterQuality.medium,
       );
     }
+    */
 
     // Dessin des indices de découverte (US04)
     _drawDiscoveryIndices(canvas, visionRadius, actualTileSize, gridPadding);

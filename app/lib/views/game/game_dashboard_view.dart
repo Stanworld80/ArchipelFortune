@@ -23,11 +23,12 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
   late AnimationController _animationController;
   late AnimationController _shakeController;
   late AnimationController _flashController;
+  late AnimationController _blinkController;
   String? _lastStatusMessage;
   ui.Image? _mapBg;
   ui.Image? _shipIcon;
   ui.Image? _islandIcon;
-  ui.Image? _compassIcon;
+
 
   @override
   void initState() {
@@ -47,6 +48,11 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
       duration: const Duration(milliseconds: 200),
     );
 
+    _blinkController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    )..repeat(reverse: true);
+
     _loadAssets();
   }
 
@@ -54,7 +60,6 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
     _mapBg = await _loadImage('assets/images/mer.png');
     _shipIcon = await _loadImage('assets/images/ship_sprite2.png');
     _islandIcon = await _loadImage('assets/images/island_sprite.png');
-    _compassIcon = await _loadImage('assets/images/compass_rose.png');
     if (mounted) setState(() {});
   }
 
@@ -71,6 +76,7 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
     _animationController.dispose();
     _shakeController.dispose();
     _flashController.dispose();
+    _blinkController.dispose();
     super.dispose();
   }
 
@@ -121,9 +127,35 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Center(
-              child: Text(
-                '${session.provisions} 🍎',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              child: AnimatedBuilder(
+                animation: _blinkController,
+                builder: (context, child) {
+                  final provisions = session.provisions;
+                  Color color = Colors.grey;
+                  FontWeight weight = FontWeight.normal;
+                  double opacity = 1.0;
+
+                  if (provisions < 10) {
+                    color = Colors.red;
+                    weight = FontWeight.bold;
+                  }
+                  
+                  if (provisions < 5) {
+                    opacity = _blinkController.value;
+                  }
+
+                  return Opacity(
+                    opacity: opacity,
+                    child: Text(
+                      '$provisions 🍎',
+                      style: TextStyle(
+                        fontSize: 18, 
+                        fontWeight: weight,
+                        color: color,
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ),
@@ -157,7 +189,6 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
                             background: _mapBg,
                             shipImage: _shipIcon,
                             islandImage: _islandIcon,
-                            compassImage: _compassIcon,
                           ),
                         ),
                       );
