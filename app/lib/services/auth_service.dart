@@ -16,6 +16,7 @@ class AuthService {
     try {
       return await _auth.signInWithEmailAndPassword(email: email, password: password);
     } catch (e) {
+      // ignore: avoid_print
       print('Error during email sign in: $e');
       return null;
     }
@@ -25,6 +26,7 @@ class AuthService {
     try {
       return await _auth.createUserWithEmailAndPassword(email: email, password: password);
     } catch (e) {
+      // ignore: avoid_print
       print('Error during email registration: $e');
       return null;
     }
@@ -34,6 +36,7 @@ class AuthService {
     try {
       return await googleLogin(_auth);
     } catch (e) {
+      // ignore: avoid_print
       print('Error during Google sign in: $e');
       return null;
     }
