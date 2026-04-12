@@ -144,7 +144,7 @@ jobs:
           
           npx firebase-tools appdistribution:distribute artifacts/android/app-release.apk \
             --app "$APP_ID" \
-            --groups "dev-testers" \
+            --groups "testers" \
             --release-notes "$RELEASE_NOTES" \
             --project archipel-fortune-dev
 
