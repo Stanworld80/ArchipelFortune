@@ -96,8 +96,15 @@ class MapPainter extends CustomPainter {
           canvas.drawImageRect(
             islandImage!,
             Rect.fromLTWH(0, 0, islandImage!.width.toDouble(), islandImage!.height.toDouble()),
-            rect.deflate(4),
-            Paint()..filterQuality = ui.FilterQuality.medium,
+            rect, // Full tile instead of deflate(4) to make it "bigger"
+            Paint()
+              ..filterQuality = ui.FilterQuality.medium
+              ..colorFilter = const ColorFilter.matrix(<double>[
+                1, 0, 0, 0, 0,
+                0, 1, 0, 0, 0,
+                0, 0, 1, 0, 0,
+                -1, -1, -1, 3, 0,
+              ]),
           );
         } else if (tile == TileType.island) {
           canvas.drawRect(rect, paintIsland);
@@ -238,8 +245,11 @@ class MapPainter extends CustomPainter {
     canvas.rotate(session.orientation * pi / 180);
 
     if (shipImage != null) {
+      // Si l'image est orientée vers l'Est par défaut, on ajoute un décalage de -90° (ou pi/2 en radians)
+      // pour que l'orientation 0 corresponde au Nord.
+      canvas.rotate(-pi / 2);
+
       // Filtre matriciel pour rendre le blanc transparent (Chroma Key sur le blanc)
-      // A' = 3*A - R - G - B (approximativement)
       const ColorFilter whiteToTransparent = ColorFilter.matrix(<double>[
         1, 0, 0, 0, 0,
         0, 1, 0, 0, 0,
@@ -250,13 +260,13 @@ class MapPainter extends CustomPainter {
       canvas.drawImageRect(
         shipImage!,
         Rect.fromLTWH(0, 0, shipImage!.width.toDouble(), shipImage!.height.toDouble()),
-        Rect.fromCenter(center: Offset.zero, width: size * 0.8, height: size * 1.0),
+        Rect.fromCenter(center: Offset.zero, width: size * 1.2, height: size * 1.5),
         Paint()
           ..filterQuality = ui.FilterQuality.medium
           ..colorFilter = whiteToTransparent,
       );
     } else {
-      // Évolution Visuelle selon hullLevel
+      // Les formes vectorielles sont déjà orientées vers le Nord par défaut
       if (session.hullLevel <= 2) {
         _drawSloop(canvas, size);
       } else if (session.hullLevel <= 4) {

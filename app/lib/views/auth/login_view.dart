@@ -193,14 +193,18 @@ class _LoginViewState extends ConsumerState<LoginView> {
                                     onPressed: _submit,
                                     label: _isLogin ? 'LANCER L\'AVENTURE' : 'SIGNER LE CONTRAT',
                                     isPrimary: true,
-                                    icon: Image.asset(
-                                      'assets/images/treasure_chest.png',
-                                      height: 28,
-                                      // Suggesting white as transparency by blending with white or using a color filter
-                                      // If the image is already PNG with transparency, this is perfect.
-                                      // If it has a white background, we attempt to blend it.
-                                      color: Colors.white.withOpacity(0.9),
-                                      colorBlendMode: BlendMode.modulate,
+                                    icon: ColorFiltered(
+                                      colorFilter: const ColorFilter.matrix(<double>[
+                                        1, 0, 0, 0, 0,
+                                        0, 1, 0, 0, 0,
+                                        0, 0, 1, 0, 0,
+                                        -1, -1, -1, 3, 0,
+                                      ]),
+                                      child: Image.asset(
+                                        'assets/images/treasure_chest.png',
+                                        height: 42,
+                                        fit: BoxFit.contain,
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(height: 16),
@@ -246,12 +250,26 @@ class _LoginViewState extends ConsumerState<LoginView> {
                   ),
 
                   const SizedBox(height: 48),
-
-                  Text(
-                    "Version ${AppEnvironment.version}+${AppEnvironment.buildNumber} • Mise à jour : ${AppEnvironment.lastUpdate} • © 2026 Stanislas Selle Informatique",
-                    style: GoogleFonts.outfit(color: Colors.black.withOpacity(0.7), fontSize: 10, letterSpacing: 0.5),
-                  ),
                 ],
+              ),
+            ),
+          ),
+          // Fixed Footer
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              color: Colors.black.withOpacity(0.6),
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              child: Text(
+                "Version ${AppEnvironment.version}+${AppEnvironment.buildNumber} • Mise à jour : ${AppEnvironment.lastUpdate} • © 2026 Stanislas Selle Informatique",
+                textAlign: TextAlign.center,
+                style: GoogleFonts.outfit(
+                  color: Colors.white.withOpacity(0.7),
+                  fontSize: 10,
+                  letterSpacing: 0.5,
+                ),
               ),
             ),
           ),
