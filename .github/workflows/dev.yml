@@ -35,12 +35,22 @@ jobs:
         run: |
           cp app/android/app/google-services.dev.json app/android/app/google-services.json
 
-      - name: 🏗️ Build Android APK (Debug/Dev)
-        working-directory: app
+      - name: 🔑 Setup Keystore
         run: |
-          flutter build apk --debug \
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/android/app/upload-keystore.jks
+
+      - name: 🏗️ Build Android APK (Release/Dev)
+        working-directory: app
+        env:
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEYSTORE_PATH: upload-keystore.jks
+        run: |
+          flutter build apk --release \
             --dart-define=APP_ENV=dev \
-            --dart-define=SUPER_ADMIN_EMAIL=stanworld@gmail.com
+            --dart-define=SUPER_ADMIN_EMAIL=stanworld@gmail.com \
+            --build-number=${{ github.run_number }}
 
       - name: 🌐 Configure & Build Web (Dev)
         working-directory: app
@@ -69,9 +79,11 @@ jobs:
           
           # Distribute Android APK
           APP_ID="${{ secrets.FIREBASE_ANDROID_APP_ID_DEV }}"
+          RELEASE_NOTES="Dev Build: ${{ github.event.head_commit.message }}"
           echo "Distributing to App ID ending in: ${APP_ID: -8}"
           
-          npx firebase-tools appdistribution:distribute app/build/app/outputs/flutter-apk/app-debug.apk \
+          npx firebase-tools appdistribution:distribute app/build/app/outputs/flutter-apk/app-release.apk \
             --app "$APP_ID" \
             --groups "dev-testers" \
+            --release-notes "$RELEASE_NOTES" \
             --project archipel-fortune-dev
