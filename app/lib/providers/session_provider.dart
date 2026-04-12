@@ -26,16 +26,19 @@ class SessionNotifier extends Notifier<SessionState?> {
       });
 
       final String sessionId = result.data['sessionId'];
+      final int actualSeed = result.data['seed'];
+      final int startX = result.data['x'];
+      final int startY = result.data['y'];
 
       state = SessionState(
         sessionId: sessionId,
-        x: mapSize ~/ 2,
-        y: mapSize ~/ 2,
+        x: startX,
+        y: startY,
         orientation: 0,
         provisions: startingProvisions,
         orVolatil: 0,
         boisCharpente: startingBois,
-        map: _generateMap(seed: seed),
+        map: _generateMap(seed: actualSeed, startX: startX, startY: startY),
         startTime: DateTime.now(),
         quests: [
           Quest(id: "explore_islands", title: "Explorateur en herbe", description: "Découvrez 3 îles inexplorées.", currentValue: 0, targetValue: 3, rewardType: RewardType.keyCopper, rewardAmount: 1),
@@ -47,7 +50,7 @@ class SessionNotifier extends Notifier<SessionState?> {
     }
   }
 
-  List<List<TileType>> _generateMap({int? seed}) {
+  List<List<TileType>> _generateMap({int? seed, int? startX, int? startY}) {
     // Cette logique DOIT être identique à celle de functions/index.js
     final rand = _Random(seed ?? 0);
     final map = List.generate(
@@ -55,9 +58,20 @@ class SessionNotifier extends Notifier<SessionState?> {
       (_) => List.generate(mapSize, (_) => TileType.sea),
     );
 
-    final startX = mapSize ~/ 2;
-    final startY = mapSize ~/ 2;
-    map[startX][startY] = TileType.sea;
+    // Si startX/startY ne sont pas fournis (ex: test local sans backend), on prend le milieu
+    final sX = startX ?? mapSize ~/ 2;
+    final sY = startY ?? mapSize ~/ 2;
+
+    // Zone de 5x5 en mer forcée (radius 2)
+    for (int i = -2; i <= 2; i++) {
+        for (int j = -2; j <= 2; j++) {
+            int nx = sX + i;
+            int ny = sY + j;
+            if (nx >= 0 && nx < mapSize && ny >= 0 && ny < mapSize) {
+                map[nx][ny] = TileType.sea;
+            }
+        }
+    }
 
     for (int i = 0; i < 5; i++) {
       int rx, ry;
@@ -69,7 +83,7 @@ class SessionNotifier extends Notifier<SessionState?> {
         ry = rand.nextInt(mapSize - 10) + 5;
       }
       
-      if ((rx - startX).abs() < 2 && (ry - startY).abs() < 2) continue;
+      if ((rx - sX).abs() < 3 && (ry - sY).abs() < 3) continue;
       
       final biome = rand.nextInt(3);
       _spawnLand(map, rx, ry, TileType.island, biome, rand);
@@ -78,7 +92,32 @@ class SessionNotifier extends Notifier<SessionState?> {
     for (int i = 0; i < 20; i++) {
         int rx = rand.nextInt(mapSize);
         int ry = rand.nextInt(mapSize);
+        if ((rx - sX).abs() < 3 && (ry - sY).abs() < 3) continue; // Respect 5x5 sea 
         if (map[rx][ry] == TileType.sea) map[rx][ry] = TileType.reef;
+    }
+
+    // Spots de pêche (15 spots aléatoires en mer)
+    for (int i = 0; i < 15; i++) {
+      int rx = rand.nextInt(mapSize);
+      int ry = rand.nextInt(mapSize);
+      if ((rx - sX).abs() < 3 && (ry - sY).abs() < 3) continue;
+      if (map[rx][ry] == TileType.sea) map[rx][ry] = TileType.fishing;
+    }
+
+    // Épaves dérivantes (10 spots aléatoires en mer)
+    for (int i = 0; i < 10; i++) {
+      int rx = rand.nextInt(mapSize);
+      int ry = rand.nextInt(mapSize);
+      if ((rx - sX).abs() < 3 && (ry - sY).abs() < 3) continue;
+      if (map[rx][ry] == TileType.sea) map[rx][ry] = TileType.shipwreck;
+    }
+
+    // Navires pirates (8 spots aléatoires en mer)
+    for (int i = 0; i < 8; i++) {
+      int rx = rand.nextInt(mapSize);
+      int ry = rand.nextInt(mapSize);
+      if ((rx - sX).abs() < 3 && (ry - sY).abs() < 3) continue;
+      if (map[rx][ry] == TileType.sea) map[rx][ry] = TileType.pirate;
     }
 
     int edge = rand.nextInt(4);
@@ -109,17 +148,11 @@ class SessionNotifier extends Notifier<SessionState?> {
     int radius = 2;
 
     TileType centerTile = type;
-    TileType beachTile = TileType.sand;
-    TileType extraTile = TileType.forest;
 
     if (biome == 1) { // Nordique
       centerTile = TileType.snow;
-      beachTile = TileType.ice;
-      extraTile = TileType.snow;
     } else if (biome == 2) { // Jungle
       centerTile = TileType.jungle;
-      beachTile = TileType.swamp;
-      extraTile = TileType.jungle;
     }
 
     final randPOI = Random(x * 31 + y * 17); // Déterministe pour le POI local
@@ -138,12 +171,6 @@ class SessionNotifier extends Notifier<SessionState?> {
               } else {
                 map[nx][ny] = centerTile;
               }
-            }
-            else if (dist < 1.5) {
-              map[nx][ny] = extraTile;
-            }
-            else if (dist < 2.2) {
-              if (map[nx][ny] == TileType.sea) map[nx][ny] = beachTile;
             }
             else if (dist < 2.8) {
               if (map[nx][ny] == TileType.sea) map[nx][ny] = TileType.shallow;

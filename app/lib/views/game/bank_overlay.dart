@@ -80,10 +80,12 @@ class BankOverlay extends ConsumerWidget {
                       Expanded(
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(backgroundColor: Colors.red.shade900, foregroundColor: Colors.white),
-                          onPressed: () {
+                          onPressed: () async {
                             if (session.orVolatil > 0) {
-                              _showQuitConfirmation(context, ref, session.orVolatil);
-                            } else {
+                              final newPermanentGold = userProfile.piecesOr + session.orVolatil;
+                              await ref.read(firestoreServiceProvider).updateUserField(userProfile.uid, 'piecesOr', newPermanentGold);
+                            }
+                            if (context.mounted) {
                               Navigator.of(context).pop();
                             }
                           },
@@ -111,34 +113,7 @@ class BankOverlay extends ConsumerWidget {
     );
   }
 
-  void _showQuitConfirmation(BuildContext context, WidgetRef ref, int volatilGold) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.teal.shade900,
-        title: const Text('ATTENTION', style: TextStyle(color: Colors.redAccent)),
-        content: Text(
-          'Il vous reste $volatilGold 🪙 non sécurisées dans votre cargaison. '
-          'Si vous stoppez l\'expédition maintenant, cet or sera PERDU !',
-          style: const TextStyle(color: Colors.white),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('ANNULER', style: TextStyle(color: Colors.amber)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () {
-              Navigator.pop(context); // Close dialog
-              Navigator.of(context).pop(); // Exit game
-            },
-            child: const Text('ABANDONNER L\'OR ET QUITTER'),
-          ),
-        ],
-      ),
-    );
-  }
+
 }
 
 class _RowInfo extends StatelessWidget {

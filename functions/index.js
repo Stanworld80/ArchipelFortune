@@ -10,7 +10,7 @@ const db = getFirestore();
 setGlobalOptions({ region: "us-central1" });
 
 // Constantes partagées avec le client
-const MAP_SIZE = 50;
+const MAP_SIZE = 36;
 
 const TileType = {
   sea: 0,
@@ -46,19 +46,19 @@ exports.startExpedition = onCall(async (request) => {
     throw new HttpsError("failed-precondition", "Or insuffisant.");
   }
 
-  // Génération de la carte (simplifiée pour le stockage)
-  const map = generateProceduralMap(seed || Date.now());
+  const actualSeed = seed || Date.now();
+  const { map, startX, startY } = generateProceduralMap(actualSeed);
 
   const sessionRef = db.collection("sessions").doc();
   const sessionData = {
     uid: auth.uid,
-    x: Math.floor(MAP_SIZE / 2),
-    y: Math.floor(MAP_SIZE / 2),
+    x: startX,
+    y: startY,
     orientation: 0,
     provisions: provisions,
     wood: wood,
     orVolatil: 0,
-    seed: seed || Date.now(),
+    seed: actualSeed,
     map: map.flat(),
     inventory: [],
     collections: {},
@@ -74,7 +74,12 @@ exports.startExpedition = onCall(async (request) => {
     t.set(sessionRef, sessionData);
   });
 
-  return { sessionId: sessionRef.id };
+  return { 
+    sessionId: sessionRef.id,
+    seed: actualSeed,
+    x: startX,
+    y: startY
+  };
 });
 
 exports.moveShip = onCall(async (request) => {
@@ -185,10 +190,20 @@ function generateProceduralMap(seed) {
   const rand = new Random(seed);
   const map = Array(MAP_SIZE).fill(0).map(() => Array(MAP_SIZE).fill(TileType.sea));
 
-  // Position de départ forcée en MER
-  const startX = Math.floor(MAP_SIZE / 2);
-  const startY = Math.floor(MAP_SIZE / 2);
-  map[startX][startY] = TileType.sea;
+  // Position de départ aléatoire (avec marge pour éviter les bords)
+  const startX = rand.nextInt(MAP_SIZE - 20) + 10;
+  const startY = rand.nextInt(MAP_SIZE - 20) + 10;
+  
+  // Zone de 5x5 en mer forcée (radius 2)
+  for (let i = -2; i <= 2; i++) {
+    for (let j = -2; j <= 2; j++) {
+      const nx = startX + i;
+      const ny = startY + j;
+      if (nx >= 0 && nx < MAP_SIZE && ny >= 0 && ny < MAP_SIZE) {
+        map[nx][ny] = TileType.sea;
+      }
+    }
+  }
 
   // Génération des îles (5 îles)
   for (let i = 0; i < 5; i++) {
@@ -201,7 +216,7 @@ function generateProceduralMap(seed) {
       ry = rand.nextInt(MAP_SIZE - 10) + 5;
     }
     
-    if (Math.abs(rx - startX) < 2 && Math.abs(ry - startY) < 2) continue;
+    if (Math.abs(rx - startX) < 3 && Math.abs(ry - startY) < 3) continue;
     
     // US05: Attribution d'un biome (0: Tropical, 1: Nordique, 2: Jungle)
     const biome = rand.nextInt(3);
@@ -228,6 +243,7 @@ function generateProceduralMap(seed) {
   for (let i = 0; i < 15; i++) {
     const rx = rand.nextInt(MAP_SIZE);
     const ry = rand.nextInt(MAP_SIZE);
+    if (Math.abs(rx - startX) < 3 && Math.abs(ry - startY) < 3) continue;
     if (map[rx][ry] === TileType.sea) map[rx][ry] = TileType.fishing;
   }
 
@@ -235,6 +251,7 @@ function generateProceduralMap(seed) {
   for (let i = 0; i < 10; i++) {
     const rx = rand.nextInt(MAP_SIZE);
     const ry = rand.nextInt(MAP_SIZE);
+    if (Math.abs(rx - startX) < 3 && Math.abs(ry - startY) < 3) continue;
     if (map[rx][ry] === TileType.sea) map[rx][ry] = TileType.shipwreck;
   }
 
@@ -242,11 +259,12 @@ function generateProceduralMap(seed) {
   for (let i = 0; i < 8; i++) {
     const rx = rand.nextInt(MAP_SIZE);
     const ry = rand.nextInt(MAP_SIZE);
+    if (Math.abs(rx - startX) < 3 && Math.abs(ry - startY) < 3) continue;
     if (map[rx][ry] === TileType.sea) map[rx][ry] = TileType.pirate;
   }
 
   // Flattening for easier storage if needed, but keeping as 2D for logic
-  return map; 
+  return { map, startX, startY }; 
 }
 
 function spawnLand(map, x, y, type, biome, rand) {
