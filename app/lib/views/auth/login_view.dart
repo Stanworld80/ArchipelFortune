@@ -259,8 +259,8 @@ class _LoginViewState extends ConsumerState<LoginView> {
 
                   // Footer
                   Text(
-                    "Version 0.1.2 • © 2026 Stanislas Selle Informatique",
-                    style: GoogleFonts.outfit(color: Colors.white38, fontSize: 11, letterSpacing: 1),
+                    "Version 0.1.3 • © 2026 Stanislas Selle Informatique",
+                    style: GoogleFonts.outfit(color: Colors.black.withOpacity(0.7), fontSize: 11, letterSpacing: 1),
                   ),
                 ],
               ),
