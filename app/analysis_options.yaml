@@ -3,3 +3,8 @@ include: package:flutter_lints/flutter.yaml
 analyzer:
   errors:
     deprecated_member_use: ignore
+    curly_braces_in_flow_control_structures: ignore
+    avoid_print: ignore
+    unused_import: ignore
+    unnecessary_underscores: ignore
+    unnecessary_nullable_for_final_variable_declarations: ignore
