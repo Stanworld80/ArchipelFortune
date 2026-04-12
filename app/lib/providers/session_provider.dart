@@ -1,18 +1,26 @@
 import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:meta/meta.dart';
 import '../models/session_model.dart';
+
+final firebaseFunctionsProvider = Provider<FirebaseFunctions>((ref) => FirebaseFunctions.instance);
 
 final sessionProvider = NotifierProvider<SessionNotifier, SessionState?>(() {
   return SessionNotifier();
 });
 
 class SessionNotifier extends Notifier<SessionState?> {
-  final _functions = FirebaseFunctions.instance;
+  FirebaseFunctions get _functions => ref.read(firebaseFunctionsProvider);
 
   @override
   SessionState? build() {
     return null;
+  }
+
+  @visibleForTesting
+  void debugSetState(SessionState? newState) {
+    state = newState;
   }
 
   static const int mapSize = 36;
@@ -38,7 +46,7 @@ class SessionNotifier extends Notifier<SessionState?> {
         provisions: startingProvisions,
         orVolatil: 0,
         boisCharpente: startingBois,
-        map: _generateMap(seed: actualSeed, startX: startX, startY: startY),
+        map: generateMap(seed: actualSeed, startX: startX, startY: startY),
         startTime: DateTime.now(),
         quests: [
           Quest(id: "explore_islands", title: "Explorateur en herbe", description: "Découvrez 3 îles inexplorées.", currentValue: 0, targetValue: 3, rewardType: RewardType.keyCopper, rewardAmount: 1),
@@ -50,9 +58,9 @@ class SessionNotifier extends Notifier<SessionState?> {
     }
   }
 
-  List<List<TileType>> _generateMap({int? seed, int? startX, int? startY}) {
+  List<List<TileType>> generateMap({int? seed, int? startX, int? startY}) {
     // Cette logique DOIT être identique à celle de functions/index.js
-    final rand = _Random(seed ?? 0);
+    final rand = ArchipelRandom(seed ?? 0);
     final map = List.generate(
       mapSize,
       (_) => List.generate(mapSize, (_) => TileType.sea),
@@ -76,8 +84,8 @@ class SessionNotifier extends Notifier<SessionState?> {
     for (int i = 0; i < 5; i++) {
       int rx, ry;
       if (i == 0) {
-        rx = startX + (rand.nextBool() ? 1 : -1) * (rand.nextInt(3) + 5);
-        ry = startY + (rand.nextBool() ? 1 : -1) * (rand.nextInt(3) + 5);
+        rx = sX + (rand.nextBool() ? 1 : -1) * (rand.nextInt(3) + 5);
+        ry = sY + (rand.nextBool() ? 1 : -1) * (rand.nextInt(3) + 5);
       } else {
         rx = rand.nextInt(mapSize - 10) + 5;
         ry = rand.nextInt(mapSize - 10) + 5;
@@ -144,7 +152,7 @@ class SessionNotifier extends Notifier<SessionState?> {
     }
   }
 
-  void _spawnLand(List<List<TileType>> map, int x, int y, TileType type, int biome, _Random rand) {
+  void _spawnLand(List<List<TileType>> map, int x, int y, TileType type, int biome, ArchipelRandom rand) {
     int radius = 2;
 
     TileType centerTile = type;
@@ -207,13 +215,13 @@ class SessionNotifier extends Notifier<SessionState?> {
       // Optimisation : au lieu de tout relire de Firestore, on applique la même logique localement
       // car le serveur est le maître, mais on veut de la réactivité.
       // Dans une version plus robuste, on écouterait le document Firestore (stream).
-      _internalPredictiveMove(direction);
+      internalPredictiveMove(direction);
     } catch (e) {
       print("Erreur move: $e");
     }
   }
 
-  void _internalPredictiveMove(String direction) {
+  void internalPredictiveMove(String direction) {
     final current = state;
     if (current == null) return;
 
@@ -334,7 +342,7 @@ class SessionNotifier extends Notifier<SessionState?> {
         );
         
         // Progression Quête : Exploration (US13)
-        _updateQuestProgress("explore_islands", 1);
+        updateQuestProgress("explore_islands", 1);
         return;
     }
 
@@ -413,7 +421,7 @@ class SessionNotifier extends Notifier<SessionState?> {
     );
 
     // Progression Quête : Or (US13)
-    _updateQuestProgress("collect_gold", finalGold);
+    updateQuestProgress("collect_gold", finalGold);
   }
 
   void addSpecialLoot({String? keyType, String? itemId}) {
@@ -431,7 +439,7 @@ class SessionNotifier extends Notifier<SessionState?> {
 
     if (itemId != null) {
       newInventory.add(itemId);
-      _checkCollectionsProgress(itemId, current.collections, (newCollections) {
+      checkCollectionsProgress(itemId, current.collections, (newCollections) {
         state = current.copyWith(
           copperKeys: ck,
           silverKeys: sk,
@@ -450,7 +458,7 @@ class SessionNotifier extends Notifier<SessionState?> {
     }
   }
 
-  void _checkCollectionsProgress(String itemId, Map<String, int> currentCollections, Function(Map<String, int>) onUpdate) {
+  void checkCollectionsProgress(String itemId, Map<String, int> currentCollections, Function(Map<String, int>) onUpdate) {
     final Map<String, int> newCollections = Map.from(currentCollections);
     
     // Définition simple des panoplies
@@ -545,14 +553,14 @@ class SessionNotifier extends Notifier<SessionState?> {
     );
   }
 
-  void _updateQuestProgress(String questId, int increment) {
+  void updateQuestProgress(String questId, int increment) {
     if (state == null) return;
     final List<Quest> newQuests = state!.quests.map((q) {
       if (q.id == questId && !q.isCompleted) {
         int newVal = q.currentValue + increment;
         bool completed = newVal >= q.targetValue;
         if (completed) {
-           _grantQuestReward(q.rewardType, q.rewardAmount);
+           grantQuestReward(q.rewardType, q.rewardAmount);
         }
         return q.copyWith(currentValue: newVal, isCompleted: completed);
       }
@@ -562,7 +570,7 @@ class SessionNotifier extends Notifier<SessionState?> {
     state = state!.copyWith(quests: newQuests);
   }
 
-  void _grantQuestReward(RewardType type, int amount) {
+  void grantQuestReward(RewardType type, int amount) {
     if (state == null) return;
     final current = state!;
 
@@ -595,9 +603,9 @@ class SessionNotifier extends Notifier<SessionState?> {
 }
 
 // Random déterministe identique au serveur
-class _Random {
+class ArchipelRandom {
   int seed;
-  _Random(this.seed);
+  ArchipelRandom(this.seed);
   double next() {
     seed = (seed * 16807) % 2147483647;
     return seed / 2147483647;
