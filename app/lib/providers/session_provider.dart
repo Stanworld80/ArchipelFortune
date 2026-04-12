@@ -140,12 +140,7 @@ class SessionNotifier extends Notifier<SessionState?> {
               }
             }
             else if (dist < 1.5) {
-              // Chance de Temple
-              if ((biome == 2 || biome == 0) && randPOI.nextDouble() > 0.9) {
-                map[nx][ny] = TileType.temple;
-              } else {
-                map[nx][ny] = extraTile;
-              }
+              map[nx][ny] = extraTile;
             }
             else if (dist < 2.2) {
               if (map[nx][ny] == TileType.sea) map[nx][ny] = beachTile;
@@ -295,10 +290,10 @@ class SessionNotifier extends Notifier<SessionState?> {
         return;
     }
 
-    if (tile == TileType.island || tile == TileType.port || tile == TileType.snow || tile == TileType.jungle || tile == TileType.temple) {
+    if (tile == TileType.island || tile == TileType.port || tile == TileType.snow || tile == TileType.jungle) {
         // L'île est pillée, on la transforme en 'grass/snow/jungle' pour empêcher de re-looter
         final newMap = List<List<TileType>>.generate(mapSize, (i) => List<TileType>.from(current.map[i]));
-        newMap[nextX][nextY] = (tile == TileType.snow) ? TileType.snow : (tile == TileType.jungle || tile == TileType.temple ? TileType.jungle : TileType.grass);
+        newMap[nextX][nextY] = (tile == TileType.snow) ? TileType.snow : (tile == TileType.jungle ? TileType.jungle : TileType.grass);
         
         state = current.copyWith(
             x: nextX,
@@ -306,9 +301,9 @@ class SessionNotifier extends Notifier<SessionState?> {
             orientation: newOrientation,
             provisions: nextProvisions,
             isAtStopover: true,
-            lootRemaining: (tile == TileType.temple) ? 10 : 5, // Bonus de loot pour le temple
+            lootRemaining: 5,
             map: newMap,
-            statusMessage: (tile == TileType.temple) ? "Temple Mystique ! Butin doublé." : "Escale ! Butin récupéré.",
+            statusMessage: "Escale ! Butin récupéré.",
         );
         
         // Progression Quête : Exploration (US13)

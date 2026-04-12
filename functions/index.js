@@ -27,7 +27,6 @@ const TileType = {
   ice: 11,
   jungle: 12,
   swamp: 13,
-  temple: 14,
   volcano: 15,
   shipwreck: 16,
   pirate: 17
@@ -292,12 +291,7 @@ function spawnLand(map, x, y, type, biome, rand) {
           map[nx][ny] = TileType.port;
           portPlaced = true;
         } else {
-          // Chance de Temple dans la jungle ou forêt
-          if ((biome === 2 || biome === 0) && rand.next() > 0.9) {
-            map[nx][ny] = TileType.temple;
-          } else {
-            map[nx][ny] = extraTile;
-          }
+          map[nx][ny] = extraTile;
         }
       }
       // Plages / Transition

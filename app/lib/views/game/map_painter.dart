@@ -10,7 +10,6 @@ class MapPainter extends CustomPainter {
   final ui.Image? background;
   final ui.Image? shipImage;
   final ui.Image? islandImage;
-  final ui.Image? compassImage;
 
   MapPainter({
     required this.session,
@@ -19,7 +18,6 @@ class MapPainter extends CustomPainter {
     this.background,
     this.shipImage,
     this.islandImage,
-    this.compassImage,
   });
 
   @override
@@ -53,9 +51,6 @@ class MapPainter extends CustomPainter {
     const int visionRadius = 2;
     const double gridPadding = 0.0; // Espace supprimé pour les chiffres sur les axes
     final double actualTileSize = (size.width - gridPadding) / 5;
-
-    // Dessin des axes (1-5)
-    // _drawGridLabels(canvas, actualTileSize, gridPadding);
 
     canvas.save();
     canvas.translate(gridPadding, gridPadding);
@@ -118,10 +113,6 @@ class MapPainter extends CustomPainter {
           _drawVolcano(canvas, rect);
         }
 
-        if (tile == TileType.temple) {
-          _drawTemple(canvas, rect);
-        }
-
         if (tile == TileType.shipwreck) {
           _drawShipwreck(canvas, rect);
         }
@@ -143,18 +134,6 @@ class MapPainter extends CustomPainter {
     _drawShipSprite(canvas, (visionRadius * actualTileSize), (visionRadius * actualTileSize), actualTileSize);
 
     canvas.restore();
-
-    /* 
-    if (compassImage != null) {
-      final double compassSize = size.width * 0.25;
-      canvas.drawImageRect(
-        compassImage!,
-        Rect.fromLTWH(0, 0, compassImage!.width.toDouble(), compassImage!.height.toDouble()),
-        Rect.fromLTWH(size.width - compassSize - 10, size.height - compassSize - 10, compassSize, compassSize),
-        Paint()..filterQuality = ui.FilterQuality.medium,
-      );
-    }
-    */
 
     // Dessin des indices de découverte (US04)
     _drawDiscoveryIndices(canvas, visionRadius, actualTileSize, gridPadding);
@@ -199,25 +178,6 @@ class MapPainter extends CustomPainter {
     canvas.drawLine(rect.topLeft + const Offset(5, 5), rect.bottomLeft + const Offset(5, -5), detailPaint);
     canvas.drawLine(rect.topCenter, rect.bottomCenter, detailPaint);
     canvas.drawLine(rect.topRight + const Offset(-5, 5), rect.bottomRight + const Offset(-5, -5), detailPaint);
-  }
-
-  void _drawGridLabels(Canvas canvas, double tileSize, double padding) {
-    const textStyle = TextStyle(color: Colors.black87, fontSize: 14, fontWeight: FontWeight.bold);
-    for (int i = 1; i <= 5; i++) {
-       // Labels colonnes (Haut)
-       final textPainterX = TextPainter(
-         text: TextSpan(text: '$i', style: textStyle),
-         textDirection: TextDirection.ltr,
-       )..layout();
-       textPainterX.paint(canvas, Offset(padding + (i - 1) * tileSize + (tileSize - textPainterX.width) / 2, (padding - textPainterX.height) / 2));
-
-       // Labels lignes (Gauche)
-       final textPainterY = TextPainter(
-         text: TextSpan(text: '$i', style: textStyle),
-         textDirection: TextDirection.ltr,
-       )..layout();
-       textPainterY.paint(canvas, Offset((padding - textPainterY.width) / 2, padding + (i - 1) * tileSize + (tileSize - textPainterY.height) / 2));
-    }
   }
 
   void _drawLand(Canvas canvas, Rect rect, TileType tile) {
@@ -393,23 +353,6 @@ class MapPainter extends CustomPainter {
     
     // Lave
     canvas.drawCircle(Offset(center.dx, center.dy - height / 2 + 5), 4, Paint()..color = Colors.orangeAccent);
-  }
-
-  void _drawTemple(Canvas canvas, Rect rect) {
-    final center = rect.center;
-    final size = rect.width * 0.6;
-    
-    final paint = Paint()..color = Colors.amber.shade700..style = PaintingStyle.fill;
-    
-    // Base carrée
-    canvas.drawRect(Rect.fromCenter(center: center, width: size, height: size * 0.4), paint);
-    // Sommet triangulaire
-    final path = Path();
-    path.moveTo(center.dx - size / 2, center.dy - size * 0.1);
-    path.lineTo(center.dx + size / 2, center.dy - size * 0.1);
-    path.lineTo(center.dx, center.dy - size * 0.6);
-    path.close();
-    canvas.drawPath(path, paint);
   }
 
   void _drawShipwreck(Canvas canvas, Rect rect) {

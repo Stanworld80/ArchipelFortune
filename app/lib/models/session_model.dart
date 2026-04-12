@@ -13,7 +13,6 @@ enum TileType {
   ice,
   jungle,
   swamp,
-  temple,
   volcano,
   shipwreck,
   pirate
