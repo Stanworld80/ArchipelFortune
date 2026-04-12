@@ -173,7 +173,7 @@ class SessionState {
       collections: collections ?? this.collections,
       isAtStopover: isAtStopover ?? this.isAtStopover,
       lootRemaining: lootRemaining ?? this.lootRemaining,
-      startTime: this.startTime,
+      startTime: startTime,
       isGameOver: isGameOver ?? this.isGameOver,
       statusMessage: statusMessage ?? this.statusMessage,
       discoveredIslandCoords: discoveredIslandCoords ?? this.discoveredIslandCoords,
