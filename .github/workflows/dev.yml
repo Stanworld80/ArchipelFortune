@@ -35,7 +35,50 @@ jobs:
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
-...
+
+      - name: ⚙️ Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: 🦅 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: 'any'
+
+      - name: 📦 Install dependencies
+        working-directory: app
+        run: flutter pub get
+
+      - name: 🔑 Setup Google Services (Dev)
+        run: |
+          cp app/android/app/google-services.dev.json app/android/app/google-services.json
+
+      - name: 🔑 Setup Keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/android/app/upload-keystore.jks
+
+      - name: 🏗️ Build Android APK (Release/Dev)
+        working-directory: app
+        env:
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEYSTORE_PATH: upload-keystore.jks
+        run: |
+          flutter build apk --release \
+            --dart-define=APP_ENV=dev \
+            --dart-define=SUPER_ADMIN_EMAIL=stanworld@gmail.com \
+            --build-number=${{ github.run_number }}
+
+      - name: 📤 Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk-dev
+          path: app/build/app/outputs/flutter-apk/app-release.apk
+
   build-web:
     name: 🌐 Build Web (Dev)
     needs: unit-tests
@@ -43,7 +86,38 @@ jobs:
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
-...
+
+      - name: 🦅 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: 'any'
+
+      - name: 📦 Install dependencies
+        working-directory: app
+        run: flutter pub get
+
+      - name: 🌐 Configure & Build Web (Dev)
+        working-directory: app
+        run: |
+          # Générer index.html à partir du template
+          cp web/index-template.html web/index.html
+          sed -i "s|##GOOGLE_SIGNIN_CLIENT_ID_PLACEHOLDER##|83241971458-14tiragdibb39tnm9op5nd6fqnm4ct53.apps.googleusercontent.com|g" web/index.html
+          
+          # S'assurer que la plateforme web est configurée
+          flutter create . --platforms web
+          
+          # Build
+          flutter build web --debug \
+            --dart-define=APP_ENV=dev \
+            --dart-define=SUPER_ADMIN_EMAIL=stanworld@gmail.com
+
+      - name: 📤 Upload Web Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build-dev
+          path: app/build/web
+
   deploy-app:
     name: 📱 Deploy App to Tester (Dev)
     needs: build-android
