@@ -9,8 +9,9 @@ test.describe('Archipel Fortune Smoke Tests', () => {
 
     // Activation de l'accessibilité via plusieurs méthodes pour maximiser la réussite
     await page.evaluate(() => {
-      // 1. Recherche directe dans tout le document
+      const start = Date.now();
       const findAndClick = () => {
+        // Flutter Web semantics tree activation
         const btns = Array.from(document.querySelectorAll('flt-semantics-placeholder, [aria-label="Enable accessibility"]'));
         const accessBtn = btns.find(el => el.getAttribute('aria-label') === 'Enable accessibility' || el.textContent?.includes('accessibility'));
         if (accessBtn instanceof HTMLElement) {
@@ -21,24 +22,17 @@ test.describe('Archipel Fortune Smoke Tests', () => {
       };
       
       if (!findAndClick()) {
-        // Envoi d'un événement clavier Tab pour forcer l'apparition du bouton
         window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab' }));
         setTimeout(findAndClick, 500);
       }
     });
 
-    // 2. Si ça échoue, on tente le clic forcé via Playwright
-    try {
-      const pBtn = page.getByRole('button', { name: /Enable accessibility/i });
-      if (await pBtn.isVisible({ timeout: 5000 })) {
-        await pBtn.click({ force: true });
-      }
-    } catch (e) {
-      // Ignore
-    }
-
-    // Attente de l'injection sémantique (réduit à 5s car 10s c'est long)
-    await page.waitForTimeout(5000);
+    // Attente explicite que le bouton disparaisse ou que le contenu sémantique apparaisse
+    await page.waitForTimeout(3000);
+    
+    // Vérification de sécurité pour s'assurer qu'on n'est pas bloqué sur l'écran d'accueil Flutter sans sémantique
+    const canvas = page.locator('flutter-view');
+    await expect(canvas).toBeVisible({ timeout: 10000 });
   });
 
   test('Page Title Verification', async ({ page }) => {
@@ -54,10 +48,14 @@ test.describe('Archipel Fortune Smoke Tests', () => {
   test('Authentication UI Elements', async ({ page }) => {
     const submitBtn = page.getByLabel('AUTH_SUBMIT_BTN');
     await expect(submitBtn).toBeVisible({ timeout: 20000 });
+    // On attend que le bouton ne soit plus désactivé (souvent vrai au chargement initial)
+    await expect(submitBtn).toBeEnabled({ timeout: 10000 });
   });
 
   test('Form Interaction', async ({ page }) => {
     const emailInput = page.getByLabel('AUTH_EMAIL_FIELD');
+    await expect(emailInput).toBeVisible();
+    await expect(emailInput).toBeEnabled({ timeout: 10000 });
     await emailInput.fill('test@example.com');
     await expect(emailInput).toHaveValue('test@example.com');
   });

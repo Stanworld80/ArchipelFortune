@@ -26,7 +26,9 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
       }
     });
 
-    await page.waitForTimeout(5000);
+    await page.waitForTimeout(3000);
+    const canvas = page.locator('flutter-view');
+    await expect(canvas).toBeVisible({ timeout: 10000 });
   });
 
   test('Full Journey: Register -> Prepare -> Navigate', async ({ page }) => {
@@ -40,7 +42,10 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
       await toggleBtn.click();
     }
 
-    await page.getByLabel('AUTH_EMAIL_FIELD').fill(testEmail);
+    const emailField = page.getByLabel('AUTH_EMAIL_FIELD');
+    await expect(emailField).toBeEnabled({ timeout: 10000 });
+    await emailField.fill(testEmail);
+    
     await page.getByLabel('AUTH_PASSWORD_FIELD').fill(testPassword);
     
     const signupBtn = page.getByLabel('AUTH_SUBMIT_BTN');

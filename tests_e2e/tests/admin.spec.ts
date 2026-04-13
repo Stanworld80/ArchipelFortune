@@ -10,11 +10,11 @@ test.describe('Archipel Fortune Admin Panel', () => {
     await page.goto('/', { waitUntil: 'load', timeout: 60000 });
     await page.waitForSelector('flutter-view', { timeout: 30000 });
 
-    // Enable accessibility
+    // Activation de l'accessibilité
     await page.evaluate(() => {
       const findAndClick = () => {
         const btns = Array.from(document.querySelectorAll('flt-semantics-placeholder, [aria-label="Enable accessibility"]'));
-        const accessBtn = btns.find(el => el.getAttribute('aria-label') === 'Enable accessibility');
+        const accessBtn = btns.find(el => el.getAttribute('aria-label') === 'Enable accessibility' || el.textContent?.includes('accessibility'));
         if (accessBtn instanceof HTMLElement) {
           accessBtn.click();
           return true;
@@ -27,7 +27,9 @@ test.describe('Archipel Fortune Admin Panel', () => {
       }
     });
 
-    await page.waitForTimeout(5000);
+    await page.waitForTimeout(3000);
+    const canvas = page.locator('flutter-view');
+    await expect(canvas).toBeVisible({ timeout: 10000 });
   });
 
   test('Access Admin Panel as Superadmin', async ({ page }) => {
@@ -40,7 +42,10 @@ test.describe('Archipel Fortune Admin Panel', () => {
     }
 
     // 2. Connection as Superadmin
-    await page.getByLabel('AUTH_EMAIL_FIELD').fill(SUPER_ADMIN_EMAIL);
+    const emailField = page.getByLabel('AUTH_EMAIL_FIELD');
+    await expect(emailField).toBeEnabled({ timeout: 10000 });
+    await emailField.fill(SUPER_ADMIN_EMAIL);
+    
     await page.getByLabel('AUTH_PASSWORD_FIELD').fill(TEST_PASSWORD);
     await page.getByLabel('AUTH_SUBMIT_BTN').click();
 
