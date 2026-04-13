@@ -27,7 +27,8 @@ test.describe('Archipel Fortune Admin Panel', () => {
       }
     });
 
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(5000);
+    await expect(page.getByLabel('Enable accessibility')).not.toBeVisible({ timeout: 10000 });
     const canvas = page.locator('flutter-view');
     await expect(canvas).toBeVisible({ timeout: 10000 });
   });
@@ -43,7 +44,9 @@ test.describe('Archipel Fortune Admin Panel', () => {
 
     // 2. Connection as Superadmin
     const emailField = page.getByLabel('AUTH_EMAIL_FIELD');
-    await expect(emailField).toBeEnabled({ timeout: 10000 });
+    await expect(emailField).toBeVisible({ timeout: 20000 });
+    await emailField.click({ force: true });
+    await expect(emailField).toBeEnabled({ timeout: 20000 });
     await emailField.fill(SUPER_ADMIN_EMAIL);
     
     await page.getByLabel('AUTH_PASSWORD_FIELD').fill(TEST_PASSWORD);

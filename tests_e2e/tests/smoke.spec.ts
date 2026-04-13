@@ -28,8 +28,11 @@ test.describe('Archipel Fortune Smoke Tests', () => {
     });
 
     // Attente explicite que le bouton disparaisse ou que le contenu sémantique apparaisse
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(5000);
     
+    // On s'assure que le bouton d'accessibilité n'est plus là (indique que les sémantiques sont chargées)
+    await expect(page.getByLabel('Enable accessibility')).not.toBeVisible({ timeout: 10000 });
+
     // Vérification de sécurité pour s'assurer qu'on n'est pas bloqué sur l'écran d'accueil Flutter sans sémantique
     const canvas = page.locator('flutter-view');
     await expect(canvas).toBeVisible({ timeout: 10000 });
@@ -54,8 +57,10 @@ test.describe('Archipel Fortune Smoke Tests', () => {
 
   test('Form Interaction', async ({ page }) => {
     const emailInput = page.getByLabel('AUTH_EMAIL_FIELD');
-    await expect(emailInput).toBeVisible();
-    await expect(emailInput).toBeEnabled({ timeout: 10000 });
+    await expect(emailInput).toBeVisible({ timeout: 20000 });
+    // On tente un clic pour forcer le focus et l'activation sémantique si nécessaire
+    await emailInput.click({ force: true });
+    await expect(emailInput).toBeEnabled({ timeout: 20000 });
     await emailInput.fill('test@example.com');
     await expect(emailInput).toHaveValue('test@example.com');
   });
