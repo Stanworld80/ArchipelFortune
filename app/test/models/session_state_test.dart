@@ -4,10 +4,10 @@ import 'package:app/models/session_model.dart';
 void main() {
   group('SessionState Model Tests', () {
     test('SessionState.fromMap and SessionState.toMap should be consistent', () {
-      final map_size = 36;
+      final mapSize = 36;
       final mockMap = List.generate(
-        map_size,
-        (_) => List.generate(map_size, (_) => TileType.sea),
+        mapSize,
+        (_) => List.generate(mapSize, (_) => TileType.sea),
       );
       
       final sessionState = SessionState(
