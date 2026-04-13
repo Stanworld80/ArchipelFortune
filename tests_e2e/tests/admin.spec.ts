@@ -12,9 +12,19 @@ test.describe('Archipel Fortune Admin Panel', () => {
 
     // Enable accessibility
     await page.evaluate(() => {
-      const btns = Array.from(document.querySelectorAll('flt-semantics-placeholder, [aria-label="Enable accessibility"]'));
-      const accessBtn = btns.find(el => el.getAttribute('aria-label') === 'Enable accessibility');
-      if (accessBtn instanceof HTMLElement) accessBtn.click();
+      const findAndClick = () => {
+        const btns = Array.from(document.querySelectorAll('flt-semantics-placeholder, [aria-label="Enable accessibility"]'));
+        const accessBtn = btns.find(el => el.getAttribute('aria-label') === 'Enable accessibility');
+        if (accessBtn instanceof HTMLElement) {
+          accessBtn.click();
+          return true;
+        }
+        return false;
+      };
+      if (!findAndClick()) {
+        window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab' }));
+        setTimeout(findAndClick, 500);
+      }
     });
 
     await page.waitForTimeout(5000);
@@ -22,16 +32,17 @@ test.describe('Archipel Fortune Admin Panel', () => {
 
   test('Access Admin Panel as Superadmin', async ({ page }) => {
     // 1. Ensure we are on the Login screen (not Sign-up)
-    const isSignup = await page.getByText(/Inscription/i).isVisible();
-    if (isSignup) {
-      await page.getByText(/Se connecter/i).click();
-      await expect(page.getByText(/Connexion/i, { exact: true })).toBeVisible();
+    // Check if toggle says "SE CONNECTER" (means we are on signup page)
+    const toggleBtn = page.getByLabel('AUTH_TOGGLE_BTN');
+    const toggleText = await toggleBtn.innerText();
+    if (toggleText.includes('SE CONNECTER')) {
+      await toggleBtn.click();
     }
 
     // 2. Connection as Superadmin
-    await page.getByLabel('Email').fill(SUPER_ADMIN_EMAIL);
-    await page.getByLabel('Mot de passe').fill(TEST_PASSWORD);
-    await page.getByRole('button', { name: /Se connecter/i }).click();
+    await page.getByLabel('AUTH_EMAIL_FIELD').fill(SUPER_ADMIN_EMAIL);
+    await page.getByLabel('AUTH_PASSWORD_FIELD').fill(TEST_PASSWORD);
+    await page.getByLabel('AUTH_SUBMIT_BTN').click();
 
     // Wait for Login to complete
     await expect(page.getByText(/Bienvenue/i)).toBeVisible({ timeout: 30000 });
@@ -53,16 +64,16 @@ test.describe('Archipel Fortune Admin Panel', () => {
 
   test('Modify Player Gold', async ({ page }) => {
     // 1. Ensure we are on the Login screen (not Sign-up)
-    const isSignup = await page.getByText(/Inscription/i).isVisible();
-    if (isSignup) {
-      await page.getByText(/Se connecter/i).click();
-      await expect(page.getByText(/Connexion/i, { exact: true })).toBeVisible();
+    const toggleBtn = page.getByLabel('AUTH_TOGGLE_BTN');
+    const toggleText = await toggleBtn.innerText();
+    if (toggleText.includes('SE CONNECTER')) {
+      await toggleBtn.click();
     }
 
     // 2. Connection and navigation
-    await page.getByLabel('Email').fill(SUPER_ADMIN_EMAIL);
-    await page.getByLabel('Mot de passe').fill(TEST_PASSWORD);
-    await page.getByRole('button', { name: /Se connecter/i }).click();
+    await page.getByLabel('AUTH_EMAIL_FIELD').fill(SUPER_ADMIN_EMAIL);
+    await page.getByLabel('AUTH_PASSWORD_FIELD').fill(TEST_PASSWORD);
+    await page.getByLabel('AUTH_SUBMIT_BTN').click();
 
     // Wait for Login to complete
     await expect(page.getByText(/Bienvenue/i)).toBeVisible({ timeout: 30000 });

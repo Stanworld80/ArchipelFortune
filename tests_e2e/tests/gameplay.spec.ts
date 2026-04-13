@@ -11,24 +11,39 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
 
     // Activation de l'accessibilité
     await page.evaluate(() => {
-      const btns = Array.from(document.querySelectorAll('flt-semantics-placeholder, [aria-label="Enable accessibility"]'));
-      const accessBtn = btns.find(el => el.getAttribute('aria-label') === 'Enable accessibility' || el.textContent?.includes('accessibility'));
-      if (accessBtn instanceof HTMLElement) accessBtn.click();
+      const findAndClick = () => {
+        const btns = Array.from(document.querySelectorAll('flt-semantics-placeholder, [aria-label="Enable accessibility"]'));
+        const accessBtn = btns.find(el => el.getAttribute('aria-label') === 'Enable accessibility' || el.textContent?.includes('accessibility'));
+        if (accessBtn instanceof HTMLElement) {
+          accessBtn.click();
+          return true;
+        }
+        return false;
+      };
+      if (!findAndClick()) {
+        window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab' }));
+        setTimeout(findAndClick, 500);
+      }
     });
 
-    await page.waitForTimeout(10000);
+    await page.waitForTimeout(5000);
   });
 
   test('Full Journey: Register -> Prepare -> Navigate', async ({ page }) => {
     // 1. Inscription
-    const signupToggle = page.getByText(/S'inscrire/i);
-    await expect(signupToggle.first()).toBeVisible({ timeout: 45000 });
-    await signupToggle.first().click();
-
-    await page.getByLabel('Email').fill(testEmail);
-    await page.getByLabel('Mot de passe').fill(testPassword);
+    const toggleBtn = page.getByLabel('AUTH_TOGGLE_BTN');
+    await expect(toggleBtn).toBeVisible({ timeout: 45000 });
+    const toggleText = await toggleBtn.innerText();
     
-    const signupBtn = page.getByRole('button', { name: /Créer un compte/i });
+    // Si on n'est pas déjà en mode inscription (bouton propose "SE CONNECTER" quand on est en inscription)
+    if (!toggleText.includes('SE CONNECTER')) {
+      await toggleBtn.click();
+    }
+
+    await page.getByLabel('AUTH_EMAIL_FIELD').fill(testEmail);
+    await page.getByLabel('AUTH_PASSWORD_FIELD').fill(testPassword);
+    
+    const signupBtn = page.getByLabel('AUTH_SUBMIT_BTN');
     await signupBtn.click();
 
     // 2. Vérification HomeView
@@ -54,7 +69,7 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
     await expect(page.getByText(/POSITION: 18, 18/i)).toBeVisible();
 
     // 5. Mouvement
-    const advanceBtn = page.getByRole('button', { name: /AVANCER/i });
+    const advanceBtn = page.getByLabel('MOVE_UP_BTN');
     await expect(advanceBtn).toBeVisible({ timeout: 10000 });
     await advanceBtn.click();
 

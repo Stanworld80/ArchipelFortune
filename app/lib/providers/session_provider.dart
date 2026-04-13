@@ -48,6 +48,7 @@ class SessionNotifier extends Notifier<SessionState?> {
         boisCharpente: startingBois,
         map: generateMap(seed: actualSeed, startX: startX, startY: startY),
         startTime: DateTime.now(),
+        seed: actualSeed,
         quests: [
           Quest(id: "explore_islands", title: "Explorateur en herbe", description: "Découvrez 3 îles inexplorées.", currentValue: 0, targetValue: 3, rewardType: RewardType.keyCopper, rewardAmount: 1),
           Quest(id: "collect_gold", title: "Fièvre de l'Or", description: "Récoltez 1000 pièces d'or.", currentValue: 0, targetValue: 1000, rewardType: RewardType.keySilver, rewardAmount: 1),
@@ -66,9 +67,9 @@ class SessionNotifier extends Notifier<SessionState?> {
       (_) => List.generate(mapSize, (_) => TileType.sea),
     );
 
-    // Si startX/startY ne sont pas fournis (ex: test local sans backend), on prend le milieu
-    final sX = startX ?? mapSize ~/ 2;
-    final sY = startY ?? mapSize ~/ 2;
+    // Position de départ fixe (Centre) pour synchronisation serveur
+    final sX = mapSize ~/ 2;
+    final sY = mapSize ~/ 2;
 
     // Zone de 5x5 en mer forcée (radius 2)
     for (int i = -2; i <= 2; i++) {
@@ -153,37 +154,68 @@ class SessionNotifier extends Notifier<SessionState?> {
   }
 
   void _spawnLand(List<List<TileType>> map, int x, int y, TileType type, int biome, ArchipelRandom rand) {
-    int radius = 2;
+    const int radius = 3;
+    bool portPlaced = false;
 
+    // Définition des types selon le biome
     TileType centerTile = type;
+    TileType beachTile = TileType.sand;
+    TileType extraTile = TileType.forest; // Par défaut jungle ou forêt
 
     if (biome == 1) { // Nordique
       centerTile = TileType.snow;
+      beachTile = TileType.ice;
+      extraTile = TileType.snow;
     } else if (biome == 2) { // Jungle
       centerTile = TileType.jungle;
+      beachTile = TileType.swamp;
+      extraTile = TileType.jungle;
     }
 
-    final randPOI = Random(x * 31 + y * 17); // Déterministe pour le POI local
+    for (int i = -radius; i <= radius; i++) {
+      for (int j = -radius; j <= radius; j++) {
+        int nx = x + i;
+        int ny = y + j;
+        if (nx < 0 || nx >= mapSize || ny < 0 || ny >= mapSize) continue;
 
-    for (int i = -radius - 1; i <= radius + 1; i++) {
-        for (int j = -radius - 1; j <= radius + 1; j++) {
-            int nx = x + i;
-            int ny = y + j;
-            if (nx < 0 || nx >= mapSize || ny < 0 || ny >= mapSize) continue;
-            
-            double dist = sqrt(i * i + j * j);
-            if (dist < 0.8) {
-              // Chance de Volcan
-              if (biome == 0 && randPOI.nextDouble() > 0.85) {
-                map[nx][ny] = TileType.volcano;
-              } else {
-                map[nx][ny] = centerTile;
-              }
-            }
-            else if (dist < 2.8) {
-              if (map[nx][ny] == TileType.sea) map[nx][ny] = TileType.shallow;
-            }
+        double dist = sqrt(i * i + j * j);
+        
+        // Centre de l'île / Forêt dense
+        if (dist < 1.2) {
+          // Chance de POI au centre (Volcan pour Tropical)
+          if (biome == 0 && rand.next() > 0.85) {
+            map[nx][ny] = TileType.volcano;
+          } else {
+            map[nx][ny] = centerTile;
+          }
+        } 
+        else if (dist < 1.8) {
+          // Placement d'UN port unique
+          if (!portPlaced && rand.next() > 0.6) {
+            map[nx][ny] = TileType.port;
+            portPlaced = true;
+          } else {
+            map[nx][ny] = extraTile;
+          }
         }
+        // Plages / Transition
+        else if (dist < 2.5) {
+          if (map[nx][ny] == TileType.sea) map[nx][ny] = beachTile;
+        }
+        // Eaux peu profondes (Shallow)
+        else if (dist < 3.2) {
+          if (map[nx][ny] == TileType.sea) map[nx][ny] = TileType.shallow;
+        }
+      }
+    }
+
+    // Sécurité: Si aucun port n'a été placé par probabilité, on en force un
+    if (!portPlaced) {
+      int nx = x + 1;
+      int ny = y;
+      if (nx >= 0 && nx < mapSize && ny >= 0 && ny < mapSize) {
+        map[nx][ny] = TileType.port;
+      }
     }
   }
 
@@ -290,8 +322,9 @@ class SessionNotifier extends Notifier<SessionState?> {
     }
 
     if (tile == TileType.pirate) {
-        final rand = Random();
-        bool victory = rand.nextDouble() > 0.4; // 60% de chance de victoire
+        // Combat déterministe identique au serveur
+        final combatRand = ArchipelRandom(current.seed + nextX * 31 + nextY * 17);
+        bool victory = combatRand.next() > 0.4;
         
         final newMap = List<List<TileType>>.generate(mapSize, (i) => List<TileType>.from(current.map[i]));
         newMap[nextX][nextY] = TileType.sea; // Le navire pirate disparaît
@@ -309,7 +342,7 @@ class SessionNotifier extends Notifier<SessionState?> {
         } else {
           final lostProvisions = (nextProvisions - 2).clamp(0, 999);
           if (lostProvisions <= 0) {
-             state = current.copyWith(isGameOver: true, statusMessage: "Famine après combat !");
+             state = current.copyWith(isGameOver: true, statusMessage: "Famine après combat !", provisions: 0);
              return;
           }
           state = current.copyWith(

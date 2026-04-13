@@ -81,6 +81,9 @@ class _LoginViewState extends ConsumerState<LoginView> {
 
   @override
   Widget build(BuildContext context) {
+    final sz = MediaQuery.of(context).size;
+    final isWide = sz.width > 600;
+
     return Scaffold(
       body: Stack(
         children: [
@@ -115,17 +118,19 @@ class _LoginViewState extends ConsumerState<LoginView> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ).createShader(bounds),
-                    child: Text(
-                      "L'Archipel de la Fortune",
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.cinzel(
-                        fontSize: 48,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
-                        letterSpacing: 3,
-                        shadows: [
-                          const Shadow(color: Colors.black87, offset: Offset(4, 4), blurRadius: 10),
-                        ],
+                    child: Semantics(
+                      label: "L'Archipel de la Fortune",
+                      header: true,
+                      child: Text(
+                        "L'Archipel\nde la Fortune",
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.cinzelDecorative(
+                          fontSize: isWide ? 52 : 36,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          height: 1.15,
+                          letterSpacing: 2,
+                        ),
                       ),
                     ),
                   ),
@@ -189,37 +194,45 @@ class _LoginViewState extends ConsumerState<LoginView> {
                                 if (_isLoading)
                                   const CircularProgressIndicator(color: Colors.amber)
                                 else ...[
-                                  _buildActionButton(
-                                    onPressed: _submit,
-                                    label: _isLogin ? 'LANCER L\'AVENTURE' : 'SIGNER LE CONTRAT',
-                                    isPrimary: true,
-                                    icon: ColorFiltered(
-                                      colorFilter: const ColorFilter.matrix(<double>[
-                                        1, 0, 0, 0, 0,
-                                        0, 1, 0, 0, 0,
-                                        0, 0, 1, 0, 0,
-                                        -1, -1, -1, 3, 0,
-                                      ]),
-                                      child: Image.asset(
-                                        'assets/images/treasure_chest.png',
-                                        height: 42,
-                                        fit: BoxFit.contain,
+                                  Semantics(
+                                    label: 'AUTH_SUBMIT_BTN',
+                                    button: true,
+                                    child: _buildActionButton(
+                                      onPressed: _submit,
+                                      label: _isLogin ? 'LANCER L\'AVENTURE' : 'SIGNER LE CONTRAT',
+                                      isPrimary: true,
+                                      icon: ColorFiltered(
+                                        colorFilter: const ColorFilter.matrix(<double>[
+                                          1, 0, 0, 0, 0,
+                                          0, 1, 0, 0, 0,
+                                          0, 0, 1, 0, 0,
+                                          -1, -1, -1, 3, 0,
+                                        ]),
+                                        child: Image.asset(
+                                          'assets/images/treasure_chest.png',
+                                          height: 42,
+                                          fit: BoxFit.contain,
+                                        ),
                                       ),
                                     ),
                                   ),
                                   const SizedBox(height: 16),
-                                  TextButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        _isLogin = !_isLogin;
-                                      });
-                                    },
-                                    child: Text(
-                                      _isLogin ? 'NOUVELLE RECRUE ? CRÉER UN PROFIL' : 'DÉJÀ MEMBRE ? SE CONNECTER',
-                                      style: GoogleFonts.outfit(
-                                        color: Colors.amber.shade100,
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 13,
+                                  Semantics(
+                                    label: 'AUTH_TOGGLE_BTN',
+                                    button: true,
+                                    child: TextButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          _isLogin = !_isLogin;
+                                        });
+                                      },
+                                      child: Text(
+                                        _isLogin ? 'NOUVELLE RECRUE ? CRÉER UN PROFIL' : 'DÉJÀ MEMBRE ? SE CONNECTER',
+                                        style: GoogleFonts.outfit(
+                                          color: Colors.amber.shade100,
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 13,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -290,24 +303,28 @@ class _LoginViewState extends ConsumerState<LoginView> {
         color: Colors.black.withOpacity(0.2),
         borderRadius: BorderRadius.circular(15),
       ),
-      child: TextField(
-        controller: controller,
-        obscureText: obscureText,
-        keyboardType: keyboardType,
-        style: const TextStyle(color: Colors.white),
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
-          prefixIcon: Icon(icon, color: Colors.amber.shade300, size: 20),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-            borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+      child: Semantics(
+        label: label == 'Email de l\'Explorateur' ? 'AUTH_EMAIL_FIELD' : 'AUTH_PASSWORD_FIELD',
+        textField: true,
+        child: TextField(
+          controller: controller,
+          obscureText: obscureText,
+          keyboardType: keyboardType,
+          style: const TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            labelText: label,
+            labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+            prefixIcon: Icon(icon, color: Colors.amber.shade300, size: 20),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: const BorderSide(color: Colors.amber, width: 1),
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
           ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-            borderSide: const BorderSide(color: Colors.amber, width: 1),
-          ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
         ),
       ),
     );

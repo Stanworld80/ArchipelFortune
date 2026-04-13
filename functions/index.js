@@ -127,7 +127,12 @@ exports.moveShip = onCall(async (request) => {
   }
 
   const tileType = session.map[nextX * MAP_SIZE + nextY];
-  const nextProvisions = session.provisions - 1;
+  
+  // Voiles Améliorées : Chance de ne pas consommer de provisions (US12)
+  // Note: Ici on simplifie en consommant toujours car le backend ne suit pas encore les niveaux d'upgrade
+  // TODO: Récupérer les niveaux d'upgrade depuis le document utilisateur
+  const nextProvisions = Math.max(0, session.provisions - 1);
+  
   let update = {
     x: nextX,
     y: nextY,
@@ -135,6 +140,7 @@ exports.moveShip = onCall(async (request) => {
     provisions: nextProvisions,
     statusMessage: ""
   };
+  const statusSuffix = "";
 
   if (nextProvisions <= 0) {
     update.isGameOver = true;
@@ -142,27 +148,47 @@ exports.moveShip = onCall(async (request) => {
     update.provisions = 0;
   }
 
-  if (tileType === TileType.reef) {
+  if (tileType === TileType.reef || tileType === TileType.volcano) {
     if (session.wood > 0) {
       update.wood = FieldValue.increment(-1);
-      update.statusMessage = "Collision avec un récif ! Réparations effectuées.";
+      update.statusMessage = (tileType === TileType.volcano) ? "Chaleur intense ! -1 Bois" : "Collision avec un récif ! -1 Bois";
     } else {
       update.isGameOver = true;
-      update.statusMessage = "Naufrage sur un récif !";
+      update.statusMessage = (tileType === TileType.volcano) ? "Cendres et feu..." : "Naufrage sur un récif !";
     }
-  } else if (tileType === TileType.island || tileType === TileType.port) {
+  } else if (tileType === TileType.shipwreck) {
+      update.wood = FieldValue.increment(2); // Auto-loot de bois
+      update.statusMessage = "Épave fouillée ! +2 Bois";
+  } else if (tileType === TileType.pirate) {
+      // Combat déterministe pour synchronisation client/serveur
+      const combatRand = new Random(session.seed + nextX * 31 + nextY * 17);
+      const victory = combatRand.next() > 0.4;
+      
+      if (victory) {
+          update.orVolatil = FieldValue.increment(100);
+          update.statusMessage = "Victoire sur les pirates ! +100 Or";
+          session.map[nextX][nextY] = TileType.sea;
+          update.map = session.map.flat();
+      } else {
+          update.provisions = Math.max(0, nextProvisions - 2);
+          update.wood = FieldValue.increment(-2);
+          update.statusMessage = "Défaite navale ! -2 Provisions, -2 Bois";
+          session.map[nextX][nextY] = TileType.sea;
+          update.map = session.map.flat();
+          if (update.provisions <= 0) update.isGameOver = true;
+      }
+  } else if (tileType === TileType.island || tileType === TileType.port || tileType === TileType.snow || tileType === TileType.jungle) {
     update.isAtStopover = true;
     update.lootRemaining = 5;
     update.statusMessage = "Escale ! Butin récupéré.";
     
-    session.map[nextX][nextY] = TileType.grass;
+    session.map[nextX][nextY] = (tileType === TileType.snow) ? TileType.snow : (tileType === TileType.jungle ? TileType.jungle : TileType.grass);
     update.map = session.map.flat();
   } else if (tileType === TileType.continent) {
     update.isAtStopover = true;
     update.lootRemaining = 15;
     update.statusMessage = "Continent atteint ! Objectif final en vue.";
     
-    // US06: Rendre tout le continent inexploitable après le premier loot
     for (let r = 0; r < MAP_SIZE; r++) {
       for (let c = 0; c < MAP_SIZE; c++) {
         if (session.map[r][c] === TileType.continent) {
@@ -173,12 +199,13 @@ exports.moveShip = onCall(async (request) => {
     update.map = session.map.flat();
   } else if (tileType === TileType.fishing) {
     update.isAtStopover = true;
-    update.lootRemaining = 1; // Un seul lancer de filet par défaut
+    update.lootRemaining = 1; 
     update.statusMessage = "C'est l'heure de pêcher !";
     
-    // On ne retire pas forcément le spot de pêche, ou on le transforme en mer
     session.map[nextX][nextY] = TileType.sea;
     update.map = session.map.flat();
+  } else {
+    update.statusMessage = "Pleine mer...";
   }
 
   await sessionRef.update(update);
@@ -190,9 +217,9 @@ function generateProceduralMap(seed) {
   const rand = new Random(seed);
   const map = Array(MAP_SIZE).fill(0).map(() => Array(MAP_SIZE).fill(TileType.sea));
 
-  // Position de départ aléatoire (avec marge pour éviter les bords)
-  const startX = rand.nextInt(MAP_SIZE - 20) + 10;
-  const startY = rand.nextInt(MAP_SIZE - 20) + 10;
+  // Position de départ fixe (Centre) pour synchronisation client
+  const startX = Math.floor(MAP_SIZE / 2);
+  const startY = Math.floor(MAP_SIZE / 2);
   
   // Zone de 5x5 en mer forcée (radius 2)
   for (let i = -2; i <= 2; i++) {

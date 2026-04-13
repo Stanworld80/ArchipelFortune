@@ -12,10 +12,11 @@ enum TileType {
   snow,
   ice,
   jungle,
-  swamp,
-  volcano,
-  shipwreck,
-  pirate
+  swamp,      // 13
+  unused_14,  // 14
+  volcano,    // 15
+  shipwreck,  // 16
+  pirate      // 17
 }
 
 enum RewardType { gold, wood, provisions, keyCopper, keySilver, keyGold }
@@ -105,6 +106,7 @@ class SessionState {
   final int sailsLevel;
   final int cargoLevel;
   final List<Quest> quests;
+  final int seed;
 
   SessionState({
     this.sessionId,
@@ -130,6 +132,7 @@ class SessionState {
     this.sailsLevel = 1,
     this.cargoLevel = 1,
     this.quests = const [],
+    this.seed = 0,
   });
 
   SessionState copyWith({
@@ -155,6 +158,7 @@ class SessionState {
     int? sailsLevel,
     int? cargoLevel,
     List<Quest>? quests,
+    int? seed,
   }) {
     return SessionState(
       sessionId: sessionId ?? this.sessionId,
@@ -180,6 +184,7 @@ class SessionState {
       sailsLevel: sailsLevel ?? this.sailsLevel,
       cargoLevel: cargoLevel ?? this.cargoLevel,
       quests: quests ?? this.quests,
+      seed: seed ?? this.seed,
     );
   }
   Map<String, dynamic> toMap() {
@@ -207,6 +212,7 @@ class SessionState {
       'sailsLevel': sailsLevel,
       'cargoLevel': cargoLevel,
       'quests': quests.map((q) => q.toMap()).toList(),
+      'seed': seed,
     };
   }
 
@@ -247,6 +253,7 @@ class SessionState {
       sailsLevel: mapData['sailsLevel']?.toInt() ?? 1,
       cargoLevel: mapData['cargoLevel']?.toInt() ?? 1,
       quests: (mapData['quests'] as List? ?? []).map((q) => Quest.fromMap(q)).toList(),
+      seed: mapData['seed']?.toInt() ?? 0,
     );
   }
 }

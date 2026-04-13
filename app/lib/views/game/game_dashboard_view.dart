@@ -429,6 +429,7 @@ class ShipControlWheel extends StatelessWidget {
             icon: Icons.keyboard_arrow_up,
             isHidden: isReverse(0),
             isDisabled: isEdge(0),
+            semanticLabel: 'MOVE_UP_BTN',
             onTap: () => onMove(getMoveType(0)),
           ),
           _DirectionArrow(
@@ -436,6 +437,7 @@ class ShipControlWheel extends StatelessWidget {
             icon: Icons.keyboard_arrow_right,
             isHidden: isReverse(90),
             isDisabled: isEdge(90),
+            semanticLabel: 'MOVE_RIGHT_BTN',
             onTap: () => onMove(getMoveType(90)),
           ),
           _DirectionArrow(
@@ -443,6 +445,7 @@ class ShipControlWheel extends StatelessWidget {
             icon: Icons.keyboard_arrow_down,
             isHidden: isReverse(180),
             isDisabled: isEdge(180),
+            semanticLabel: 'MOVE_DOWN_BTN',
             onTap: () => onMove(getMoveType(180)),
           ),
           _DirectionArrow(
@@ -450,6 +453,7 @@ class ShipControlWheel extends StatelessWidget {
             icon: Icons.keyboard_arrow_left,
             isHidden: isReverse(270),
             isDisabled: isEdge(270),
+            semanticLabel: 'MOVE_LEFT_BTN',
             onTap: () => onMove(getMoveType(270)),
           ),
         ],
@@ -463,6 +467,7 @@ class _DirectionArrow extends StatelessWidget {
   final IconData icon;
   final bool isHidden;
   final bool isDisabled;
+  final String semanticLabel;
   final VoidCallback onTap;
 
   const _DirectionArrow({
@@ -470,6 +475,7 @@ class _DirectionArrow extends StatelessWidget {
     required this.icon,
     this.isHidden = false,
     this.isDisabled = false,
+    required this.semanticLabel,
     required this.onTap,
   });
 
@@ -485,20 +491,25 @@ class _DirectionArrow extends StatelessWidget {
 
     return Transform.translate(
       offset: Offset(dx, dy),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: isDisabled ? null : onTap,
-          borderRadius: BorderRadius.circular(30),
-          child: Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: isDisabled ? Colors.grey.withOpacity(0.5) : Colors.teal.shade700,
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.white24, width: 2),
-              boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2))],
+      child: Semantics(
+        label: semanticLabel,
+        button: true,
+        enabled: !isDisabled,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: isDisabled ? null : onTap,
+            borderRadius: BorderRadius.circular(30),
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: isDisabled ? Colors.grey.withOpacity(0.5) : Colors.teal.shade700,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white24, width: 2),
+                boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2))],
+              ),
+              child: Icon(icon, color: isDisabled ? Colors.white38 : Colors.white, size: 40),
             ),
-            child: Icon(icon, color: isDisabled ? Colors.white38 : Colors.white, size: 40),
           ),
         ),
       ),
