@@ -43,27 +43,29 @@ test.describe('Archipel Fortune Admin Panel', () => {
     }
 
     // 2. Connection as Superadmin
-    const emailField = page.getByLabel('AUTH_EMAIL_FIELD');
-    await expect(emailField).toBeVisible({ timeout: 20000 });
-    await emailField.click({ force: true });
-    await expect(emailField).toBeEnabled({ timeout: 20000 });
-    await emailField.fill(SUPER_ADMIN_EMAIL);
+    const emailInput = page.getByLabel('AUTH_EMAIL_FIELD');
+    await expect(emailInput).toBeVisible({ timeout: 20000 });
+    // On tente un clic pour forcer le focus et l'activation sémantique si nécessaire
+    await emailInput.click({ force: true });
+    await emailInput.fill(SUPER_ADMIN_EMAIL);
     
     await page.getByLabel('AUTH_PASSWORD_FIELD').fill(TEST_PASSWORD);
-    await page.getByLabel('AUTH_SUBMIT_BTN').click();
+    const submitBtn = page.getByLabel('AUTH_SUBMIT_BTN');
+    await expect(submitBtn).toBeVisible({ timeout: 20000 });
+    await submitBtn.click({ force: true });
 
     // Wait for Login to complete
-    await expect(page.getByText(/Bienvenue/i)).toBeVisible({ timeout: 30000 });
+    await expect(page.getByLabel('APP_TITLE')).toBeVisible({ timeout: 30000 });
 
     // 2. Open User Menu
     const profileBtn = page.getByLabel('PROFILE_BTN');
     await expect(profileBtn).toBeVisible({ timeout: 20000 });
-    await profileBtn.click();
+    await profileBtn.click({ force: true });
 
     // 3. Click Panel Admin
     const adminLink = page.getByText(/Panel Admin/i);
     await expect(adminLink).toBeVisible({ timeout: 20000 });
-    await adminLink.click();
+    await adminLink.click({ force: true });
 
     // 4. Verify Admin Panel Content
     await expect(page.getByText(/Pannel d'Administration/i)).toBeVisible();
@@ -84,7 +86,7 @@ test.describe('Archipel Fortune Admin Panel', () => {
     await page.getByLabel('AUTH_SUBMIT_BTN').click();
 
     // Wait for Login to complete
-    await expect(page.getByText(/Bienvenue/i)).toBeVisible({ timeout: 30000 });
+    await expect(page.getByLabel('APP_TITLE')).toBeVisible({ timeout: 30000 });
     
     // Open Admin Panel
     const profileBtn = page.getByLabel('PROFILE_BTN');

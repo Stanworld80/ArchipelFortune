@@ -1,0 +1,26 @@
+﻿
+X develop CI/CD Dev · 24346866488
+Triggered via push about 2 hours ago
+
+X 🎭 E2E Tests (Dev) in 1h31m35s (ID 71091124183)
+  ✓ Set up job
+  ✓ 📥 Checkout repository
+  ✓ 🟢 Setup Node.js
+  ✓ 📦 Install dependencies
+  ✓ 🎭 Install Playwright Browsers
+  X 🚀 Run E2E Tests (Dev)
+  ✓ 📤 Upload Playwright Report
+  - Post 🟢 Setup Node.js
+  ✓ Post 📥 Checkout repository
+  ✓ Complete job
+
+ANNOTATIONS
+! Node.js 20 actions are deprecated. The following actions are running on Node.js 20 and may not work as expected: actions/checkout@v4, actions/setup-node@v3, actions/upload-artifact@v4. Actions will be forced to run with Node.js 24 by default starting June 2nd, 2026. Node.js 20 will be removed from the runner on September 16th, 2026. Please check if updated versions of these actions are available that support Node.js 24. To opt into Node.js 24 now, set the FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true environment variable on the runner or in your workflow file. Once Node.js 24 becomes the default, you can temporarily opt out by setting ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+🎭 E2E Tests (Dev): .github#2
+
+X Process completed with exit code 1.
+🎭 E2E Tests (Dev): .github#413
+
+
+To see the logs for the failed steps, try: gh run view --log-failed --job=71091124183
+View this run on GitHub: https://github.com/Stanworld80/ArchipelFortune/actions/runs/24346866488

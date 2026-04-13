@@ -192,15 +192,18 @@ class _HomeViewState extends ConsumerState<HomeView>
                               ],
                               stops: [0.0, 0.5, 1.0],
                             ).createShader(bounds),
-                            child: Text(
-                              "L'Archipel\nde la Fortune",
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.cinzelDecorative(
-                                fontSize: isWide ? 52 : 36,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                                height: 1.15,
-                                letterSpacing: 2,
+                            child: Semantics(
+                              label: 'APP_TITLE',
+                              child: Text(
+                                "L'Archipel\nde la Fortune",
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.cinzelDecorative(
+                                  fontSize: isWide ? 52 : 36,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                  height: 1.15,
+                                  letterSpacing: 2,
+                                ),
                               ),
                             ),
                           ),

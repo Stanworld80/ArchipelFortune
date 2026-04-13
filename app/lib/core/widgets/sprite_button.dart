@@ -8,13 +8,13 @@ import 'package:flutter/material.dart';
 ///   Row 2 (h ≈ 290–440): RÉGLAGES (small circle) | VOYAGE (wide banner) | DÉFI (small circle)
 class SpriteRegions {
   static const double imgW = 1078;
-  static const double imgH = 440;
+  static const double imgH = 1078;
 
   static const Rect depart = Rect.fromLTRB(285, 0, 725, 440);
   static const Rect inventaire = Rect.fromLTRB(0, 0, 285, 290);
   static const Rect carte = Rect.fromLTRB(730, 0, 1078, 290);
   static const Rect reglages = Rect.fromLTRB(0, 285, 195, 440);
-  static const Rect voyage = Rect.fromLTRB(195, 290, 820, 440);
+  static const Rect voyage = Rect.fromLTRB(195, 285, 820, 440);
   static const Rect defi = Rect.fromLTRB(820, 285, 1078, 440);
 }
 
@@ -102,23 +102,17 @@ class _SpriteButtonState extends State<SpriteButton>
               height: displayH,
               child: ClipRect(
                 child: Align(
-                  // Convert the rect to an Alignment in [-1, 1] space
                   alignment: Alignment(
-                    (rect.left + rect.width / 2) /
-                            SpriteRegions.imgW *
-                            2 -
-                        1,
-                    (rect.top + rect.height / 2) /
-                            SpriteRegions.imgH *
-                            2 -
-                        1,
+                    (rect.left / (SpriteRegions.imgW - rect.width)) * 2 - 1,
+                    (rect.top / (SpriteRegions.imgH - rect.height)) * 2 - 1,
                   ),
-                  widthFactor: SpriteRegions.imgW / rect.width,
-                  heightFactor: SpriteRegions.imgH / rect.height,
+                  widthFactor: rect.width / SpriteRegions.imgW,
+                  heightFactor: rect.height / SpriteRegions.imgH,
                   child: Image.asset(
                     SpriteButton._asset,
-                    width: displayW * (SpriteRegions.imgW / rect.width),
-                    height: displayH * (SpriteRegions.imgH / rect.height),
+                    width: SpriteRegions.imgW * (displayW / rect.width),
+                    height: SpriteRegions.imgH * (displayH / rect.height),
+                    fit: BoxFit.fill,
                     filterQuality: FilterQuality.high,
                     errorBuilder: (ctx, err, stack) => Container(
                       width: displayW,

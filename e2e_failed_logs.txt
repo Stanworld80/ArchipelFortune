@@ -1,0 +1,413 @@
+﻿🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	﻿2026-04-13T15:12:39.8411114Z ##[group]Run npm run test:dev
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:12:39.8411570Z [36;1mnpm run test:dev[0m
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:12:39.8435916Z shell: /usr/bin/bash -e {0}
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:12:39.8436157Z ##[endgroup]
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:12:39.9719254Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:12:39.9720083Z > tests_e2e@1.0.0 test:dev
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:12:39.9721223Z > PLAYWRIGHT_BASE_URL=https://archipel-fortune-dev.web.app playwright test
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:12:39.9721991Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:12:41.1856243Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:12:41.1857293Z Running 11 tests using 1 worker
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:12:41.1857956Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:13:21.3514230Z   ✘   1 [chromium] › tests/admin.spec.ts:36:7 › Archipel Fortune Admin Panel › Access Admin Panel as Superadmin (39.2s)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:14:03.0759932Z   ✘   2 [chromium] › tests/admin.spec.ts:36:7 › Archipel Fortune Admin Panel › Access Admin Panel as Superadmin (retry #1) (40.3s)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:14:42.5444307Z   ✘   3 [chromium] › tests/admin.spec.ts:36:7 › Archipel Fortune Admin Panel › Access Admin Panel as Superadmin (retry #2) (38.7s)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:15:21.5594137Z   ✘   4 [chromium] › tests/admin.spec.ts:73:7 › Archipel Fortune Admin Panel › Modify Player Gold (38.2s)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:16:02.4206425Z   ✘   5 [chromium] › tests/admin.spec.ts:73:7 › Archipel Fortune Admin Panel › Modify Player Gold (retry #1) (39.4s)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:16:41.2864239Z   ✘   6 [chromium] › tests/admin.spec.ts:73:7 › Archipel Fortune Admin Panel › Modify Player Gold (retry #2) (38.1s)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:17:50.8226908Z   ✘   7 [chromium] › tests/gameplay.spec.ts:35:7 › Archipel Fortune Gameplay Loop › Full Journey: Register -> Prepare -> Navigate (1.1m)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:19:02.2554259Z   ✘   8 [chromium] › tests/gameplay.spec.ts:35:7 › Archipel Fortune Gameplay Loop › Full Journey: Register -> Prepare -> Navigate (retry #1) (1.2m)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:20:11.9086904Z   ✘   9 [chromium] › tests/gameplay.spec.ts:35:7 › Archipel Fortune Gameplay Loop › Full Journey: Register -> Prepare -> Navigate (retry #2) (1.1m)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:20:20.3619889Z   ✓  10 [chromium] › tests/smoke.spec.ts:41:7 › Archipel Fortune Smoke Tests › Page Title Verification (7.7s)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:21:28.1195701Z   ✘  11 [chromium] › tests/smoke.spec.ts:45:7 › Archipel Fortune Smoke Tests › Landing Page Content (1.1m)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:22:38.4278340Z   ✘  12 [chromium] › tests/smoke.spec.ts:45:7 › Archipel Fortune Smoke Tests › Landing Page Content (retry #1) (1.1m)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:23:46.9848583Z   ✘  13 [chromium] › tests/smoke.spec.ts:45:7 › Archipel Fortune Smoke Tests › Landing Page Content (retry #2) (1.1m)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:23:55.6139991Z   ✓  14 [chromium] › tests/smoke.spec.ts:51:7 › Archipel Fortune Smoke Tests › Authentication UI Elements (7.8s)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:03.8346200Z   ✓  15 [chromium] › tests/smoke.spec.ts:58:7 › Archipel Fortune Smoke Tests › Form Interaction (8.2s)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:13.1672621Z   ✘  16 [chromium] › tests/visual.spec.ts:33:7 › Archipel Fortune Visual & Button Tests › Visual Regression - Landing Page (9.2s)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:22.1465352Z   ✓  17 [chromium] › tests/visual.spec.ts:43:7 › Archipel Fortune Visual & Button Tests › Button Presence and States (8.2s)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:33.7612867Z   ✘  18 [chromium] › tests/visual.spec.ts:61:7 › Archipel Fortune Visual & Button Tests › Authentication Mode Toggle (11.5s)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:42.8594315Z   ✓  19 [chromium] › tests/visual.spec.ts:83:7 › Archipel Fortune Visual & Button Tests › Google Sign-In Button Presence (8.3s)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0643155Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0643530Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0653939Z   1) [chromium] › tests/admin.spec.ts:36:7 › Archipel Fortune Admin Panel › Access Admin Panel as Superadmin 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0654653Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0655232Z     Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0655778Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0655947Z     Locator: getByText(/Bienvenue/i)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0656320Z     Expected: visible
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0656601Z     Timeout: 30000ms
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0656941Z     Error: element(s) not found
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0657166Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0657266Z     Call log:
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0658117Z     [2m  - Expect "toBeVisible" with timeout 30000ms[22m
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0658739Z     [2m  - waiting for getByText(/Bienvenue/i)[22m
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0659056Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0659066Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0659161Z       54 |
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0659477Z       55 |     // Wait for Login to complete
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0660157Z     > 56 |     await expect(page.getByText(/Bienvenue/i)).toBeVisible({ timeout: 30000 });
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0660784Z          |                                                ^
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0661021Z       57 |
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0661220Z       58 |     // 2. Open User Menu
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0661536Z       59 |     const profileBtn = page.getByLabel('PROFILE_BTN');
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0662046Z         at /home/runner/work/ArchipelFortune/ArchipelFortune/tests_e2e/tests/admin.spec.ts:56:48
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0662729Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0663488Z     Error Context: test-results/admin-Archipel-Fortune-Adm-c9dc3-s-Admin-Panel-as-Superadmin-chromium/error-context.md
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0664314Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0664942Z     Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0665421Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0665986Z     Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0666551Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0666771Z     Locator: getByText(/Bienvenue/i)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0667144Z     Expected: visible
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0667447Z     Timeout: 30000ms
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0667782Z     Error: element(s) not found
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0668346Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0668457Z     Call log:
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0669010Z     [2m  - Expect "toBeVisible" with timeout 30000ms[22m
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0669637Z     [2m  - waiting for getByText(/Bienvenue/i)[22m
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0669961Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0669979Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0670084Z       54 |
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0670404Z       55 |     // Wait for Login to complete
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0671119Z     > 56 |     await expect(page.getByText(/Bienvenue/i)).toBeVisible({ timeout: 30000 });
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0671838Z          |                                                ^
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0673827Z       57 |
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0674182Z       58 |     // 2. Open User Menu
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0674718Z       59 |     const profileBtn = page.getByLabel('PROFILE_BTN');
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0675574Z         at /home/runner/work/ArchipelFortune/ArchipelFortune/tests_e2e/tests/admin.spec.ts:56:48
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0676137Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0676938Z     Error Context: test-results/admin-Archipel-Fortune-Adm-c9dc3-s-Admin-Panel-as-Superadmin-chromium-retry1/error-context.md
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0677805Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0678553Z     attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0679771Z     test-results/admin-Archipel-Fortune-Adm-c9dc3-s-Admin-Panel-as-Superadmin-chromium-retry1/trace.zip
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0680626Z     Usage:
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0680791Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0681654Z         npx playwright show-trace test-results/admin-Archipel-Fortune-Adm-c9dc3-s-Admin-Panel-as-Superadmin-chromium-retry1/trace.zip
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0682818Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0683454Z     ────────────────────────────────────────────────────────────────────────────────────────────────
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0683903Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0684488Z     Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0684965Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0685538Z     Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0686094Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0686264Z     Locator: getByText(/Bienvenue/i)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0686600Z     Expected: visible
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0686897Z     Timeout: 30000ms
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0687223Z     Error: element(s) not found
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0687458Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0687561Z     Call log:
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0688301Z     [2m  - Expect "toBeVisible" with timeout 30000ms[22m
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0688863Z     [2m  - waiting for getByText(/Bienvenue/i)[22m
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0689147Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0689155Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0689254Z       54 |
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0689537Z       55 |     // Wait for Login to complete
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0690154Z     > 56 |     await expect(page.getByText(/Bienvenue/i)).toBeVisible({ timeout: 30000 });
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0690966Z          |                                                ^
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0691478Z       57 |
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0692134Z       58 |     // 2. Open User Menu
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0697571Z       59 |     const profileBtn = page.getByLabel('PROFILE_BTN');
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0698507Z         at /home/runner/work/ArchipelFortune/ArchipelFortune/tests_e2e/tests/admin.spec.ts:56:48
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0699115Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0699921Z     Error Context: test-results/admin-Archipel-Fortune-Adm-c9dc3-s-Admin-Panel-as-Superadmin-chromium-retry2/error-context.md
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0700863Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0701597Z   2) [chromium] › tests/admin.spec.ts:73:7 › Archipel Fortune Admin Panel › Modify Player Gold ─────
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0702449Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0703031Z     Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0703594Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0703750Z     Locator: getByText(/Bienvenue/i)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0704148Z     Expected: visible
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0704457Z     Timeout: 30000ms
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0704798Z     Error: element(s) not found
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0705038Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0705166Z     Call log:
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0705666Z     [2m  - Expect "toBeVisible" with timeout 30000ms[22m
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0706291Z     [2m  - waiting for getByText(/Bienvenue/i)[22m
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0706631Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0706640Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0706769Z       85 |
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0707109Z       86 |     // Wait for Login to complete
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0707850Z     > 87 |     await expect(page.getByText(/Bienvenue/i)).toBeVisible({ timeout: 30000 });
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0708566Z          |                                                ^
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0708965Z       88 |     
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0709313Z       89 |     // Open Admin Panel
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0709871Z       90 |     const profileBtn = page.getByLabel('PROFILE_BTN');
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0710820Z         at /home/runner/work/ArchipelFortune/ArchipelFortune/tests_e2e/tests/admin.spec.ts:87:48
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0711436Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0712146Z     Error Context: test-results/admin-Archipel-Fortune-Admin-Panel-Modify-Player-Gold-chromium/error-context.md
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0713174Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0713955Z     Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0714485Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0715032Z     Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0715523Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0715678Z     Locator: getByText(/Bienvenue/i)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0716068Z     Expected: visible
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0716341Z     Timeout: 30000ms
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0716654Z     Error: element(s) not found
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0716880Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0716982Z     Call log:
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0717465Z     [2m  - Expect "toBeVisible" with timeout 30000ms[22m
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0718093Z     [2m  - waiting for getByText(/Bienvenue/i)[22m
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0718464Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0718473Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0718571Z       85 |
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0718893Z       86 |     // Wait for Login to complete
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0719534Z     > 87 |     await expect(page.getByText(/Bienvenue/i)).toBeVisible({ timeout: 30000 });
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0720231Z          |                                                ^
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0720599Z       88 |     
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0720885Z       89 |     // Open Admin Panel
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0721373Z       90 |     const profileBtn = page.getByLabel('PROFILE_BTN');
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0722767Z         at /home/runner/work/ArchipelFortune/ArchipelFortune/tests_e2e/tests/admin.spec.ts:87:48
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0723344Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0724054Z     Error Context: test-results/admin-Archipel-Fortune-Admin-Panel-Modify-Player-Gold-chromium-retry1/error-context.md
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0724821Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0725502Z     attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0726518Z     test-results/admin-Archipel-Fortune-Admin-Panel-Modify-Player-Gold-chromium-retry1/trace.zip
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0727423Z     Usage:
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0727576Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0728315Z         npx playwright show-trace test-results/admin-Archipel-Fortune-Admin-Panel-Modify-Player-Gold-chromium-retry1/trace.zip
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0729073Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0729575Z     ────────────────────────────────────────────────────────────────────────────────────────────────
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0729975Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0730495Z     Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0730893Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0731441Z     Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0731950Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0732125Z     Locator: getByText(/Bienvenue/i)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0732715Z     Expected: visible
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0733008Z     Timeout: 30000ms
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0733334Z     Error: element(s) not found
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0733585Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0733686Z     Call log:
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0734159Z     [2m  - Expect "toBeVisible" with timeout 30000ms[22m
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0734737Z     [2m  - waiting for getByText(/Bienvenue/i)[22m
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0735039Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0735047Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0735139Z       85 |
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0735429Z       86 |     // Wait for Login to complete
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0736085Z     > 87 |     await expect(page.getByText(/Bienvenue/i)).toBeVisible({ timeout: 30000 });
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0736721Z          |                                                ^
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0737057Z       88 |     
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0737332Z       89 |     // Open Admin Panel
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0737778Z       90 |     const profileBtn = page.getByLabel('PROFILE_BTN');
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0738550Z         at /home/runner/work/ArchipelFortune/ArchipelFortune/tests_e2e/tests/admin.spec.ts:87:48
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0739064Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0739748Z     Error Context: test-results/admin-Archipel-Fortune-Admin-Panel-Modify-Player-Gold-chromium-retry2/error-context.md
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0740466Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0741233Z   3) [chromium] › tests/gameplay.spec.ts:35:7 › Archipel Fortune Gameplay Loop › Full Journey: Register -> Prepare -> Navigate 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0741928Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0742619Z     Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0743263Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0743525Z     Locator: getByLabel('EXPLORE_MAIN_BTN', { exact: true })
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0743957Z     Expected: visible
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0744223Z     Timeout: 60000ms
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0744515Z     Error: element(s) not found
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0744737Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0744830Z     Call log:
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0745271Z     [2m  - Expect "toBeVisible" with timeout 60000ms[22m
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0745985Z     [2m  - waiting for getByLabel('EXPLORE_MAIN_BTN', { exact: true })[22m
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0746381Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0746400Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0746583Z       58 |     // On cherche le bouton EXPLORER
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0747184Z       59 |     const exploreBtn = page.getByLabel('EXPLORE_MAIN_BTN', { exact: true });
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0747894Z     > 60 |     await expect(exploreBtn).toBeVisible({ timeout: 60000 });
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0748379Z          |                              ^
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0748688Z       61 |     
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0749115Z       62 |     // Vérifier l'or initial (50 gold)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0749785Z       63 |     await expect(page.getByText(/50 Pièces d'Or/i)).toBeVisible();
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0750663Z         at /home/runner/work/ArchipelFortune/ArchipelFortune/tests_e2e/tests/gameplay.spec.ts:60:30
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0751207Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0751875Z     Error Context: test-results/gameplay-Archipel-Fortune--95205-gister---Prepare---Navigate-chromium/error-context.md
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0752840Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0753390Z     Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0753984Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0754489Z     Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0754941Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0755183Z     Locator: getByLabel('EXPLORE_MAIN_BTN', { exact: true })
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0755606Z     Expected: visible
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0755956Z     Timeout: 60000ms
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0756295Z     Error: element(s) not found
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0756522Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0756632Z     Call log:
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0757110Z     [2m  - Expect "toBeVisible" with timeout 60000ms[22m
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0757888Z     [2m  - waiting for getByLabel('EXPLORE_MAIN_BTN', { exact: true })[22m
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0758299Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0758307Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0758499Z       58 |     // On cherche le bouton EXPLORER
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0759167Z       59 |     const exploreBtn = page.getByLabel('EXPLORE_MAIN_BTN', { exact: true });
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0759959Z     > 60 |     await expect(exploreBtn).toBeVisible({ timeout: 60000 });
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0760474Z          |                              ^
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0760824Z       61 |     
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0761243Z       62 |     // Vérifier l'or initial (50 gold)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0761942Z       63 |     await expect(page.getByText(/50 Pièces d'Or/i)).toBeVisible();
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0763081Z         at /home/runner/work/ArchipelFortune/ArchipelFortune/tests_e2e/tests/gameplay.spec.ts:60:30
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0763665Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0764468Z     Error Context: test-results/gameplay-Archipel-Fortune--95205-gister---Prepare---Navigate-chromium-retry1/error-context.md
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0765331Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0765987Z     attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0767173Z     test-results/gameplay-Archipel-Fortune--95205-gister---Prepare---Navigate-chromium-retry1/trace.zip
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0767975Z     Usage:
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0768118Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0768913Z         npx playwright show-trace test-results/gameplay-Archipel-Fortune--95205-gister---Prepare---Navigate-chromium-retry1/trace.zip
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0769748Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0770318Z     ────────────────────────────────────────────────────────────────────────────────────────────────
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0770766Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0771538Z     Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0771993Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0772769Z     Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0773280Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0773555Z     Locator: getByLabel('EXPLORE_MAIN_BTN', { exact: true })
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0774046Z     Expected: visible
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0774337Z     Timeout: 60000ms
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0774664Z     Error: element(s) not found
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0774897Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0775009Z     Call log:
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0775668Z     [2m  - Expect "toBeVisible" with timeout 60000ms[22m
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0776437Z     [2m  - waiting for getByLabel('EXPLORE_MAIN_BTN', { exact: true })[22m
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0776869Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0776877Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0777072Z       58 |     // On cherche le bouton EXPLORER
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0777757Z       59 |     const exploreBtn = page.getByLabel('EXPLORE_MAIN_BTN', { exact: true });
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0778555Z     > 60 |     await expect(exploreBtn).toBeVisible({ timeout: 60000 });
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0779090Z          |                              ^
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0779440Z       61 |     
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0779871Z       62 |     // Vérifier l'or initial (50 gold)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0780905Z       63 |     await expect(page.getByText(/50 Pièces d'Or/i)).toBeVisible();
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0781860Z         at /home/runner/work/ArchipelFortune/ArchipelFortune/tests_e2e/tests/gameplay.spec.ts:60:30
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0782645Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0783478Z     Error Context: test-results/gameplay-Archipel-Fortune--95205-gister---Prepare---Navigate-chromium-retry2/error-context.md
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0784328Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0785023Z   4) [chromium] › tests/smoke.spec.ts:45:7 › Archipel Fortune Smoke Tests › Landing Page Content ───
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0785597Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0786107Z     Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0786588Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0786838Z     Locator: locator('[aria-label*="Archipel"]').first()
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0787257Z     Expected: visible
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0787537Z     Timeout: 60000ms
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0787840Z     Error: element(s) not found
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0788053Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0788166Z     Call log:
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0788620Z     [2m  - Expect "toBeVisible" with timeout 60000ms[22m
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0789316Z     [2m  - waiting for locator('[aria-label*="Archipel"]').first()[22m
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0789718Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0789726Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0790399Z       46 |     // Locator très robuste utilisant un match partiel sur l'un des aria-labels
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0791170Z       47 |     const branding = page.locator('[aria-label*="Archipel"]');
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0791854Z     > 48 |     await expect(branding.first()).toBeVisible({ timeout: 60000 });
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0792689Z          |                                    ^
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0793217Z       49 |   });
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0793460Z       50 |
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0793888Z       51 |   test('Authentication UI Elements', async ({ page }) => {
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0794728Z         at /home/runner/work/ArchipelFortune/ArchipelFortune/tests_e2e/tests/smoke.spec.ts:48:36
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0795272Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0795935Z     Error Context: test-results/smoke-Archipel-Fortune-Smoke-Tests-Landing-Page-Content-chromium/error-context.md
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0796647Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0797189Z     Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0797621Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0798126Z     Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0798587Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0798825Z     Locator: locator('[aria-label*="Archipel"]').first()
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0799231Z     Expected: visible
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0799520Z     Timeout: 60000ms
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0799840Z     Error: element(s) not found
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0800076Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0800171Z     Call log:
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0800603Z     [2m  - Expect "toBeVisible" with timeout 60000ms[22m
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0801277Z     [2m  - waiting for locator('[aria-label*="Archipel"]').first()[22m
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0801672Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0801680Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0802158Z       46 |     // Locator très robuste utilisant un match partiel sur l'un des aria-labels
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0803033Z       47 |     const branding = page.locator('[aria-label*="Archipel"]');
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0803906Z     > 48 |     await expect(branding.first()).toBeVisible({ timeout: 60000 });
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0804517Z          |                                    ^
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0804851Z       49 |   });
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0805127Z       50 |
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0805562Z       51 |   test('Authentication UI Elements', async ({ page }) => {
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0806444Z         at /home/runner/work/ArchipelFortune/ArchipelFortune/tests_e2e/tests/smoke.spec.ts:48:36
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0807022Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0807814Z     Error Context: test-results/smoke-Archipel-Fortune-Smoke-Tests-Landing-Page-Content-chromium-retry1/error-context.md
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0808644Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0809299Z     attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0810421Z     test-results/smoke-Archipel-Fortune-Smoke-Tests-Landing-Page-Content-chromium-retry1/trace.zip
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0811203Z     Usage:
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0811371Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0812441Z         npx playwright show-trace test-results/smoke-Archipel-Fortune-Smoke-Tests-Landing-Page-Content-chromium-retry1/trace.zip
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0813328Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0813915Z     ────────────────────────────────────────────────────────────────────────────────────────────────
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0814364Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0814921Z     Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0815389Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0815942Z     Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0816444Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0816702Z     Locator: locator('[aria-label*="Archipel"]').first()
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0817150Z     Expected: visible
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0817445Z     Timeout: 60000ms
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0817776Z     Error: element(s) not found
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0818011Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0818114Z     Call log:
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0818623Z     [2m  - Expect "toBeVisible" with timeout 60000ms[22m
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0819366Z     [2m  - waiting for locator('[aria-label*="Archipel"]').first()[22m
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0819777Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0819785Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0820322Z       46 |     // Locator très robuste utilisant un match partiel sur l'un des aria-labels
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0821118Z       47 |     const branding = page.locator('[aria-label*="Archipel"]');
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0822052Z     > 48 |     await expect(branding.first()).toBeVisible({ timeout: 60000 });
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0822803Z          |                                    ^
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0823230Z       49 |   });
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0823485Z       50 |
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0823905Z       51 |   test('Authentication UI Elements', async ({ page }) => {
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0824789Z         at /home/runner/work/ArchipelFortune/ArchipelFortune/tests_e2e/tests/smoke.spec.ts:48:36
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0825375Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0826171Z     Error Context: test-results/smoke-Archipel-Fortune-Smoke-Tests-Landing-Page-Content-chromium-retry2/error-context.md
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0827156Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0827918Z   5) [chromium] › tests/visual.spec.ts:33:7 › Archipel Fortune Visual & Button Tests › Visual Regression - Landing Page 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0830371Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0831463Z     Error: A snapshot doesn't exist at /home/runner/work/ArchipelFortune/ArchipelFortune/tests_e2e/tests/visual.spec.ts-snapshots/landing-page-chromium-linux.png, writing actual.
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0832115Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0832746Z       34 |     // Vérifie l'aspect visuel global de la page d'accueil
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0833487Z       35 |     // Note: La première exécution créera les snapshots de référence
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0833953Z     > 36 |     await expect(page).toHaveScreenshot('landing-page.png', {
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0834267Z          |     ^
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0834475Z       37 |       fullPage: true,
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0834729Z       38 |       maxDiffPixelRatio: 0.05,
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0835015Z       39 |       animations: 'disabled'
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0835471Z         at /home/runner/work/ArchipelFortune/ArchipelFortune/tests_e2e/tests/visual.spec.ts:36:5
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0835807Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0836196Z     attachment #1: landing-page (image/png) ────────────────────────────────────────────────────────
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0836752Z     Expected: tests/visual.spec.ts-snapshots/landing-page-chromium-linux.png
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0837493Z     Received: test-results/visual-Archipel-Fortune-Vi-d9383-l-Regression---Landing-Page-chromium/landing-page-actual.png
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0838287Z     ────────────────────────────────────────────────────────────────────────────────────────────────
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0838537Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0838961Z     Error Context: test-results/visual-Archipel-Fortune-Vi-d9383-l-Regression---Landing-Page-chromium/error-context.md
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0839404Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0839835Z   6) [chromium] › tests/visual.spec.ts:61:7 › Archipel Fortune Visual & Button Tests › Authentication Mode Toggle 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0840225Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0840848Z     Error: A snapshot doesn't exist at /home/runner/work/ArchipelFortune/ArchipelFortune/tests_e2e/tests/visual.spec.ts-snapshots/signup-mode-chromium-linux.png, writing actual.
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0841449Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0841522Z       70 |
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0842146Z       71 |     // Vérification visuelle après toggle (changement de texte dans la carte)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0843088Z     > 72 |     await expect(page).toHaveScreenshot('signup-mode.png', {
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0843555Z          |     ^
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0843934Z       73 |       maxDiffPixelRatio: 0.05,
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0844351Z       74 |       animations: 'disabled'
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0844673Z       75 |     });
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0845070Z         at /home/runner/work/ArchipelFortune/ArchipelFortune/tests_e2e/tests/visual.spec.ts:72:5
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0845405Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0845796Z     attachment #1: signup-mode (image/png) ─────────────────────────────────────────────────────────
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0846334Z     Expected: tests/visual.spec.ts-snapshots/signup-mode-chromium-linux.png
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0847049Z     Received: test-results/visual-Archipel-Fortune-Vi-63af7--Authentication-Mode-Toggle-chromium/signup-mode-actual.png
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0847828Z     ────────────────────────────────────────────────────────────────────────────────────────────────
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0848095Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0848509Z     Error Context: test-results/visual-Archipel-Fortune-Vi-63af7--Authentication-Mode-Toggle-chromium/error-context.md
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0848948Z 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0849019Z   6 failed
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0849509Z     [chromium] › tests/admin.spec.ts:36:7 › Archipel Fortune Admin Panel › Access Admin Panel as Superadmin 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0850220Z     [chromium] › tests/admin.spec.ts:73:7 › Archipel Fortune Admin Panel › Modify Player Gold ──────
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0851210Z     [chromium] › tests/gameplay.spec.ts:35:7 › Archipel Fortune Gameplay Loop › Full Journey: Register -> Prepare -> Navigate 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0851979Z     [chromium] › tests/smoke.spec.ts:45:7 › Archipel Fortune Smoke Tests › Landing Page Content ────
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0853514Z     [chromium] › tests/visual.spec.ts:33:7 › Archipel Fortune Visual & Button Tests › Visual Regression - Landing Page 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0854810Z     [chromium] › tests/visual.spec.ts:61:7 › Archipel Fortune Visual & Button Tests › Authentication Mode Toggle 
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0855523Z   5 passed (12.0m)
+🎭 E2E Tests (Dev)	🚀 Run E2E Tests (Dev)	2026-04-13T15:24:43.0931146Z ##[error]Process completed with exit code 1.
