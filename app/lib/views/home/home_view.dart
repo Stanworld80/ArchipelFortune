@@ -70,6 +70,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                     child: Semantics(
                       label: 'PROFILE_BTN',
                       button: true,
+                      enabled: true,
                       child: Container(
                         margin: const EdgeInsets.only(right: 8, top: 4),
                         decoration: BoxDecoration(

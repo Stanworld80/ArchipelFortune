@@ -197,6 +197,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                                   Semantics(
                                     label: 'AUTH_SUBMIT_BTN',
                                     button: true,
+                                    enabled: true,
                                     child: _buildActionButton(
                                       onPressed: _submit,
                                       label: _isLogin ? 'LANCER L\'AVENTURE' : 'SIGNER LE CONTRAT',
@@ -220,6 +221,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                                   Semantics(
                                     label: 'AUTH_TOGGLE_BTN',
                                     button: true,
+                                    enabled: true,
                                     child: TextButton(
                                       onPressed: () {
                                         setState(() {
@@ -306,6 +308,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
       child: Semantics(
         label: label == 'Email de l\'Explorateur' ? 'AUTH_EMAIL_FIELD' : 'AUTH_PASSWORD_FIELD',
         textField: true,
+        enabled: true,
         child: TextField(
           controller: controller,
           obscureText: obscureText,

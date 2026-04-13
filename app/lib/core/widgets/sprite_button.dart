@@ -84,6 +84,7 @@ class _SpriteButtonState extends State<SpriteButton>
     return Semantics(
       label: widget.semanticLabel,
       button: true,
+      enabled: !widget.disabled,
       child: GestureDetector(
         onTapDown: widget.disabled ? null : _onTapDown,
         onTapUp: widget.disabled ? null : _onTapUp,
@@ -119,6 +120,14 @@ class _SpriteButtonState extends State<SpriteButton>
                     width: displayW * (SpriteRegions.imgW / rect.width),
                     height: displayH * (SpriteRegions.imgH / rect.height),
                     filterQuality: FilterQuality.high,
+                    errorBuilder: (ctx, err, stack) => Container(
+                      width: displayW,
+                      height: displayH,
+                      color: Colors.teal.shade900.withOpacity(0.5),
+                      child: const Center(
+                        child: Icon(Icons.help_outline, color: Colors.amber),
+                      ),
+                    ),
                   ),
                 ),
               ),
