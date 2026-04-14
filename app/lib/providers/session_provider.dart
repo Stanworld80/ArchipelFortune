@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:meta/meta.dart';
 import '../models/session_model.dart';
+import '../core/utils.dart';
 
 final firebaseFunctionsProvider = Provider<FirebaseFunctions>((ref) => FirebaseFunctions.instance);
 
@@ -18,12 +19,9 @@ class SessionNotifier extends Notifier<SessionState?> {
     return null;
   }
 
-  @visibleForTesting
-  void debugSetState(SessionState? newState) {
-    state = newState;
-  }
-
   static const int mapSize = 36;
+
+  int _toInt(dynamic value, [int defaultValue = 0]) => ArchipelUtils.toInt(value, defaultValue);
 
   Future<void> startNewSession({int startingProvisions = 20, int startingBois = 1, int? seed}) async {
     try {
@@ -37,34 +35,26 @@ class SessionNotifier extends Notifier<SessionState?> {
         throw Exception("La fonction startExpedition a renvoyé une réponse vide (null).");
       }
 
-      print("DEBUG: startExpedition response type: ${result.data.runtimeType}");
-      print("DEBUG: startExpedition response data: ${result.data}");
-
-      // Extraction sécurisée pour Flutter Web (JSMap)
+      // Extraction ultra-sécurisée pour Flutter Web
       Map<dynamic, dynamic> dataMap;
-      try {
-        dataMap = Map<dynamic, dynamic>.from(result.data as Map);
-      } catch (e) {
-        print("DEBUG: Erreur de conversion en Map: $e");
-        // Fallback si ce n'est pas directement castable en Map
-        dataMap = result.data as dynamic; 
+      if (result.data is Map) {
+        dataMap = result.data;
+      } else {
+        try {
+          dataMap = Map<dynamic, dynamic>.from(result.data as dynamic);
+        } catch (e) {
+          throw Exception("Impossible de parser la réponse serveur comme un dictionnaire: $e");
+        }
       }
 
       final String? sessionId = dataMap['sessionId']?.toString();
-      final num? actualSeedNum = dataMap['seed'] is num ? dataMap['seed'] : num.tryParse(dataMap['seed']?.toString() ?? '');
-      final num? startXNum = dataMap['x'] is num ? dataMap['x'] : num.tryParse(dataMap['x']?.toString() ?? '');
-      final num? startYNum = dataMap['y'] is num ? dataMap['y'] : num.tryParse(dataMap['y']?.toString() ?? '');
+      final int actualSeed = _toInt(dataMap['seed'], 0);
+      final int startX = _toInt(dataMap['x'], mapSize ~/ 2);
+      final int startY = _toInt(dataMap['y'], mapSize ~/ 2);
 
-      print("DEBUG: Parsed values - sessionId: $sessionId, seed: $actualSeedNum, x: $startXNum, y: $startYNum");
-
-      if (sessionId == null || actualSeedNum == null || startXNum == null || startYNum == null) {
-        throw Exception("Données de session incomplètes ou invalides reçues du serveur. "
-            "Reçu: sessionId=$sessionId, seed=$actualSeedNum, x=$startXNum, y=$startYNum");
+      if (sessionId == null || sessionId.isEmpty) {
+        throw Exception("ID de session manquant dans la réponse du serveur.");
       }
-
-      final int actualSeed = actualSeedNum.toInt();
-      final int startX = startXNum.toInt();
-      final int startY = startYNum.toInt();
 
       state = SessionState(
         sessionId: sessionId,
@@ -82,9 +72,7 @@ class SessionNotifier extends Notifier<SessionState?> {
           Quest(id: "collect_gold", title: "Fièvre de l'Or", description: "Récoltez 1000 pièces d'or.", currentValue: 0, targetValue: 1000, rewardType: RewardType.keySilver, rewardAmount: 1),
         ],
       );
-    } catch (e, stack) {
-      print("Erreur startNewSession: $e");
-      print("Stacktrace: $stack");
+    } catch (e) {
       rethrow;
     }
   }
@@ -184,70 +172,21 @@ class SessionNotifier extends Notifier<SessionState?> {
   }
 
   void _spawnLand(List<List<TileType>> map, int x, int y, TileType type, int biome, ArchipelRandom rand) {
-    const int radius = 3;
-    bool portPlaced = false;
-
-    // Définition des types selon le biome
-    TileType centerTile = type;
-    TileType beachTile = TileType.sand;
-    TileType extraTile = TileType.forest; // Par défaut jungle ou forêt
-
+    // Une île ne doit être représentée que par une seule case
     if (biome == 1) { // Nordique
-      centerTile = TileType.snow;
-      beachTile = TileType.ice;
-      extraTile = TileType.snow;
+      map[x][y] = TileType.snow;
     } else if (biome == 2) { // Jungle
-      centerTile = TileType.jungle;
-      beachTile = TileType.swamp;
-      extraTile = TileType.jungle;
-    }
-
-    for (int i = -radius; i <= radius; i++) {
-      for (int j = -radius; j <= radius; j++) {
-        int nx = x + i;
-        int ny = y + j;
-        if (nx < 0 || nx >= mapSize || ny < 0 || ny >= mapSize) continue;
-
-        double dist = sqrt(i * i + j * j);
-        
-        // Centre de l'île / Forêt dense
-        if (dist < 1.2) {
-          // Chance de POI au centre (Volcan pour Tropical)
-          if (biome == 0 && rand.next() > 0.85) {
-            map[nx][ny] = TileType.volcano;
-          } else {
-            map[nx][ny] = centerTile;
-          }
-        } 
-        else if (dist < 1.8) {
-          // Placement d'UN port unique
-          if (!portPlaced && rand.next() > 0.6) {
-            map[nx][ny] = TileType.port;
-            portPlaced = true;
-          } else {
-            map[nx][ny] = extraTile;
-          }
-        }
-        // Plages / Transition
-        else if (dist < 2.5) {
-          if (map[nx][ny] == TileType.sea) map[nx][ny] = beachTile;
-        }
-        // Eaux peu profondes (Shallow)
-        else if (dist < 3.2) {
-          if (map[nx][ny] == TileType.sea) map[nx][ny] = TileType.shallow;
-        }
-      }
-    }
-
-    // Sécurité: Si aucun port n'a été placé par probabilité, on en force un
-    if (!portPlaced) {
-      int nx = x + 1;
-      int ny = y;
-      if (nx >= 0 && nx < mapSize && ny >= 0 && ny < mapSize) {
-        map[nx][ny] = TileType.port;
+      map[x][y] = TileType.jungle;
+    } else { // Tropical
+      // Chance de volcan (15%) ou port (85%)
+      if (rand.next() > 0.85) {
+        map[x][y] = TileType.volcano;
+      } else {
+        map[x][y] = TileType.port;
       }
     }
   }
+
 
   Future<void> moveForward() async {
     if (state == null || state!.isGameOver) return;

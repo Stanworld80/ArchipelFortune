@@ -1,3 +1,5 @@
+import '../core/utils.dart';
+
 enum TileType {
   sea,
   shallow,
@@ -69,15 +71,17 @@ class Quest {
   }
 
   factory Quest.fromMap(Map<String, dynamic> map) {
+    int _toInt(dynamic v, [int d = 0]) => ArchipelUtils.toInt(v, d);
+
     return Quest(
-      id: map['id'],
-      title: map['title'],
-      description: map['description'],
-      currentValue: map['currentValue'],
-      targetValue: map['targetValue'],
-      isCompleted: map['isCompleted'],
-      rewardType: RewardType.values[map['rewardType']],
-      rewardAmount: map['rewardAmount'],
+      id: map['id'] ?? '',
+      title: map['title'] ?? '',
+      description: map['description'] ?? '',
+      currentValue: _toInt(map['currentValue']),
+      targetValue: _toInt(map['targetValue']),
+      isCompleted: map['isCompleted'] ?? false,
+      rewardType: RewardType.values[_toInt(map['rewardType']) % RewardType.values.length],
+      rewardAmount: _toInt(map['rewardAmount']),
     );
   }
 }
@@ -187,6 +191,7 @@ class SessionState {
       seed: seed ?? this.seed,
     );
   }
+
   Map<String, dynamic> toMap() {
     return {
       'sessionId': sessionId,
@@ -217,43 +222,53 @@ class SessionState {
   }
 
   factory SessionState.fromMap(Map<String, dynamic> mapData, {String? id}) {
-    final List<dynamic> flatMap = mapData['map'] as List<dynamic>;
-    // On assume une taille fixe de 50 pour l'Archipel (MAP_SIZE coté serveur)
+    int _toInt(dynamic v, [int d = 0]) => ArchipelUtils.toInt(v, d);
+
+    final dynamic flatMapRaw = mapData['map'];
+    final List<dynamic> flatMap = (flatMapRaw is List) ? flatMapRaw : [];
+    
+    // On assume une taille fixe de 36 pour l'Archipel
     const int size = 36;
     final List<List<TileType>> reconstructedMap = List.generate(size, (i) {
       return List.generate(size, (j) {
-        final int index = flatMap[i * size + j] as int;
-        return TileType.values[index];
+        final int listIndex = i * size + j;
+        if (listIndex < flatMap.length) {
+          final int tileIndex = _toInt(flatMap[listIndex]);
+          if (tileIndex >= 0 && tileIndex < TileType.values.length) {
+            return TileType.values[tileIndex];
+          }
+        }
+        return TileType.sea;
       });
     });
 
     return SessionState(
-      sessionId: id ?? mapData['sessionId'],
-      x: mapData['x']?.toInt() ?? 0,
-      y: mapData['y']?.toInt() ?? 0,
-      orientation: mapData['orientation']?.toInt() ?? 0,
-      provisions: mapData['provisions']?.toInt() ?? 0,
-      orVolatil: mapData['orVolatil']?.toInt() ?? 0,
-      boisCharpente: mapData['boisCharpente']?.toInt() ?? 0,
-      copperKeys: mapData['copperKeys']?.toInt() ?? 0,
-      silverKeys: mapData['silverKeys']?.toInt() ?? 0,
-      goldKeys: mapData['goldKeys']?.toInt() ?? 0,
+      sessionId: id ?? mapData['sessionId']?.toString(),
+      x: _toInt(mapData['x'], size ~/ 2),
+      y: _toInt(mapData['y'], size ~/ 2),
+      orientation: _toInt(mapData['orientation']),
+      provisions: _toInt(mapData['provisions']),
+      orVolatil: _toInt(mapData['orVolatil']),
+      boisCharpente: _toInt(mapData['boisCharpente']),
+      copperKeys: _toInt(mapData['copperKeys']),
+      silverKeys: _toInt(mapData['silverKeys']),
+      goldKeys: _toInt(mapData['goldKeys']),
       map: reconstructedMap,
       inventory: List<String>.from(mapData['inventory'] ?? []),
       isAtStopover: mapData['isAtStopover'] ?? false,
-      lootRemaining: mapData['lootRemaining']?.toInt() ?? 0,
+      lootRemaining: _toInt(mapData['lootRemaining']),
       startTime: mapData['startTime'] is String 
           ? DateTime.parse(mapData['startTime']) 
-          : (mapData['startTime'] as dynamic)?.toDate() ?? DateTime.now(),
+          : (mapData['startTime'] is DateTime ? mapData['startTime'] : (mapData['startTime'] as dynamic)?.toDate() ?? DateTime.now()),
       isGameOver: mapData['isGameOver'] ?? false,
-      statusMessage: mapData['statusMessage'],
+      statusMessage: mapData['statusMessage']?.toString(),
       collections: Map<String, int>.from(mapData['collections'] ?? {}),
       discoveredIslandCoords: (mapData['discoveredIslandCoords'] as List? ?? []).map((e) => Map<String, int>.from(e as Map)).toList(),
-      hullLevel: mapData['hullLevel']?.toInt() ?? 1,
-      sailsLevel: mapData['sailsLevel']?.toInt() ?? 1,
-      cargoLevel: mapData['cargoLevel']?.toInt() ?? 1,
-      quests: (mapData['quests'] as List? ?? []).map((q) => Quest.fromMap(q)).toList(),
-      seed: mapData['seed']?.toInt() ?? 0,
+      hullLevel: _toInt(mapData['hullLevel'], 1),
+      sailsLevel: _toInt(mapData['sailsLevel'], 1),
+      cargoLevel: _toInt(mapData['cargoLevel'], 1),
+      quests: (mapData['quests'] as List? ?? []).map((q) => Quest.fromMap(Map<String, dynamic>.from(q as Map))).toList(),
+      seed: _toInt(mapData['seed']),
     );
   }
 }

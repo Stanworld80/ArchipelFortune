@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../core/utils.dart';
 
 class UserModel {
   final String uid;
@@ -57,7 +57,7 @@ class UserModel {
       email: map['email'] ?? '',
       displayName: map['displayName'] ?? '',
       role: map['role'] ?? 'player',
-      piecesOr: map['piecesOr']?.toInt() ?? 0,
+      piecesOr: ArchipelUtils.toInt(map['piecesOr']),
       lastLoginAt: map['lastLoginAt'] != null ? DateTime.parse(map['lastLoginAt']) : null,
     );
   }

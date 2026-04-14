@@ -243,7 +243,8 @@ Set-Location -Path $RootPath
 if ($Platform -eq 'web' -or $Platform -eq 'all') {
     $deployTargets = if ($Environment -eq 'prod') { 'hosting,firestore' } else { 'hosting,functions,firestore' }
     Write-Host "   Deploying [$deployTargets] to Firebase Project: $($EnvConfig.ProjectId)"
-    firebase deploy --only $deployTargets --project $EnvConfig.ProjectId
+    # Use --force to automatically set up cleanup policies and avoid soft failures
+    firebase deploy --only $deployTargets --project $EnvConfig.ProjectId --force
     if ($LASTEXITCODE -ne 0) { throw '❌ Firebase deploy failed.' }
     Write-Host '   ✅ Firebase deploy done.' -ForegroundColor Green
 }

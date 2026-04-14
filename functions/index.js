@@ -295,70 +295,21 @@ function generateProceduralMap(seed) {
 }
 
 function spawnLand(map, x, y, type, biome, rand) {
-  const radius = 3;
-  let portPlaced = false;
-
-  // Définition des types selon le biome
-  let centerTile = type;
-  let beachTile = TileType.sand;
-  let extraTile = TileType.forest; // Par défaut jungle ou forêt
-
+  // Une île ne doit être représentée que par une seule case
   if (biome === 1) { // Nordique
-    centerTile = TileType.snow;
-    beachTile = TileType.ice;
-    extraTile = TileType.snow;
+    map[x][y] = TileType.snow;
   } else if (biome === 2) { // Jungle
-    centerTile = TileType.jungle;
-    beachTile = TileType.swamp;
-    extraTile = TileType.jungle;
-  }
-
-  for (let i = -radius; i <= radius; i++) {
-    for (let j = -radius; j <= radius; j++) {
-      const nx = x + i;
-      const ny = y + j;
-      if (nx < 0 || nx >= MAP_SIZE || ny < 0 || ny >= MAP_SIZE) continue;
-
-      const dist = Math.sqrt(i * i + j * j);
-      
-      // Centre de l'île / Forêt dense
-      if (dist < 1.2) {
-        // Chance de POI au centre (Volcan pour Tropical)
-        if (biome === 0 && rand.next() > 0.85) {
-          map[nx][ny] = TileType.volcano;
-        } else {
-          map[nx][ny] = centerTile;
-        }
-      } 
-      else if (dist < 1.8) {
-        // Placement d'UN port unique
-        if (!portPlaced && rand.next() > 0.6) {
-          map[nx][ny] = TileType.port;
-          portPlaced = true;
-        } else {
-          map[nx][ny] = extraTile;
-        }
-      }
-      // Plages / Transition
-      else if (dist < 2.5) {
-        if (map[nx][ny] === TileType.sea) map[nx][ny] = beachTile;
-      }
-      // Eaux peu profondes (Shallow)
-      else if (dist < 3.2) {
-        if (map[nx][ny] === TileType.sea) map[nx][ny] = TileType.shallow;
-      }
-    }
-  }
-
-  // Sécurité: Si aucun port n'a été placé par probabilité, on en force un
-  if (!portPlaced) {
-    const nx = x + 1;
-    const ny = y;
-    if (nx >= 0 && nx < MAP_SIZE && ny >= 0 && ny < MAP_SIZE) {
-      map[nx][ny] = TileType.port;
+    map[x][y] = TileType.jungle;
+  } else { // Tropical
+    // Chance de volcan (15%) ou port (85%)
+    if (rand.next() > 0.85) {
+      map[x][y] = TileType.volcano;
+    } else {
+      map[x][y] = TileType.port;
     }
   }
 }
+
 
 function applyContinent(map, x, y) {
   map[x][y] = TileType.continent;
