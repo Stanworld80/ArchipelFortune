@@ -232,12 +232,11 @@ class _HomeViewState extends ConsumerState<HomeView>
 
                         const SizedBox(height: 32),
 
-                        // ── DÉPART (hero button) ─────────────────────
-                        SpriteButton(
+                        // ── DÉPART (hero button with barre.png) ─────────────────────
+                        _BarreButton(
                           semanticLabel: 'EXPLORE_MAIN_BTN',
-                          spriteRect: SpriteRegions.depart,
-                          width: isWide ? 280 : 200,
-                          height: isWide ? 280 : 200,
+                          width: isWide ? 400 : 300,
+                          height: isWide ? 400 : 300,
                           onTap: () =>
                               _showPreparationDialog(context, ref, profile),
                         ),
@@ -647,6 +646,80 @@ class _SupplyRow extends StatelessWidget {
             onPressed: onIncrement,
           ),
         ],
+      ),
+    );
+  }
+}
+class _BarreButton extends StatefulWidget {
+  const _BarreButton({
+    required this.onTap,
+    this.width,
+    this.height,
+    this.semanticLabel,
+  });
+
+  final VoidCallback onTap;
+  final double? width;
+  final double? height;
+  final String? semanticLabel;
+
+  @override
+  State<_BarreButton> createState() => _BarreButtonState();
+}
+
+class _BarreButtonState extends State<_BarreButton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _scale;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 80),
+      lowerBound: 0.92,
+      upperBound: 1.0,
+      value: 1.0,
+    );
+    _scale = _ctrl;
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: widget.semanticLabel,
+      button: true,
+      enabled: true,
+      child: GestureDetector(
+        onTapDown: (_) => _ctrl.reverse(),
+        onTapUp: (_) {
+          _ctrl.forward();
+          widget.onTap();
+        },
+        onTapCancel: () => _ctrl.forward(),
+        child: AnimatedBuilder(
+          animation: _scale,
+          builder: (ctx, child) => Transform.scale(
+            scale: _scale.value,
+            child: child,
+          ),
+          child: Image.asset(
+            'assets/images/barre.png',
+            width: widget.width,
+            height: widget.height,
+            fit: BoxFit.contain,
+            // The user mentioned "fond blanc est en fait transparent".
+            // If the image lacks real transparency, we could try a blend mode,
+            // but for now we assume it's a standard PNG with transparency.
+          ),
+        ),
       ),
     );
   }
