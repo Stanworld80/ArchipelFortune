@@ -430,13 +430,6 @@ class _HomeViewState extends ConsumerState<HomeView>
                       ? () async {
                           setState(() => _isLoading = true);
                           try {
-                            final firestoreService =
-                                ref.read(firestoreServiceProvider);
-                            await firestoreService.updateUserField(
-                                profile.uid,
-                                'piecesOr',
-                                profile.piecesOr - totalCost);
-
                             const int? testSeed =
                                 bool.hasEnvironment('TEST_SEED')
                                     ? int.fromEnvironment('TEST_SEED')
@@ -451,7 +444,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                                 );
 
                             if (context.mounted) {
-                              Navigator.pop(context);
+                              Navigator.pop(context); // Ferme le dialogue
                               Navigator.of(context).push(
                                 MaterialPageRoute(
                                     builder: (_) =>
@@ -461,7 +454,10 @@ class _HomeViewState extends ConsumerState<HomeView>
                           } catch (e) {
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Erreur: $e')),
+                                SnackBar(
+                                  content: Text('Erreur lors du départ : $e'),
+                                  backgroundColor: Colors.redAccent,
+                                ),
                               );
                             }
                           } finally {

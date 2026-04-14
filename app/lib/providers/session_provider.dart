@@ -33,10 +33,38 @@ class SessionNotifier extends Notifier<SessionState?> {
         'seed': seed,
       });
 
-      final String sessionId = result.data['sessionId'];
-      final int actualSeed = result.data['seed'];
-      final int startX = result.data['x'];
-      final int startY = result.data['y'];
+      if (result.data == null) {
+        throw Exception("La fonction startExpedition a renvoyé une réponse vide (null).");
+      }
+
+      print("DEBUG: startExpedition response type: ${result.data.runtimeType}");
+      print("DEBUG: startExpedition response data: ${result.data}");
+
+      // Extraction sécurisée pour Flutter Web (JSMap)
+      Map<dynamic, dynamic> dataMap;
+      try {
+        dataMap = Map<dynamic, dynamic>.from(result.data as Map);
+      } catch (e) {
+        print("DEBUG: Erreur de conversion en Map: $e");
+        // Fallback si ce n'est pas directement castable en Map
+        dataMap = result.data as dynamic; 
+      }
+
+      final String? sessionId = dataMap['sessionId']?.toString();
+      final num? actualSeedNum = dataMap['seed'] is num ? dataMap['seed'] : num.tryParse(dataMap['seed']?.toString() ?? '');
+      final num? startXNum = dataMap['x'] is num ? dataMap['x'] : num.tryParse(dataMap['x']?.toString() ?? '');
+      final num? startYNum = dataMap['y'] is num ? dataMap['y'] : num.tryParse(dataMap['y']?.toString() ?? '');
+
+      print("DEBUG: Parsed values - sessionId: $sessionId, seed: $actualSeedNum, x: $startXNum, y: $startYNum");
+
+      if (sessionId == null || actualSeedNum == null || startXNum == null || startYNum == null) {
+        throw Exception("Données de session incomplètes ou invalides reçues du serveur. "
+            "Reçu: sessionId=$sessionId, seed=$actualSeedNum, x=$startXNum, y=$startYNum");
+      }
+
+      final int actualSeed = actualSeedNum.toInt();
+      final int startX = startXNum.toInt();
+      final int startY = startYNum.toInt();
 
       state = SessionState(
         sessionId: sessionId,
@@ -54,8 +82,10 @@ class SessionNotifier extends Notifier<SessionState?> {
           Quest(id: "collect_gold", title: "Fièvre de l'Or", description: "Récoltez 1000 pièces d'or.", currentValue: 0, targetValue: 1000, rewardType: RewardType.keySilver, rewardAmount: 1),
         ],
       );
-    } catch (e) {
+    } catch (e, stack) {
       print("Erreur startNewSession: $e");
+      print("Stacktrace: $stack");
+      rethrow;
     }
   }
 
