@@ -119,7 +119,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                       end: Alignment.bottomRight,
                     ).createShader(bounds),
                     child: Semantics(
-                      label: "L'Archipel de la Fortune",
+                      label: "APP_TITLE",
                       header: true,
                       child: Text(
                         "L'Archipel\nde la Fortune",

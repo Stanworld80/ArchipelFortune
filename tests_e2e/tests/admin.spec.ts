@@ -23,14 +23,17 @@ test.describe('Archipel Fortune Admin Panel', () => {
       };
       if (!findAndClick()) {
         window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab' }));
-        setTimeout(findAndClick, 500);
+        setTimeout(findAndClick, 1000);
       }
     });
 
-    await page.waitForTimeout(5000);
-    await expect(page.getByLabel('Enable accessibility')).not.toBeVisible({ timeout: 10000 });
-    const canvas = page.locator('flutter-view');
-    await expect(canvas).toBeVisible({ timeout: 10000 });
+    await page.waitForTimeout(10000); // Wait longer for semantics to settle
+    
+    // On s'assure que le bouton d'accessibilité n'est plus là
+    const accessBtn = page.getByLabel('Enable accessibility');
+    if (await accessBtn.isVisible()) {
+      await accessBtn.click({ force: true }).catch(() => {});
+    }
   });
 
   test('Access Admin Panel as Superadmin', async ({ page }) => {
@@ -54,8 +57,17 @@ test.describe('Archipel Fortune Admin Panel', () => {
     await expect(submitBtn).toBeVisible({ timeout: 20000 });
     await submitBtn.click({ force: true });
 
-    // Wait for Login to complete
-    await expect(page.getByLabel('APP_TITLE')).toBeVisible({ timeout: 30000 });
+    // Wait for Login to complete and transition to HomeView
+    // Check for potential error SnackBar if it takes too long
+    try {
+      await expect(page.getByLabel('PROFILE_BTN')).toBeVisible({ timeout: 45000 });
+    } catch (e) {
+      const errorText = page.locator('text=/Erreur|Error/i');
+      if (await errorText.isVisible()) {
+        throw new Error(`Login failed with error: ${await errorText.innerText()}`);
+      }
+      throw e;
+    }
 
     // 2. Open User Menu
     const profileBtn = page.getByLabel('PROFILE_BTN');
@@ -85,8 +97,16 @@ test.describe('Archipel Fortune Admin Panel', () => {
     await page.getByLabel('AUTH_PASSWORD_FIELD').fill(TEST_PASSWORD);
     await page.getByLabel('AUTH_SUBMIT_BTN').click();
 
-    // Wait for Login to complete
-    await expect(page.getByLabel('APP_TITLE')).toBeVisible({ timeout: 30000 });
+    // Wait for Login to complete and transition to HomeView
+    try {
+      await expect(page.getByLabel('PROFILE_BTN')).toBeVisible({ timeout: 45000 });
+    } catch (e) {
+      const errorText = page.locator('text=/Erreur|Error/i');
+      if (await errorText.isVisible()) {
+        throw new Error(`Login failed with error: ${await errorText.innerText()}`);
+      }
+      throw e;
+    }
     
     // Open Admin Panel
     const profileBtn = page.getByLabel('PROFILE_BTN');

@@ -11,6 +11,7 @@ import '../../providers/session_provider.dart';
 import '../../models/session_model.dart';
 import 'upgrade_shop_view.dart';
 import 'quest_log_view.dart';
+import 'collections_view.dart';
 
 class GameDashboardView extends ConsumerStatefulWidget {
   const GameDashboardView({super.key});
@@ -281,6 +282,20 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFE5D3B3),
                           foregroundColor: const Color(0xFF5D4037),
+                          textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton.icon(
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const CollectionsView()),
+                        ),
+                        icon: const Icon(Icons.collections_bookmark, size: 14),
+                        label: const Text("COLLECTION"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.teal.shade400,
+                          foregroundColor: Colors.white,
                           textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
                         ),

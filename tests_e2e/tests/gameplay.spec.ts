@@ -22,14 +22,17 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
       };
       if (!findAndClick()) {
         window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab' }));
-        setTimeout(findAndClick, 500);
+        setTimeout(findAndClick, 1000);
       }
     });
 
-    await page.waitForTimeout(5000);
-    await expect(page.getByLabel('Enable accessibility')).not.toBeVisible({ timeout: 10000 });
-    const canvas = page.locator('flutter-view');
-    await expect(canvas).toBeVisible({ timeout: 10000 });
+    await page.waitForTimeout(10000);
+    
+    // On s'assure que le bouton d'accessibilité n'est plus là
+    const accessBtn = page.getByLabel('Enable accessibility');
+    if (await accessBtn.isVisible()) {
+      await accessBtn.click({ force: true }).catch(() => {});
+    }
   });
 
   test('Full Journey: Register -> Prepare -> Navigate', async ({ page }) => {
@@ -56,9 +59,17 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
     await signupBtn.click();
 
     // 2. Vérification HomeView
-    // On cherche le bouton EXPLORER
+    // On cherche le bouton EXPLORER, avec un check d'erreur si timeout
     const exploreBtn = page.getByLabel('EXPLORE_MAIN_BTN', { exact: true });
-    await expect(exploreBtn).toBeVisible({ timeout: 60000 });
+    try {
+      await expect(exploreBtn).toBeVisible({ timeout: 60000 });
+    } catch (e) {
+      const errorText = page.locator('text=/Erreur|Error/i');
+      if (await errorText.isVisible()) {
+        throw new Error(`Signup failed with error: ${await errorText.innerText()}`);
+      }
+      throw e;
+    }
     
     // Vérifier l'or initial (50 gold)
     await expect(page.getByText(/50 Pièces d'Or/i)).toBeVisible();

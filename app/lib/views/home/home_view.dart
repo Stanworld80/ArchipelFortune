@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/session_provider.dart';
 import '../admin/admin_view.dart';
-import '../game/collections_view.dart';
+
 import '../game/game_dashboard_view.dart';
 import '../../models/user_model.dart';
 import '../../core/widgets/sprite_button.dart';
@@ -114,16 +114,6 @@ class _HomeViewState extends ConsumerState<HomeView>
                     ],
                   ),
             orElse: () => const SizedBox.shrink(),
-          ),
-          const SizedBox(width: 8),
-          IconButton(
-            icon: const Icon(Icons.collections_bookmark, color: Colors.amber),
-            tooltip: 'Mes Collections',
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const CollectionsView()),
-              );
-            },
           ),
           const SizedBox(width: 8),
         ],
@@ -247,21 +237,6 @@ class _HomeViewState extends ConsumerState<HomeView>
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            // INVENTAIRE / Collections
-                            SpriteButton(
-                              semanticLabel: 'COLLECTIONS_BTN',
-                              spriteRect: SpriteRegions.inventaire,
-                              width: isWide ? 160 : 120,
-                              height: isWide ? 160 : 120,
-                              onTap: () => Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (_) => const CollectionsView(),
-                                ),
-                              ),
-                            ),
-
-                            const SizedBox(width: 20),
-
                             // CARTE — placeholder (map view future)
                             SpriteButton(
                               semanticLabel: 'MAP_BTN',
