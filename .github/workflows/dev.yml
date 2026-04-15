@@ -37,6 +37,10 @@ jobs:
         with:
           channel: 'stable'
           flutter-version: 'any'
+          cache: true
+
+      - name: 🔍 Diagnostics
+        run: flutter --version
 
       - name: 📦 Install dependencies
         working-directory: app
@@ -132,10 +136,10 @@ jobs:
           flutter create . --platforms web
           
           # Build
-          flutter build web --debug \
-            --web-renderer html \
+          flutter build web --profile \
             --dart-define=APP_ENV=dev \
-            --dart-define=SUPER_ADMIN_EMAIL=stanworld@gmail.com
+            --dart-define=SUPER_ADMIN_EMAIL=stanworld@gmail.com \
+            --source-maps
 
       - name: 📤 Upload Web Artifact
         uses: actions/upload-artifact@v4

@@ -161,7 +161,7 @@ $CommonArgs = $DartDefineArgs + @(
 
 if ($Platform -eq 'web' -or $Platform -eq 'all') {
     Write-Host '   Building Web...' -ForegroundColor Yellow
-    flutter build web --web-renderer html @CommonArgs
+    flutter build web @CommonArgs
     if ($LASTEXITCODE -ne 0) { throw '❌ Web Build Failed' }
     Write-Host '   ✅ Web build done.' -ForegroundColor Green
 }
