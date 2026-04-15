@@ -42,21 +42,34 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
     await page.locator('input[aria-label*="Passe"], [aria-label="AUTH_PASSWORD_FIELD"]').first().fill(testPassword);
     await page.locator('[aria-label="AUTH_SUBMIT_BTN"]').first().click();
 
-    // 2. HomeView check
+    // 2. Wait for login to complete
+    try {
+      await page.locator('[aria-label="PROFILE_BTN"]').first().waitFor({ state: 'visible', timeout: 60000 });
+    } catch (e) {
+      const errorVisible = await page.locator('.SnackBar, :text("Erreur"), [aria-label*="Error"]').first().isVisible();
+      if (errorVisible) {
+        const errorText = await page.locator('.SnackBar, :text("Erreur"), [aria-label*="Error"]').first().innerText().catch(() => 'Unknown error');
+        throw new Error(`Registration/Login failed for ${testEmail}: ${errorText}`);
+      }
+      await page.screenshot({ path: `gameplay-auth-timeout-${Date.now()}.png`, fullPage: true });
+      throw new Error(`Timed out waiting for login to complete for ${testEmail}`);
+    }
+
+    // 3. HomeView check
     const exploreBtn = page.locator('[aria-label="EXPLORE_MAIN_BTN"]').first();
-    await expect(exploreBtn).toBeVisible({ timeout: 90000 });
+    await expect(exploreBtn).toBeVisible({ timeout: 45000 });
     await exploreBtn.click({ force: true });
 
-    // 3. Preparation Dialog
+    // 4. Preparation Dialog
     const startExpBtn = page.locator('[aria-label="START_EXPEDITION_BTN"]').first();
     await expect(startExpBtn).toBeVisible({ timeout: 20000 });
     await startExpBtn.click();
 
-    // 4. Session View (Map)
+    // 5. Session View (Map)
     // The position text is a great way to confirm we are in the session
     await expect(page.getByText(/POSITION: 18, 18/i)).toBeVisible({ timeout: 45000 });
 
-    // 5. Movement
+    // 6. Movement
     const advanceBtn = page.locator('[aria-label="MOVE_UP_BTN"]').first();
     await expect(advanceBtn).toBeVisible({ timeout: 10000 });
     await advanceBtn.click();

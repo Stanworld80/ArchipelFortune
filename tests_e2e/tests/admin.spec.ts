@@ -5,7 +5,7 @@ test.describe('Admin Panel Tests', () => {
   test.setTimeout(180000);
 
   const SUPER_ADMIN_EMAIL = 'admin@stanworld.com';
-  const SUPER_ADMIN_PASSWORD = 'password123';
+  const SUPER_ADMIN_PASSWORD = 'Stanworld80!';
 
   test.beforeEach(async ({ page }) => {
     await page.goto('/', { waitUntil: 'load', timeout: 60000 });
@@ -50,15 +50,17 @@ test.describe('Admin Panel Tests', () => {
     const errorSnackbar = page.locator('.SnackBar, :text("Erreur"), [aria-label*="Error"]').first();
     
     try {
-      await Promise.race([
-        expect(profileBtn).toBeVisible({ timeout: 60000 }),
-        expect(errorSnackbar).toBeVisible({ timeout: 15000 }).then(() => {
-          throw new Error('Login failed: Error message detected on screen.');
-        })
-      ]);
+      // Wait for success without failing if the error snackbar isn't immediately visible
+      await page.locator('[aria-label="PROFILE_BTN"]').first().waitFor({ state: 'visible', timeout: 60000 });
     } catch (e) {
-      console.error(`Login failed for ${SUPER_ADMIN_EMAIL}. This is likely due to invalid credentials, network issues, or Firebase configuration in the dev environment.`);
-      await page.screenshot({ path: `login-failure-${Date.now()}.png`, fullPage: true });
+      const errorVisible = await page.locator('.SnackBar, :text("Erreur"), [aria-label*="Error"]').first().isVisible();
+      if (errorVisible) {
+        const errorText = await page.locator('.SnackBar, :text("Erreur"), [aria-label*="Error"]').first().innerText().catch(() => 'Unknown error');
+        console.error(`Login failed with error: ${errorText}`);
+        throw new Error(`Login failed for ${SUPER_ADMIN_EMAIL}: ${errorText}`);
+      }
+      console.error(`Login timed out for ${SUPER_ADMIN_EMAIL}. This is likely due to network issues or Firebase performance.`);
+      await page.screenshot({ path: `login-timeout-${Date.now()}.png`, fullPage: true });
       throw e;
     }
   }
