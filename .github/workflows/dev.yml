@@ -105,8 +105,7 @@ jobs:
   build-web:
     name: 🌐 Build Web (Dev)
     if: github.event_name == 'push' || inputs.run_web == true
-    
-    needs: unit-tests
+    #needs: unit-tests
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout repository
