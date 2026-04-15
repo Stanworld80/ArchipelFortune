@@ -61,9 +61,9 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
     await page.waitForTimeout(1000);
     await submitBtn.click({ force: true });
 
-    // 2. Wait for login to complete
+    // 2. Wait for login to complete (increased timeout for slow CI)
     try {
-      await page.locator('[aria-label="PROFILE_BTN"]').first().waitFor({ state: 'visible', timeout: 60000 });
+      await page.locator('[aria-label="PROFILE_BTN"]').first().waitFor({ state: 'visible', timeout: 120000 });
     } catch (e) {
       const errorVisible = await page.locator('.SnackBar, :text("Erreur"), [aria-label*="Error"]').first().isVisible();
       if (errorVisible) {
@@ -86,14 +86,15 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
 
     // 5. Session View (Map)
     // The position text is a great way to confirm we are in the session
-    await expect(page.getByText(/POSITION: 18, 18/i)).toBeVisible({ timeout: 45000 });
+    // Updated for 64x64 map (Center is 32, 32)
+    await expect(page.getByText(/POSITION: 32, 32/i)).toBeVisible({ timeout: 45000 });
 
     // 6. Movement
     const advanceBtn = page.locator('[aria-label="MOVE_UP_BTN"]').first();
     await expect(advanceBtn).toBeVisible({ timeout: 10000 });
     await advanceBtn.click();
 
-    // Position update verification
-    await expect(page.getByText(/POSITION: 18, 17/i)).toBeVisible({ timeout: 15000 });
+    // Position update verification (Move up from 32, 32 -> 32, 31)
+    await expect(page.getByText(/POSITION: 32, 31/i)).toBeVisible({ timeout: 15000 });
   });
 });

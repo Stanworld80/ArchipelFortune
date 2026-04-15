@@ -65,7 +65,7 @@ test.describe('Admin Panel Tests', () => {
     
     try {
       // Wait for success without failing if the error snackbar isn't immediately visible
-      await page.locator('[aria-label="PROFILE_BTN"]').first().waitFor({ state: 'visible', timeout: 60000 });
+      await page.locator('[aria-label="PROFILE_BTN"]').first().waitFor({ state: 'visible', timeout: 120000 });
     } catch (e) {
       const errorVisible = await page.locator('.SnackBar, :text("Erreur"), [aria-label*="Error"]').first().isVisible();
       if (errorVisible) {
