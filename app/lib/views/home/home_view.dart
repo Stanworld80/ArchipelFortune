@@ -233,66 +233,6 @@ class _HomeViewState extends ConsumerState<HomeView>
 
                         const SizedBox(height: 48),
 
-                        // ── Second row: INVENTAIRE + CARTE ────────────
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // CARTE — placeholder (map view future)
-                            SpriteButton(
-                              semanticLabel: 'MAP_BTN',
-                              spriteRect: SpriteRegions.carte,
-                              width: isWide ? 160 : 120,
-                              height: isWide ? 140 : 100,
-                              disabled: true, // à activer quand Map View existe
-                              onTap: () {},
-                            ),
-                          ],
-                        ),
-
-
-
-                        // ── Third row: RÉGLAGES + VOYAGE + DÉFI ──────
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // RÉGLAGES
-                            SpriteButton(
-                              semanticLabel: 'SETTINGS_BTN',
-                              spriteRect: SpriteRegions.reglages,
-                              width: isWide ? 100 : 76,
-                              height: isWide ? 100 : 76,
-                              disabled: true, // future
-                              onTap: () {},
-                            ),
-
-                            const SizedBox(width: 12),
-
-                            // VOYAGE (active = trigger explore)
-                            SpriteButton(
-                              semanticLabel: 'VOYAGE_BTN',
-                              spriteRect: SpriteRegions.voyage,
-                              width: isWide ? 240 : 180,
-                              height: isWide ? 80 : 60,
-                              onTap: () =>
-                                  _showPreparationDialog(context, ref, profile),
-                            ),
-
-                            const SizedBox(width: 12),
-
-                            // DÉFI
-                            SpriteButton(
-                              semanticLabel: 'DEFI_BTN',
-                              spriteRect: SpriteRegions.defi,
-                              width: isWide ? 100 : 76,
-                              height: isWide ? 100 : 76,
-                              disabled: true, // future
-                              onTap: () {},
-                            ),
-                          ],
-                        ),
-
-
-
                         // Tagline
                         Text(
                           'Une aventure d\'exploration, de découvertes\net de fortune vous attend...',
