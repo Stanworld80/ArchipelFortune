@@ -602,6 +602,11 @@ class SessionNotifier extends Notifier<SessionState?> {
       statusMessage: "QUÊTE TERMINÉE ! Récompense reçue.",
     );
   }
+
+  @visibleForTesting
+  void debugSetState(SessionState? nextState) {
+    state = nextState;
+  }
 }
 
 // Random déterministe identique au serveur
