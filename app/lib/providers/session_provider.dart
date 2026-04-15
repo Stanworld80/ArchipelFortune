@@ -268,7 +268,7 @@ class SessionNotifier extends Notifier<SessionState?> {
           orientation: newOrientation,
           provisions: nextProvisions,
           boisCharpente: (current.boisCharpente - 1).clamp(0, 999), 
-          statusMessage: (tile == TileType.volcano) ? "Chaleur intense ! -1 Bois$statusSuffix" : "Collision ! -1 Bois$statusSuffix",
+          statusMessage: (tile == TileType.volcano) ? "Chaleur intense ! -1 Kit Rép.$statusSuffix" : "Collision ! -1 Kit Rép.$statusSuffix",
         );
       } else {
         state = current.copyWith(isGameOver: true, statusMessage: (tile == TileType.volcano) ? "Cendres et feu..." : "Naufrage !");
@@ -285,7 +285,7 @@ class SessionNotifier extends Notifier<SessionState?> {
         orientation: newOrientation,
         provisions: nextProvisions,
         boisCharpente: (current.boisCharpente + 2).clamp(0, maxWood), 
-        statusMessage: "Épave fouillée ! +2 Bois$statusSuffix",
+        statusMessage: "Épave fouillée ! +2 Kits Rép.$statusSuffix",
       );
       return;
     }
@@ -321,7 +321,7 @@ class SessionNotifier extends Notifier<SessionState?> {
             provisions: lostProvisions,
             boisCharpente: (current.boisCharpente - 2).clamp(0, 999), 
             map: newMap,
-            statusMessage: "Défaite navale ! -2 Provisions supplémentaires, -2 Bois",
+            statusMessage: "Défaite navale ! -2 Provisions supplémentaires, -2 Kits Rép.",
           );
         }
         return;
@@ -338,7 +338,7 @@ class SessionNotifier extends Notifier<SessionState?> {
             orientation: newOrientation,
             provisions: nextProvisions,
             isAtStopover: true,
-            lootRemaining: 5,
+            lootRemaining: 2, // 2 paquets
             map: newMap,
             statusMessage: "Escale ! Butin récupéré.",
         );
@@ -363,7 +363,7 @@ class SessionNotifier extends Notifier<SessionState?> {
             orientation: newOrientation,
             provisions: nextProvisions,
             isAtStopover: true,
-            lootRemaining: 15,
+            lootRemaining: 5, // 5 paquets
             map: newMap,
             statusMessage: "Continent atteint ! Objectif final en vue.",
         );

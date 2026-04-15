@@ -15,57 +15,101 @@ class _LootOverlayState extends State<LootOverlay> {
   late List<_CrateContent> _crates;
   bool _allRevealed = false;
   bool _isAutoRevealing = false;
+  
   int _goldGained = 0;
-  int _provGained = 0;
-  int _woodGained = 0;
+  
+  // Tracking parts during stopover
+  final Set<String> _repairPartsFound = {}; 
+  int _provisionPartsFound = 0;
+  
+  // Completed kits
+  int _repairKitsGained = 0;
+  int _provisionKitsGained = 0;
+  
+  // Special items
+  int _mapsFound = 0;
 
   @override
   void initState() {
     super.initState();
+    _goldGained = 0;
+    _repairKitsGained = 0;
+    _provisionKitsGained = 0;
+    _mapsFound = 0;
+    _repairPartsFound.clear();
+    _provisionPartsFound = 0;
     _generateCrates();
   }
 
   void _generateCrates() {
     final rand = Random();
     _crates = List.generate(6, (_) {
-      int type = rand.nextInt(100);
-      if (type < 35) return _CrateContent(type: 'gold', value: (rand.nextInt(10) + 5) * 10, icon: Icons.monetization_on, color: Colors.amber);
-      if (type < 60) return _CrateContent(type: 'provisions', value: rand.nextInt(5) + 3, icon: Icons.apple, color: Colors.red);
-      if (type < 75) return _CrateContent(type: 'wood', value: 1, icon: Icons.handyman, color: Colors.brown);
+      int roll = rand.nextInt(100);
       
-      // Nouvelles récompenses rares
-      if (type < 85) {
-        final keyTypes = ['copper', 'silver', 'gold'];
-        final kt = keyTypes[rand.nextInt(3)];
-        return _CrateContent(
-          type: 'key', 
-          value: 1, 
-          icon: Icons.key, 
-          color: kt == 'gold' ? Colors.yellow : (kt == 'silver' ? Colors.grey : Colors.orange), 
-          label: kt.toUpperCase(),
-          keyType: kt,
-        );
+      // -- Trash (20%)
+      if (roll < 20) {
+        final trash = ["Vieille botte", "Crochet rouillé", "Chapeau troué", "Boîte de conserve vide"];
+        return _CrateContent(type: 'trash', value: 0, icon: Icons.delete_outline, color: Colors.grey, label: trash[rand.nextInt(trash.length)]);
       }
       
-      if (type < 95) {
-        final items = ['Boussole Antique', 'Longue-vue en Ivoire', 'Sextant en Or', 'Sabre Rouillé', 'Chapeau de Capitaine'];
-        final item = items[rand.nextInt(items.length)];
-        return _CrateContent(type: 'item', value: 1, icon: Icons.auto_awesome, color: Colors.purple, label: item, itemId: item.toLowerCase().replaceAll(' ', '_'));
+      // -- Or (30%)
+      if (roll < 50) {
+        int goldRoll = rand.nextInt(100);
+        int pieceCount;
+        if (goldRoll < 50) pieceCount = 2; // 50%
+        else if (goldRoll < 80) pieceCount = 5; // 30%
+        else if (goldRoll < 95) pieceCount = 10; // 15%
+        else if (goldRoll < 99) pieceCount = 25; // 4%
+        else pieceCount = 50; // 1%
+        
+        return _CrateContent(type: 'gold', value: pieceCount, icon: Icons.monetization_on, color: Colors.amber, label: "$pieceCount Or");
       }
-
+      
+      // -- Éléments Kit de réparation (20%)
+      if (roll < 70) {
+        final parts = [
+          {'id':'outil', 'nom': 'Gros outil'}, 
+          {'id':'bois', 'nom': 'Bois'}, 
+          {'id':'materiel', 'nom': 'Petit matériel'}, 
+          {'id':'cordes', 'nom': 'Cordes'}
+        ];
+        final part = parts[rand.nextInt(parts.length)];
+        return _CrateContent(type: 'repair_part', value: 1, icon: Icons.build, color: Colors.brown, label: part['nom'], itemId: part['id']);
+      }
+      
+      // -- Éléments Kit de provisions (25%)
+      if (roll < 95) {
+         final provs = ['Poisson', 'Viande', 'Bouteille de vin', 'Eau'];
+         final p = provs[rand.nextInt(provs.length)];
+         return _CrateContent(type: 'prov_part', value: 1, icon: Icons.fastfood, color: Colors.redAccent, label: p);
+      }
+      
+      // -- Carte mystérieuse (5%)
       return _CrateContent(type: 'map', value: 1, icon: Icons.map, color: Colors.tealAccent, label: "Carte mystérieuse");
     });
+    
     _allRevealed = false;
     _isAutoRevealing = false;
-    _goldGained = 0;
-    _provGained = 0;
-    _woodGained = 0;
   }
 
   void _processRevealedContent(_CrateContent content) {
-    if (content.type == 'gold') _goldGained += content.value;
-    if (content.type == 'provisions') _provGained += content.value;
-    if (content.type == 'wood') _woodGained += content.value;
+    if (content.type == 'gold') {
+      _goldGained += content.value;
+    } else if (content.type == 'repair_part') {
+      _repairPartsFound.add(content.itemId!);
+      if (_repairPartsFound.length == 4) {
+        _repairKitsGained++;
+        _repairPartsFound.clear();
+      }
+    } else if (content.type == 'prov_part') {
+       _provisionPartsFound++;
+       if (_provisionPartsFound == 5) {
+          _provisionKitsGained++;
+          _provisionPartsFound = 0;
+       }
+    } else if (content.type == 'map') {
+       _mapsFound++;
+    }
     
     if (_crates.every((c) => c.revealed)) {
       _allRevealed = true;
@@ -104,9 +148,9 @@ class _LootOverlayState extends State<LootOverlay> {
               'Cliquez sur les caisses pour révéler leur contenu',
               style: TextStyle(color: Colors.white70, fontSize: 16),
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 20),
             Container(
-              width: 400,
+              width: 500,
               padding: const EdgeInsets.all(16),
               child: GridView.builder(
                 shrinkWrap: true,
@@ -129,27 +173,38 @@ class _LootOverlayState extends State<LootOverlay> {
                 },
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
+            
+            // Panneau de progression des kits (Toujours visible)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(color: Colors.white.withAlpha(20), borderRadius: BorderRadius.circular(12)),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _SummaryItem(value: _goldGained, icon: Icons.monetization_on, color: Colors.amber),
+                  const SizedBox(width: 24),
+                  Column(
+                    children: [
+                      Text("Kits Rép.: $_repairKitsGained", style: const TextStyle(color: Colors.brown, fontWeight: FontWeight.bold, fontSize: 16)),
+                      Text("Pièces: ${_repairPartsFound.length}/4", style: const TextStyle(color: Colors.brown, fontSize: 12)),
+                    ],
+                  ),
+                  const SizedBox(width: 24),
+                  Column(
+                    children: [
+                      Text("Kits Prov.: $_provisionKitsGained", style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 16)),
+                      Text("Pièces: $_provisionPartsFound/5", style: const TextStyle(color: Colors.redAccent, fontSize: 12)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            
             const SizedBox(height: 20),
             if (_isAutoRevealing && !_allRevealed)
               const CircularProgressIndicator(color: Colors.amber, strokeWidth: 6),
             const SizedBox(height: 20),
-            if (_allRevealed)
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: Colors.white10, borderRadius: BorderRadius.circular(12)),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _SummaryItem(value: _goldGained, icon: Icons.monetization_on, color: Colors.amber),
-                    const SizedBox(width: 20),
-                    _SummaryItem(value: _provGained, icon: Icons.apple, color: Colors.red),
-                    const SizedBox(width: 20),
-                    _SummaryItem(value: _woodGained, icon: Icons.handyman, color: Colors.brown),
-                  ],
-                ),
-              ),
-            const SizedBox(height: 30),
             Consumer(builder: (context, ref, child) {
               final session = ref.watch(sessionProvider);
               if (session == null) return const SizedBox.shrink();
@@ -174,26 +229,20 @@ class _LootOverlayState extends State<LootOverlay> {
                         label: session.lootRemaining > 1 ? "SUIVANT" : "FIN",
                         color: Colors.amber,
                         onPressed: _allRevealed ? () {
-                          // Ajouter le butin à la cargaison
-                          ref.read(sessionProvider.notifier).addLootToCargaison(_goldGained, _provGained, _woodGained);
-                          
-                          // Ajouter les items spéciaux trouvés
-                          for (var crate in _crates) {
-                            if (crate.type == 'key' || crate.type == 'item') {
-                              ref.read(sessionProvider.notifier).addSpecialLoot(
-                                keyType: crate.keyType,
-                                itemId: crate.itemId,
-                              );
-                            }
-                            if (crate.type == 'map') {
+                          if (session.lootRemaining > 1) {
+                            // On passe au paquet suivant en gardant la progression
+                            ref.read(sessionProvider.notifier).endLootSerie();
+                            setState(() => _generateCrates());
+                          } else {
+                            // Fin du Loot - Les pièces incomplètes sont perdues
+                            // On considère qu'un kit de provisions donne 5 unités de provisions au bateau
+                            ref.read(sessionProvider.notifier).addLootToCargaison(_goldGained, _provisionKitsGained * 5, _repairKitsGained);
+                            
+                            for (int i = 0; i < _mapsFound; i++) {
                               ref.read(sessionProvider.notifier).addDiscoveryMap();
                             }
-                          }
-
-                          ref.read(sessionProvider.notifier).endLootSerie();
-                          
-                          if (session.lootRemaining > 1) {
-                            setState(() => _generateCrates());
+                            
+                            ref.read(sessionProvider.notifier).endLootSerie();
                           }
                         } : null,
                       ),
@@ -281,11 +330,11 @@ class _RoundActionButton extends StatelessWidget {
               width: 70,
               height: 70,
               decoration: BoxDecoration(
-                color: isDisabled ? Colors.grey.withValues(alpha: 0.2) : color,
+                color: isDisabled ? Colors.grey.withAlpha(50) : color,
                 shape: BoxShape.circle,
                 border: Border.all(color: isDisabled ? Colors.white10 : Colors.white24, width: 3),
                 boxShadow: isDisabled ? [] : [
-                  BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 12, spreadRadius: 2)
+                  BoxShadow(color: color.withAlpha(100), blurRadius: 12, spreadRadius: 2)
                 ],
               ),
               child: Icon(icon, color: isDisabled ? Colors.white24 : Colors.brown.shade900, size: 36),
@@ -337,7 +386,7 @@ class _CrateWidgetState extends State<_CrateWidget> {
             color: widget.content.revealed ? Colors.white10 : Colors.brown.shade800,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: widget.content.revealed ? widget.content.color : Colors.brown.shade400, width: 2),
-            boxShadow: widget.content.revealed ? [BoxShadow(color: widget.content.color.withValues(alpha: 0.5), blurRadius: 10)] : [],
+            boxShadow: widget.content.revealed ? [BoxShadow(color: widget.content.color.withAlpha(130), blurRadius: 10)] : [],
           ),
           child: widget.content.revealed
               ? Column(
@@ -346,7 +395,8 @@ class _CrateWidgetState extends State<_CrateWidget> {
                     Icon(widget.content.icon, color: widget.content.color, size: 32),
                     const SizedBox(height: 4),
                     Text(
-                      widget.content.label ?? '+${widget.content.value}',
+                      widget.content.label ?? '${widget.content.value}',
+                      textAlign: TextAlign.center,
                       style: TextStyle(color: widget.content.color, fontWeight: FontWeight.bold, fontSize: 12),
                     ),
                   ],
@@ -378,3 +428,4 @@ class _SummaryItem extends StatelessWidget {
     );
   }
 }
+

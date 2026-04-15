@@ -133,6 +133,7 @@ jobs:
           
           # Build
           flutter build web --debug \
+            --web-renderer html \
             --dart-define=APP_ENV=dev \
             --dart-define=SUPER_ADMIN_EMAIL=stanworld@gmail.com
 

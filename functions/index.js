@@ -151,14 +151,14 @@ exports.moveShip = onCall(async (request) => {
   if (tileType === TileType.reef || tileType === TileType.volcano) {
     if (session.wood > 0) {
       update.wood = FieldValue.increment(-1);
-      update.statusMessage = (tileType === TileType.volcano) ? "Chaleur intense ! -1 Bois" : "Collision avec un récif ! -1 Bois";
+      update.statusMessage = (tileType === TileType.volcano) ? "Chaleur intense ! -1 Kit Rép." : "Collision récif ! -1 Kit Rép.";
     } else {
       update.isGameOver = true;
       update.statusMessage = (tileType === TileType.volcano) ? "Cendres et feu..." : "Naufrage sur un récif !";
     }
   } else if (tileType === TileType.shipwreck) {
       update.wood = FieldValue.increment(2); // Auto-loot de bois
-      update.statusMessage = "Épave fouillée ! +2 Bois";
+      update.statusMessage = "Épave fouillée ! +2 Kits Rép.";
   } else if (tileType === TileType.pirate) {
       // Combat déterministe pour synchronisation client/serveur
       const combatRand = new Random(session.seed + nextX * 31 + nextY * 17);
@@ -172,21 +172,21 @@ exports.moveShip = onCall(async (request) => {
       } else {
           update.provisions = Math.max(0, nextProvisions - 2);
           update.wood = FieldValue.increment(-2);
-          update.statusMessage = "Défaite navale ! -2 Provisions, -2 Bois";
+          update.statusMessage = "Défaite navale ! -2 Provisions, -2 Kits Rép.";
           session.map[nextX][nextY] = TileType.sea;
           update.map = session.map.flat();
           if (update.provisions <= 0) update.isGameOver = true;
       }
   } else if (tileType === TileType.island || tileType === TileType.port || tileType === TileType.snow || tileType === TileType.jungle) {
     update.isAtStopover = true;
-    update.lootRemaining = 5;
+    update.lootRemaining = 2; // 2 paquets
     update.statusMessage = "Escale ! Butin récupéré.";
     
     session.map[nextX][nextY] = (tileType === TileType.snow) ? TileType.snow : (tileType === TileType.jungle ? TileType.jungle : TileType.grass);
     update.map = session.map.flat();
   } else if (tileType === TileType.continent) {
     update.isAtStopover = true;
-    update.lootRemaining = 15;
+    update.lootRemaining = 5; // 5 paquets
     update.statusMessage = "Continent atteint ! Objectif final en vue.";
     
     for (let r = 0; r < MAP_SIZE; r++) {

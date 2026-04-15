@@ -249,7 +249,7 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
                   Text('POSITION: ${session.x}, ${session.y}', style: const TextStyle(color: Colors.white70)),
                   const SizedBox(height: 4),
                   Text('OR EN MAIN: ${session.orVolatil} 🪙', style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
-                  Text('LUMBER: ${session.boisCharpente} 🪵', style: const TextStyle(color: Colors.brown)),
+                  Text('KITS RÉP.: ${session.boisCharpente} 🛠️', style: const TextStyle(color: Colors.brown)),
                   const SizedBox(height: 10),
                   Row(
                     children: [
