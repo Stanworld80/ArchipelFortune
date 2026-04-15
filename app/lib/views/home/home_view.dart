@@ -231,7 +231,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                               _showPreparationDialog(context, ref, profile),
                         ),
 
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 48),
 
                         // ── Second row: INVENTAIRE + CARTE ────────────
                         Row(
@@ -249,7 +249,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                           ],
                         ),
 
-                        const SizedBox(height: 16),
+
 
                         // ── Third row: RÉGLAGES + VOYAGE + DÉFI ──────
                         Row(
@@ -291,7 +291,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                           ],
                         ),
 
-                        const SizedBox(height: 24),
+
 
                         // Tagline
                         Text(

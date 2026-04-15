@@ -220,7 +220,7 @@ class MapPainter extends CustomPainter {
       canvas.drawImageRect(
         shipImage!,
         Rect.fromLTWH(0, 0, shipImage!.width.toDouble(), shipImage!.height.toDouble()),
-        Rect.fromCenter(center: Offset.zero, width: size * 1.2, height: size * 1.5),
+        Rect.fromCenter(center: Offset.zero, width: size * 0.6, height: size * 0.75),
         Paint()
           ..filterQuality = ui.FilterQuality.medium
           ..colorFilter = whiteToTransparent,
@@ -228,11 +228,11 @@ class MapPainter extends CustomPainter {
     } else {
       // Les formes vectorielles sont déjà orientées vers le Nord par défaut
       if (session.hullLevel <= 2) {
-        _drawSloop(canvas, size);
+        _drawSloop(canvas, size / 2);
       } else if (session.hullLevel <= 4) {
-        _drawBrig(canvas, size);
+        _drawBrig(canvas, size / 2);
       } else {
-        _drawFrigate(canvas, size);
+        _drawFrigate(canvas, size / 2);
       }
     }
 
