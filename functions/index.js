@@ -232,22 +232,38 @@ function generateProceduralMap(seed) {
     }
   }
 
-  // Génération des îles (5 îles)
+  // Génération des îles (5 îles) avec distance de Manhattan minimale de 7
+  const islandCoords = [{ x: startX, y: startY }];
   for (let i = 0; i < 5; i++) {
     let rx, ry;
-    if (i === 0) {
-      rx = startX + (rand.nextBool() ? 1 : -1) * (rand.nextInt(3) + 5);
-      ry = startY + (rand.nextBool() ? 1 : -1) * (rand.nextInt(3) + 5);
-    } else {
-      rx = rand.nextInt(MAP_SIZE - 10) + 5;
-      ry = rand.nextInt(MAP_SIZE - 10) + 5;
+    let valid = false;
+    let attempts = 0;
+
+    while (!valid && attempts < 50) {
+      if (i === 0) {
+        rx = startX + (rand.nextBool() ? 1 : -1) * (rand.nextInt(3) + 5);
+        ry = startY + (rand.nextBool() ? 1 : -1) * (rand.nextInt(3) + 5);
+      } else {
+        rx = rand.nextInt(MAP_SIZE - 10) + 5;
+        ry = rand.nextInt(MAP_SIZE - 10) + 5;
+      }
+
+      valid = true;
+      for (const other of islandCoords) {
+        const dist = Math.abs(rx - other.x) + Math.abs(ry - other.y);
+        if (dist < 7) {
+          valid = false;
+          break;
+        }
+      }
+      attempts++;
     }
-    
-    if (Math.abs(rx - startX) < 3 && Math.abs(ry - startY) < 3) continue;
-    
-    // US05: Attribution d'un biome (0: Tropical, 1: Nordique, 2: Jungle)
-    const biome = rand.nextInt(3);
-    spawnLand(map, rx, ry, TileType.island, biome, rand);
+
+    if (valid) {
+      islandCoords.push({ x: rx, y: ry });
+      const biome = rand.nextInt(3);
+      spawnLand(map, rx, ry, TileType.island, biome, rand);
+    }
   }
 
   // Récifs
