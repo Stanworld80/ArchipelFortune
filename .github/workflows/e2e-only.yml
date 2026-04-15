@@ -1,0 +1,49 @@
+name: E2E Tests Only
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environnement cible pour les tests'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - local
+
+jobs:
+  e2e-tests:
+    name: 🎭 Standalone E2E Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: tests_e2e/package-lock.json
+
+      - name: 📦 Install dependencies
+        working-directory: tests_e2e
+        run: npm ci
+
+      - name: 🎭 Install Playwright Browsers
+        working-directory: tests_e2e
+        run: npx playwright install --with-deps
+
+      - name: 🚀 Run E2E Tests
+        working-directory: tests_e2e
+        run: npm run test:${{ github.event.inputs.environment }}
+
+      - name: 📤 Upload Playwright Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ github.event.inputs.environment }}
+          path: tests_e2e/playwright-report/
+          retention-days: 30

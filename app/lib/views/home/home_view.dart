@@ -167,7 +167,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                     }
                     return Column(
                       children: [
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 4),
 
                         // ── Title ───────────────────────────────────
                         FadeTransition(
@@ -215,12 +215,12 @@ class _HomeViewState extends ConsumerState<HomeView>
                           ],
                         ),
 
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 12),
 
                         // ── Player info card ─────────────────────────
                         _PlayerCard(profile: profile, isWide: isWide),
 
-                        const SizedBox(height: 32),
+                        const SizedBox(height: 20),
 
                         // ── DÉPART (hero button with barre.png) ─────────────────────
                         _BarreButton(
@@ -231,7 +231,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                               _showPreparationDialog(context, ref, profile),
                         ),
 
-                        const SizedBox(height: 48),
+                        const SizedBox(height: 24),
 
                         // Tagline
                         Text(
@@ -244,7 +244,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                           textAlign: TextAlign.center,
                         ),
 
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 12),
 
                         // Footer (Version & Update Info)
                         Padding(

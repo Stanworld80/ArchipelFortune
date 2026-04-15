@@ -204,6 +204,12 @@ class MapPainter extends CustomPainter {
     canvas.translate(shipCenter.dx, shipCenter.dy);
     canvas.rotate(session.orientation * pi / 180);
 
+    // Si on va vers l'Ouest (270°), le bateau se retrouve à l'envers à cause de la rotation de 180°
+    // par rapport à sa position initiale (Est). On le met en miroir pour qu'il soit dans le bon sens.
+    if (session.orientation == 270) {
+      canvas.scale(1, -1);
+    }
+
     if (shipImage != null) {
       // Si l'image est orientée vers l'Est par défaut, on ajoute un décalage de -90° (ou pi/2 en radians)
       // pour que l'orientation 0 corresponde au Nord.
