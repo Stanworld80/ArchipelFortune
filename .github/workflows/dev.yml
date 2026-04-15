@@ -5,9 +5,27 @@ on:
     branches:
       - develop
   workflow_dispatch: 
+    inputs:
+      run_unit-tests:
+        description: 'Run Unit_Tests ?'
+        type: boolean
+        default: true
+      run_android:
+        description: 'Build Android ?'
+        type: boolean
+        default: true
+      run_web:
+        description: 'Build Web ?'
+        type: boolean
+        default: true
+      run_e2e:
+        description: 'Run E2E Tests ?'
+        type: boolean
+        default: false
 
 jobs:
   unit-tests:
+    if: github.event_name == 'push' || inputs.run_unit-tests == true
     name: 🧪 Unit Tests & Lint
     runs-on: ubuntu-latest
     steps:
@@ -34,6 +52,7 @@ jobs:
 
   build-android:
     name: 🏗️ Build Android (Dev)
+    if: github.event_name == 'push' || inputs.run_android == true
     needs: unit-tests
     runs-on: ubuntu-latest
     steps:
@@ -85,6 +104,8 @@ jobs:
 
   build-web:
     name: 🌐 Build Web (Dev)
+    if: github.event_name == 'push' || inputs.run_web == true
+    
     needs: unit-tests
     runs-on: ubuntu-latest
     steps:
@@ -190,6 +211,7 @@ jobs:
 
   e2e-tests:
     name: 🎭 E2E Tests (Dev)
+    if : github.event_name == 'push' || inputs.run_e2e == true
     needs: deploy-web
     runs-on: ubuntu-latest
     steps:
