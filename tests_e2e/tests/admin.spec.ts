@@ -11,24 +11,35 @@ test.describe('Admin Panel Tests', () => {
     await page.goto('/', { waitUntil: 'load', timeout: 60000 });
     await page.waitForSelector('flutter-view', { timeout: 30000 });
 
-    // Enable accessibility
+    // activation de l'accessibilité via plusieurs méthodes (copié depuis smoke.spec.ts)
     await page.evaluate(() => {
-      const activate = () => {
-        const btn = document.querySelector('flt-semantics-placeholder, [aria-label="Enable accessibility"]');
-        if (btn instanceof HTMLElement) btn.click();
+      const findAndClick = () => {
+        const btns = Array.from(document.querySelectorAll('flt-semantics-placeholder, [aria-label="Enable accessibility"]'));
+        const accessBtn = btns.find(el => el.getAttribute('aria-label') === 'Enable accessibility' || el.textContent?.includes('accessibility'));
+        if (accessBtn instanceof HTMLElement) {
+          accessBtn.click();
+          return true;
+        }
+        return false;
       };
-      activate();
-      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab' }));
-      setTimeout(activate, 1000); // Pulse activation
-      setTimeout(activate, 3000); 
+      
+      if (!findAndClick()) {
+        window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab' }));
+        setTimeout(findAndClick, 1000);
+      }
     });
 
     await page.waitForTimeout(5000);
+    
+    const accessBtn = page.locator('[aria-label="Enable accessibility"]').first();
+    if (await accessBtn.isVisible()) {
+      await accessBtn.click({ force: true }).catch(() => {});
+    }
   });
 
   async function adminLogin(page) {
-    const emailField = page.locator('input[aria-label*="Email"], [aria-label="AUTH_EMAIL_FIELD"]').first();
-    const passwordField = page.locator('input[aria-label*="Passe"], [aria-label="AUTH_PASSWORD_FIELD"]').first();
+    const emailField = page.locator('[aria-label*="AUTH_EMAIL_FIELD"], [aria-label*="Email de l\'Explorateur"]').first();
+    const passwordField = page.locator('[aria-label*="AUTH_PASSWORD_FIELD"], [aria-label*="Mot de Passe Secret"]').first();
     const submitBtn = page.locator('[aria-label="AUTH_SUBMIT_BTN"]').first();
 
     await expect(emailField).toBeVisible({ timeout: 45000 });
@@ -41,9 +52,12 @@ test.describe('Admin Panel Tests', () => {
        await page.waitForTimeout(1000);
     }
 
-    await emailField.fill(SUPER_ADMIN_EMAIL);
-    await passwordField.fill(SUPER_ADMIN_PASSWORD);
-    await submitBtn.click();
+    await emailField.click({ force: true });
+    await emailField.fill(SUPER_ADMIN_EMAIL, { force: true });
+    await passwordField.click({ force: true });
+    await passwordField.fill(SUPER_ADMIN_PASSWORD, { force: true });
+    await page.waitForTimeout(1000);
+    await submitBtn.click({ force: true });
 
     // Check for success or error
     const profileBtn = page.locator('[aria-label="PROFILE_BTN"]').first();

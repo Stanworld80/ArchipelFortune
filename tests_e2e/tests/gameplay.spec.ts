@@ -10,18 +10,30 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
     await page.goto('/', { waitUntil: 'load', timeout: 60000 });
     await page.waitForSelector('flutter-view', { timeout: 30000 });
 
+    // activation de l'accessibilité via plusieurs méthodes (copié depuis smoke.spec.ts)
     await page.evaluate(() => {
-      const activate = () => {
-        const btn = document.querySelector('flt-semantics-placeholder, [aria-label="Enable accessibility"]');
-        if (btn instanceof HTMLElement) btn.click();
+      const findAndClick = () => {
+        const btns = Array.from(document.querySelectorAll('flt-semantics-placeholder, [aria-label="Enable accessibility"]'));
+        const accessBtn = btns.find(el => el.getAttribute('aria-label') === 'Enable accessibility' || el.textContent?.includes('accessibility'));
+        if (accessBtn instanceof HTMLElement) {
+          accessBtn.click();
+          return true;
+        }
+        return false;
       };
-      activate();
-      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab' }));
-      setTimeout(activate, 1000);
-      setTimeout(activate, 3000);
+      
+      if (!findAndClick()) {
+        window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab' }));
+        setTimeout(findAndClick, 1000);
+      }
     });
 
     await page.waitForTimeout(5000);
+    
+    const accessBtn = page.locator('[aria-label="Enable accessibility"]').first();
+    if (await accessBtn.isVisible()) {
+      await accessBtn.click({ force: true }).catch(() => {});
+    }
   });
 
   test('Full Journey: Register -> Prepare -> Navigate', async ({ page }) => {
@@ -38,9 +50,16 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
       await page.waitForTimeout(1000);
     }
 
-    await page.locator('input[aria-label*="Email"], [aria-label="AUTH_EMAIL_FIELD"]').first().fill(testEmail);
-    await page.locator('input[aria-label*="Passe"], [aria-label="AUTH_PASSWORD_FIELD"]').first().fill(testPassword);
-    await page.locator('[aria-label="AUTH_SUBMIT_BTN"]').first().click();
+    const emailField = page.locator('[aria-label*="AUTH_EMAIL_FIELD"], [aria-label*="Email de l\'Explorateur"]').first();
+    const passwordField = page.locator('[aria-label*="AUTH_PASSWORD_FIELD"], [aria-label*="Mot de Passe Secret"]').first();
+    const submitBtn = page.locator('[aria-label="AUTH_SUBMIT_BTN"]').first();
+
+    await emailField.click({ force: true });
+    await emailField.fill(testEmail, { force: true });
+    await passwordField.click({ force: true });
+    await passwordField.fill(testPassword, { force: true });
+    await page.waitForTimeout(1000);
+    await submitBtn.click({ force: true });
 
     // 2. Wait for login to complete
     try {
