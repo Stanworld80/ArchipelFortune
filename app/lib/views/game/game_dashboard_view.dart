@@ -392,7 +392,7 @@ class ShipControlWheel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const double wheelSize = 130;
-    const int mapSize = 36;
+    const int mapSize = 64;
 
     // Helper to check if a direction is "Reverse"
     bool isReverse(int arrowAngle) {

@@ -19,7 +19,7 @@ class SessionNotifier extends Notifier<SessionState?> {
     return null;
   }
 
-  static const int mapSize = 36;
+  static const int mapSize = 64;
 
   int _toInt(dynamic value, [int defaultValue = 0]) => ArchipelUtils.toInt(value, defaultValue);
 

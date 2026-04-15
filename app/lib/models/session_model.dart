@@ -227,8 +227,8 @@ class SessionState {
     final dynamic flatMapRaw = mapData['map'];
     final List<dynamic> flatMap = (flatMapRaw is List) ? flatMapRaw : [];
     
-    // On assume une taille fixe de 36 pour l'Archipel
-    const int size = 36;
+    // On assume une taille fixe de 64 pour l'Archipel
+    const int size = 64;
     final List<List<TileType>> reconstructedMap = List.generate(size, (i) {
       return List.generate(size, (j) {
         final int listIndex = i * size + j;

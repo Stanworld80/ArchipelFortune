@@ -10,7 +10,7 @@ const db = getFirestore();
 setGlobalOptions({ region: "us-central1" });
 
 // Constantes partagées avec le client
-const MAP_SIZE = 36;
+const MAP_SIZE = 64;
 
 const TileType = {
   sea: 0,
@@ -239,16 +239,18 @@ function generateProceduralMap(seed) {
     let valid = false;
     let attempts = 0;
 
-    while (!valid && attempts < 50) {
+    while (!valid && attempts < 100) {
       if (i === 0) {
-        rx = startX + (rand.nextBool() ? 1 : -1) * (rand.nextInt(3) + 5);
-        ry = startY + (rand.nextBool() ? 1 : -1) * (rand.nextInt(3) + 5);
+        rx = startX + (rand.nextBool() ? 1 : -1) * (rand.nextInt(3) + 7);
+        ry = startY + (rand.nextBool() ? 1 : -1) * (rand.nextInt(3) + 7);
       } else {
-        rx = rand.nextInt(MAP_SIZE - 10) + 5;
-        ry = rand.nextInt(MAP_SIZE - 10) + 5;
+        // Au moins 9 cases du bord (index 9 à 54 sur une grille de 64)
+        rx = rand.nextInt(MAP_SIZE - 18) + 9;
+        ry = rand.nextInt(MAP_SIZE - 18) + 9;
       }
 
       valid = true;
+      // Vérification de la distance de Manhattan minimale de 7 par rapport au départ et aux autres îles
       for (const other of islandCoords) {
         const dist = Math.abs(rx - other.x) + Math.abs(ry - other.y);
         if (dist < 7) {
@@ -256,6 +258,12 @@ function generateProceduralMap(seed) {
           break;
         }
       }
+
+      // Sécurité supplémentaire : s'assurer qu'on ne sort pas des 9 cases de marge
+      if (rx < 9 || rx > MAP_SIZE - 10 || ry < 9 || ry > MAP_SIZE - 10) {
+        valid = false;
+      }
+
       attempts++;
     }
 
