@@ -56,12 +56,18 @@ test.describe('Admin Panel Tests', () => {
     // Check for success or error
     // If login fails, we'll see a snackbar. If it succeeds, we see the Profile button.
     const profileBtn = page.locator('[aria-label="PROFILE_BTN"]').first();
+    const errorSnackbar = page.locator('.SnackBar, :text("Erreur")').first();
     
-    // We expect this to fail if the credentials are invalid in the current environment
     try {
-      await expect(profileBtn).toBeVisible({ timeout: 45000 });
+      // Race between success (profile button) and failure (error message)
+      await Promise.race([
+        expect(profileBtn).toBeVisible({ timeout: 60000 }),
+        expect(errorSnackbar).toBeVisible({ timeout: 60000 }).then(() => {
+          throw new Error('Login failed with an error message on screen.');
+        })
+      ]);
     } catch (e) {
-      console.error('Login failed. This is likely due to invalid admin credentials in the dev environment.');
+      console.error(`Login failed for ${SUPER_ADMIN_EMAIL}. This is likely due to invalid credentials, network issues, or Firebase configuration in the dev environment.`);
       // Take a screenshot for the report
       await page.screenshot({ path: 'admin-login-failure.png' });
       throw e;

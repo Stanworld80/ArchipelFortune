@@ -47,7 +47,7 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
     await exploreBtn.click({ force: true });
 
     // 3. Preparation Dialog
-    const startExpBtn = page.locator('[aria-label="START_EXPEDITION_BTN"], :text("Prendre la Mer")').first();
+    const startExpBtn = page.locator('[aria-label="START_EXPEDITION_BTN"]').first();
     await expect(startExpBtn).toBeVisible({ timeout: 20000 });
     await startExpBtn.click();
 

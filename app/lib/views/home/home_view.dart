@@ -425,65 +425,70 @@ class _HomeViewState extends ConsumerState<HomeView>
                       style: GoogleFonts.crimsonText(
                           color: Colors.white54, fontSize: 15)),
                 ),
-                ElevatedButton(
-                  onPressed: canAfford
-                      ? () async {
-                          setState(() => _isLoading = true);
-                          try {
-                            const int? testSeed =
-                                bool.hasEnvironment('TEST_SEED')
-                                    ? int.fromEnvironment('TEST_SEED')
-                                    : null;
+                Semantics(
+                  label: 'START_EXPEDITION_BTN',
+                  button: true,
+                  enabled: true,
+                  child: ElevatedButton(
+                    onPressed: canAfford
+                        ? () async {
+                            setState(() => _isLoading = true);
+                            try {
+                              const int? testSeed =
+                                  bool.hasEnvironment('TEST_SEED')
+                                      ? int.fromEnvironment('TEST_SEED')
+                                      : null;
 
-                            await ref
-                                .read(sessionProvider.notifier)
-                                .startNewSession(
-                                  startingProvisions: provisionsToBuy,
-                                  startingBois: woodToBuy,
-                                  seed: testSeed,
+                              await ref
+                                  .read(sessionProvider.notifier)
+                                  .startNewSession(
+                                    startingProvisions: provisionsToBuy,
+                                    startingBois: woodToBuy,
+                                    seed: testSeed,
+                                  );
+
+                              if (context.mounted) {
+                                Navigator.pop(context); // Ferme le dialogue
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (_) =>
+                                          const GameDashboardView()),
                                 );
-
-                            if (context.mounted) {
-                              Navigator.pop(context); // Ferme le dialogue
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                    builder: (_) =>
-                                        const GameDashboardView()),
-                              );
-                            }
-                          } catch (e) {
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Erreur lors du départ : $e'),
-                                  backgroundColor: Colors.redAccent,
-                                ),
-                              );
-                            }
-                          } finally {
-                            if (context.mounted) {
-                              setState(() => _isLoading = false);
+                              }
+                            } catch (e) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Erreur lors du départ : $e'),
+                                    backgroundColor: Colors.redAccent,
+                                  ),
+                                );
+                              }
+                            } finally {
+                              if (context.mounted) {
+                                setState(() => _isLoading = false);
+                              }
                             }
                           }
-                        }
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFD4AF37),
-                    foregroundColor: const Color(0xFF2B1810),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFD4AF37),
+                      foregroundColor: const Color(0xFF2B1810),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: _isLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Color(0xFF2B1810),
+                            ),
+                          )
+                        : Text('Prendre la Mer 🚢',
+                            style: GoogleFonts.cinzelDecorative(fontSize: 14)),
                   ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Color(0xFF2B1810),
-                          ),
-                        )
-                      : Text('Prendre la Mer 🚢',
-                          style: GoogleFonts.cinzelDecorative(fontSize: 14)),
                 ),
               ],
             );

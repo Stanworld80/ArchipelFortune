@@ -71,17 +71,17 @@ class Quest {
   }
 
   factory Quest.fromMap(Map<String, dynamic> map) {
-    int _toInt(dynamic v, [int d = 0]) => ArchipelUtils.toInt(v, d);
+    int toInt(dynamic v, [int d = 0]) => ArchipelUtils.toInt(v, d);
 
     return Quest(
       id: map['id'] ?? '',
       title: map['title'] ?? '',
       description: map['description'] ?? '',
-      currentValue: _toInt(map['currentValue']),
-      targetValue: _toInt(map['targetValue']),
+      currentValue: toInt(map['currentValue']),
+      targetValue: toInt(map['targetValue']),
       isCompleted: map['isCompleted'] ?? false,
-      rewardType: RewardType.values[_toInt(map['rewardType']) % RewardType.values.length],
-      rewardAmount: _toInt(map['rewardAmount']),
+      rewardType: RewardType.values[toInt(map['rewardType']) % RewardType.values.length],
+      rewardAmount: toInt(map['rewardAmount']),
     );
   }
 }
@@ -222,7 +222,7 @@ class SessionState {
   }
 
   factory SessionState.fromMap(Map<String, dynamic> mapData, {String? id}) {
-    int _toInt(dynamic v, [int d = 0]) => ArchipelUtils.toInt(v, d);
+    int toInt(dynamic v, [int d = 0]) => ArchipelUtils.toInt(v, d);
 
     final dynamic flatMapRaw = mapData['map'];
     final List<dynamic> flatMap = (flatMapRaw is List) ? flatMapRaw : [];
@@ -233,7 +233,7 @@ class SessionState {
       return List.generate(size, (j) {
         final int listIndex = i * size + j;
         if (listIndex < flatMap.length) {
-          final int tileIndex = _toInt(flatMap[listIndex]);
+          final int tileIndex = toInt(flatMap[listIndex]);
           if (tileIndex >= 0 && tileIndex < TileType.values.length) {
             return TileType.values[tileIndex];
           }
@@ -244,19 +244,19 @@ class SessionState {
 
     return SessionState(
       sessionId: id ?? mapData['sessionId']?.toString(),
-      x: _toInt(mapData['x'], size ~/ 2),
-      y: _toInt(mapData['y'], size ~/ 2),
-      orientation: _toInt(mapData['orientation']),
-      provisions: _toInt(mapData['provisions']),
-      orVolatil: _toInt(mapData['orVolatil']),
-      boisCharpente: _toInt(mapData['boisCharpente']),
-      copperKeys: _toInt(mapData['copperKeys']),
-      silverKeys: _toInt(mapData['silverKeys']),
-      goldKeys: _toInt(mapData['goldKeys']),
+      x: toInt(mapData['x'], size ~/ 2),
+      y: toInt(mapData['y'], size ~/ 2),
+      orientation: toInt(mapData['orientation']),
+      provisions: toInt(mapData['provisions']),
+      orVolatil: toInt(mapData['orVolatil']),
+      boisCharpente: toInt(mapData['boisCharpente']),
+      copperKeys: toInt(mapData['copperKeys']),
+      silverKeys: toInt(mapData['silverKeys']),
+      goldKeys: toInt(mapData['goldKeys']),
       map: reconstructedMap,
       inventory: List<String>.from(mapData['inventory'] ?? []),
       isAtStopover: mapData['isAtStopover'] ?? false,
-      lootRemaining: _toInt(mapData['lootRemaining']),
+      lootRemaining: toInt(mapData['lootRemaining']),
       startTime: mapData['startTime'] is String 
           ? DateTime.parse(mapData['startTime']) 
           : (mapData['startTime'] is DateTime ? mapData['startTime'] : (mapData['startTime'] as dynamic)?.toDate() ?? DateTime.now()),
@@ -264,11 +264,11 @@ class SessionState {
       statusMessage: mapData['statusMessage']?.toString(),
       collections: Map<String, int>.from(mapData['collections'] ?? {}),
       discoveredIslandCoords: (mapData['discoveredIslandCoords'] as List? ?? []).map((e) => Map<String, int>.from(e as Map)).toList(),
-      hullLevel: _toInt(mapData['hullLevel'], 1),
-      sailsLevel: _toInt(mapData['sailsLevel'], 1),
-      cargoLevel: _toInt(mapData['cargoLevel'], 1),
+      hullLevel: toInt(mapData['hullLevel'], 1),
+      sailsLevel: toInt(mapData['sailsLevel'], 1),
+      cargoLevel: toInt(mapData['cargoLevel'], 1),
       quests: (mapData['quests'] as List? ?? []).map((q) => Quest.fromMap(Map<String, dynamic>.from(q as Map))).toList(),
-      seed: _toInt(mapData['seed']),
+      seed: toInt(mapData['seed']),
     );
   }
 }
