@@ -4,7 +4,7 @@ import 'package:app/models/session_model.dart';
 void main() {
   group('SessionState Model Tests', () {
     test('SessionState.fromMap and SessionState.toMap should be consistent', () {
-      final mapSize = 36;
+      final mapSize = 64;
       final mockMap = List.generate(
         mapSize,
         (_) => List.generate(mapSize, (_) => TileType.sea),
@@ -51,15 +51,15 @@ void main() {
       expect(reconstructed.quests[0].id, sessionState.quests[0].id);
       
       // Check map reconstruction
-      expect(reconstructed.map.length, 36);
-      expect(reconstructed.map[0].length, 36);
+      expect(reconstructed.map.length, 64);
+      expect(reconstructed.map[0].length, 64);
       expect(reconstructed.map[10][20], TileType.sea);
     });
 
     test('SessionState.copyWith should create a new instance with updated values', () {
        final mockMap = List.generate(
-        36,
-        (_) => List.generate(36, (_) => TileType.sea),
+        64,
+        (_) => List.generate(64, (_) => TileType.sea),
       );
       
       final sessionState = SessionState(
