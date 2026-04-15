@@ -16,8 +16,8 @@ L'économie du jeu repose sur une combinaison de ressources persistantes (conser
 
 - **Pièces d'Or Sécurisées (Permanentes) :** Richesse totale du joueur, sauvegardée sur son profil (Firebase/Firestore). Elles sont utilisées pour préparer l'expédition ou acheter des provisions depuis les banques.
 - **Or en main (Volatil) :** Richesses récoltées durant l'expédition courante. Elles sont stockées sur le navire et peuvent être perdues en cas de naufrage (Game Over).
-- **Les Provisions (🍎) :** Denrées achetables au début et pendant un voyage. Chaque déplacement du navire consomme exactement 1 Provision. Si les provisions tombent à 0 en mer, le navire est perdu (Famine  donc Game Over).
-- **Le Bois de Charpente (Joker) :** Ressource volatile servant de "bouclier". À l'impact avec un Récif, le bois est consommé pour sauver le bateau du naufrage.
+- **Les Provisions (🍎) :** Denrées achetables au début et pendant un voyage, ou pouvant être craftées en ramassant des éléments de kit de provisions. Chaque déplacement du navire consomme exactement 1 Provision. Si les provisions tombent à 0 en mer, le navire est perdu (Famine donc Game Over).
+- **Le Kit de Réparation (🛠️) :** Ressource volatile servant de "bouclier" (anciennement 'Bois de Charpente'). À l'impact avec un Récif ou après une défaite face à des pirates, un kit est consommé pour sauver le bateau du naufrage.
 
 ---
 
@@ -27,13 +27,13 @@ L'économie du jeu repose sur une combinaison de ressources persistantes (conser
 
 Le jeu commence sur une ile sécurisée (Port de Départ) à un endroit aléatoire de la carte.
 - **Investissement initial :** Le joueur dépense ses Pièces d'Or pour acheter des Provisions.
-- **Récompense de départ :** Le joueur a droit à un "grattage" gratuit de caisses de ravitaillement pour obtenir un petit bonus (Provisions additionnelles ou Bois de Charpente).
+- **Récompense de départ :** Le joueur a droit à un "grattage" gratuit de caisses de ravitaillement pour obtenir un petit bonus (Provisions additionnelles ou Kits de Réparation).
 
 ### Phase 2 : En Haute Mer
 - **Carte :** Matrice générée de **36x36** cases. Elle n'est générée et connue que côté serveur (Anti-Cheat).
 - **Vision (Limitation) :** Le joueur n'a qu'un aperçu d'une grille **5x5** autour du navire. Le reste est caché (Brouillard de guerre).
 - **Position d'affichage :** Le navire reste fixe au centre de la vue. Ce sont les éléments de la carte qui glissent.
-- **Les Dangers (Récifs) :** Naviguer sur un récif à 50% de chance de détruire le navire (Game Over) à moins de posséder du Bois de Charpente, il est alors automatiquement consommé si besoin.
+- **Les Dangers (Récifs) :** Naviguer sur un récif à 50% de chance de détruire le navire (Game Over) à moins de posséder un Kit de Réparation, il est alors automatiquement consommé si besoin.
 
 **Mouvements & Navigation relative (Coût : 1 Provision)** :
 Aucun retour en arrière n'est permis. Le jeu se joue sur une rotation de 90° :
@@ -53,8 +53,13 @@ La carte contient 5 Îles isolées et 1 grand Continent connecté le long d'un b
 - Fin d'expédition automatique et conversion des Provisions restantes en Or permanent.
 
 **La Fouille (Le mode de "Grattage") :**
-- **Série de caisses :** Boîtes tirées aléatoirement avec de l'Or, des Provisions, du Bois, des Clés, ou des objets rattachés à des Panoplies, ou des Trésors (Mineur ou Majeur).
-- **Apparition visuelle :** Parquets de 6 tombant dans une grille de 3x2. Leurs formes suggèrent leur contenu mais doivent être cliquées ou grattées pour que la valeur s'ajoute à la cargaison. Cliquer sur "Go" amène la série suivante.
+- **Série de caisses :** Boîtes tirées aléatoirement. Chaque boîte peut contenir :
+  - **Pièces d'or** (2, 5, 10, 25 ou 50, les gros montants étant les plus rares).
+  - **Éléments de kit de réparation** (5 éléments nécessaires pour constituer 1 kit complet).
+  - **Éléments de kit de provisions** (5 éléments nécessaires pour constituer 1 kit complet offrant 5 Provisions).
+  - **Cartes mystérieuses** (Révèlent un point d'intérêt / une île sur la carte à la fin de la série).
+  - **Déchets** (Aucune utilité).
+- **Apparition visuelle :** Paquets de 6 tombant dans une grille de 3x2. 2 paquets à gratter lors d'une escale sur une île (5 pour le Continent). Leur contenu est révélé en interagissant avec, puis l'ensemble du butin crafté est ajouté à votre soute à la fin.
 
 **La Banque du Capitaine :**
 - *Sécuriser* : Convertir "Or en main" en "Pièces d'Or".
@@ -99,7 +104,7 @@ Pendant les "grattages", des objets divers et rares peuvent être gagnés et s'a
 - **Framework Global :** Flutter.
 - **Cible :** Web (WebGL/CanvasKit pour de bonnes performances visuelles) & Android (Native compilation).
 - **State Management :** Utilisation de **Riverpod** (ou Provider) pour gérer :
-  - Les ressources : `OrPermanent`, `OrVolatile`, `Provisions`, `Bois`.
+  - Les ressources : `OrPermanent`, `OrVolatile`, `Provisions`, `Kits de Réparation`.
   - L'état de Session : "Au Port", "En Navigation", "En Escale Île", "Au Continent", "GameOver".
   - Les objets contenus en soute.
 

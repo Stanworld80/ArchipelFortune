@@ -13,14 +13,14 @@ Ce document centralise l'ensemble des fonctionnalités du jeu sous forme de User
 - **Critères :** Si Provisions = 0, la session se termine par un échec (Famine).
 
 ### US.CORE.03 : Escales et Fouille
-**En tant que** joueur, **je veux** pouvoir accoster sur des îles pour fouiller des caisses, **afin de** récolter de l'or volatil et des objets de collection.
-- **Critères :** Grattage de caisses en 3x2. Accumulation du butin en soute.
+**En tant que** joueur, **je veux** pouvoir accoster sur des îles pour fouiller des caisses, **afin de** récolter de l'or volatil, des cartes mystérieuses et des outils de survie.
+- **Critères :** Grattage de caisses en 3x2 (2 paquets par défaut). Les pépites s'accumulent. Les fragments de kits s'assemblent par 5 pour former des kits complets.
 
 ### US.CORE.04 : Banque et Sécurisation
 **En tant que** joueur, **je veux** sécuriser mon or volatil dans une banque lors d'une escale, **afin de** ne pas tout perdre en cas de naufrage futur.
 
-### US.CORE.05 : Bois de Charpente (Protection)
-**En tant que** joueur, **je veux** collecter du bois, **afin de** m'en servir de protection automatique lors d'une collision avec un récif.
+### US.CORE.05 : Kits de Réparation (Protection)
+**En tant que** joueur, **je veux** collecter des kits de réparation (directement ou via fragments), **afin de** m'en servir de protection automatique lors d'une collision avec un récif ou suite à une défaite navale.
 
 ---
 
@@ -64,7 +64,7 @@ Ce document centralise l'ensemble des fonctionnalités du jeu sous forme de User
 
 ### US09 : Événements Aléatoires
 **En tant que** joueur, **je veux** rencontrer des événements imprévus lors de ma navigation.
-- **Statut :** ✅ Terminé (Épaves dérivantes fournissant du bois de charpente ajoutées en mer).
+- **Statut :** ✅ Terminé (Épaves dérivantes fournissant des kits de réparation ajoutées en mer).
 
 ### US10 : Météo Dynamique et Ambiances Visuelles
 **En tant que** joueur, **je veux** que l'ambiance visuelle s'adapte à l'environnement.

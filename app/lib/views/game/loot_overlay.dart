@@ -286,7 +286,6 @@ class _CrateContent {
   final IconData icon;
   final Color color;
   final String? label;
-  final String? keyType;
   final String? itemId;
   bool revealed = false;
 
@@ -296,7 +295,6 @@ class _CrateContent {
     required this.icon, 
     required this.color, 
     this.label,
-    this.keyType,
     this.itemId,
   });
 }
