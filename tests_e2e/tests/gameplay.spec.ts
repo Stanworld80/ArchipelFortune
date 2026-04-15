@@ -18,6 +18,7 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
       activate();
       window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab' }));
       setTimeout(activate, 1000);
+      setTimeout(activate, 3000);
     });
 
     await page.waitForTimeout(5000);
