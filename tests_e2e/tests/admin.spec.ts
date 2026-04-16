@@ -53,9 +53,9 @@ test.describe('Admin Panel Tests', () => {
     }
 
     await emailField.click({ force: true });
-    await emailField.fill(SUPER_ADMIN_EMAIL, { force: true });
+    await page.keyboard.type(SUPER_ADMIN_EMAIL, { delay: 50 });
     await passwordField.click({ force: true });
-    await passwordField.fill(SUPER_ADMIN_PASSWORD, { force: true });
+    await page.keyboard.type(SUPER_ADMIN_PASSWORD, { delay: 50 });
     await page.waitForTimeout(1000);
     await submitBtn.click({ force: true });
 

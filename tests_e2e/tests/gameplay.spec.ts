@@ -55,9 +55,9 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
     const submitBtn = page.locator('[aria-label="AUTH_SUBMIT_BTN"]').first();
 
     await emailField.click({ force: true });
-    await emailField.fill(testEmail, { force: true });
+    await page.keyboard.type(testEmail, { delay: 50 });
     await passwordField.click({ force: true });
-    await passwordField.fill(testPassword, { force: true });
+    await page.keyboard.type(testPassword, { delay: 50 });
     await page.waitForTimeout(1000);
     await submitBtn.click({ force: true });
 
