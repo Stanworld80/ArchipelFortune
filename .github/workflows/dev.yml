@@ -97,7 +97,7 @@ jobs:
         run: |
           flutter build apk --release \
             --dart-define=APP_ENV=dev \
-            --dart-define=SUPER_ADMIN_EMAIL=stanworld@gmail.com \
+            --dart-define=SUPER_ADMIN_EMAIL=stantest@stanworld.org \
             --build-number=${{ github.run_number }}
 
       - name: 📤 Upload APK Artifact
@@ -138,7 +138,7 @@ jobs:
           # Build
           flutter build web --profile \
             --dart-define=APP_ENV=dev \
-            --dart-define=SUPER_ADMIN_EMAIL=stanworld@gmail.com \
+            --dart-define=SUPER_ADMIN_EMAIL=stantest@stanworld.org \
             --source-maps
 
       - name: 📤 Upload Web Artifact

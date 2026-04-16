@@ -30,5 +30,5 @@ async function elevateUser(email) {
   }
 }
 
-const targetEmail = 'stanworld@gmail.com';
+const targetEmail = 'stantest@stanworld.org';
 elevateUser(targetEmail);
