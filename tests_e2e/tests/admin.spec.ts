@@ -66,6 +66,7 @@ test.describe('Admin Panel Tests', () => {
     try {
       // Wait for success without failing if the error snackbar isn't immediately visible
       await page.locator('[aria-label="PROFILE_BTN"]').first().waitFor({ state: 'visible', timeout: 120000 });
+      await page.screenshot({ path: `screenshots/admin-login-success-${Date.now()}.png` });
     } catch (e) {
       const errorVisible = await page.locator('.SnackBar, :text("Erreur"), [aria-label*="Error"]').first().isVisible();
       if (errorVisible) {
@@ -90,6 +91,7 @@ test.describe('Admin Panel Tests', () => {
     await adminPanelBtn.click();
 
     await expect(page.getByText('PANEL ADMINISTRATION')).toBeVisible({ timeout: 20000 });
+    await page.screenshot({ path: `screenshots/admin-panel-view-${Date.now()}.png` });
   });
 
   test('Modify Player Gold', async ({ page }) => {
@@ -114,6 +116,7 @@ test.describe('Admin Panel Tests', () => {
     // Verify it saved (usually by checking a snackbar or value persistence)
     await page.waitForTimeout(3000);
     await expect(goldInput).toHaveValue('99999', { timeout: 10000 });
+    await page.screenshot({ path: `screenshots/admin-gold-modified-${Date.now()}.png` });
     
     // Cleanup: restore value
     await goldInput.fill(originalValue);
