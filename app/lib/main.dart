@@ -11,10 +11,16 @@ import 'providers/auth_provider.dart';
 import 'views/auth/login_view.dart';
 import 'views/home/home_view.dart';
 
+import 'package:flutter/semantics.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   AppEnvironment.printEnv();
+
+  if (AppEnvironment.isDev) {
+    SemanticsBinding.instance.ensureSemantics();
+  }
 
   // Initialisation de Firebase
   try {
