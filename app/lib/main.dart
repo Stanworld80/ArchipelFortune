@@ -65,6 +65,7 @@ class ArchipelFortuneApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Archipel de la Fortune',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
         useMaterial3: true,

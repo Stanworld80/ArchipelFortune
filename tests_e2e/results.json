@@ -1,0 +1,290 @@
+{
+  "config": {
+    "configFile": "D:\\development\\ArchipelFortune\\tests_e2e\\playwright.config.ts",
+    "rootDir": "D:/development/ArchipelFortune/tests_e2e/tests",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 2
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "D:/development/ArchipelFortune/tests_e2e/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 2
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "D:/development/ArchipelFortune/tests_e2e/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.59.1",
+    "workers": 6,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "admin.spec.ts",
+      "file": "admin.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Admin Panel Tests",
+          "file": "admin.spec.ts",
+          "line": 4,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Admin Authentication and Navigation",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 53830,
+                      "error": {
+                        "message": "TimeoutError: locator.waitFor: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[aria-label*=\"Panel Admin\"], flt-semantics:has-text(\"Panel Admin\")').first()\u001b[22m\n",
+                        "stack": "TimeoutError: locator.waitFor: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[aria-label*=\"Panel Admin\"], flt-semantics:has-text(\"Panel Admin\")').first()\u001b[22m\n\n    at clickCoordinate (D:\\development\\ArchipelFortune\\tests_e2e\\tests\\test_utils.ts:16:19)\n    at D:\\development\\ArchipelFortune\\tests_e2e\\tests\\admin.spec.ts:56:26",
+                        "location": {
+                          "file": "D:\\development\\ArchipelFortune\\tests_e2e\\tests\\test_utils.ts",
+                          "column": 19,
+                          "line": 16
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mtest_utils.ts:16\n\n\u001b[0m \u001b[90m 14 |\u001b[39m \u001b[90m */\u001b[39m\n \u001b[90m 15 |\u001b[39m \u001b[36mexport\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m clickCoordinate(page\u001b[33m:\u001b[39m \u001b[33mPage\u001b[39m\u001b[33m,\u001b[39m locator\u001b[33m:\u001b[39m \u001b[33mLocator\u001b[39m\u001b[33m,\u001b[39m options\u001b[33m:\u001b[39m { timeout\u001b[33m?\u001b[39m\u001b[33m:\u001b[39m number } \u001b[33m=\u001b[39m {}) {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 16 |\u001b[39m     \u001b[36mawait\u001b[39m locator\u001b[33m.\u001b[39mwaitFor({ state\u001b[33m:\u001b[39m \u001b[32m'attached'\u001b[39m\u001b[33m,\u001b[39m timeout\u001b[33m:\u001b[39m options\u001b[33m.\u001b[39mtimeout \u001b[33m||\u001b[39m \u001b[35m30000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                   \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 17 |\u001b[39m     \u001b[36mconst\u001b[39m box \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m locator\u001b[33m.\u001b[39mboundingBox()\u001b[33m;\u001b[39m\n \u001b[90m 18 |\u001b[39m     \u001b[36mif\u001b[39m (box) {\n \u001b[90m 19 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mmouse\u001b[33m.\u001b[39mclick(box\u001b[33m.\u001b[39mx \u001b[33m+\u001b[39m box\u001b[33m.\u001b[39mwidth \u001b[33m/\u001b[39m \u001b[35m2\u001b[39m\u001b[33m,\u001b[39m box\u001b[33m.\u001b[39my \u001b[33m+\u001b[39m box\u001b[33m.\u001b[39mheight \u001b[33m/\u001b[39m \u001b[35m2\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "D:\\development\\ArchipelFortune\\tests_e2e\\tests\\test_utils.ts",
+                            "column": 19,
+                            "line": 16
+                          },
+                          "message": "TimeoutError: locator.waitFor: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[aria-label*=\"Panel Admin\"], flt-semantics:has-text(\"Panel Admin\")').first()\u001b[22m\n\n\n   at test_utils.ts:16\n\n  14 |  */\n  15 | export async function clickCoordinate(page: Page, locator: Locator, options: { timeout?: number } = {}) {\n> 16 |     await locator.waitFor({ state: 'attached', timeout: options.timeout || 30000 });\n     |                   ^\n  17 |     const box = await locator.boundingBox();\n  18 |     if (box) {\n  19 |         await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);\n    at clickCoordinate (D:\\development\\ArchipelFortune\\tests_e2e\\tests\\test_utils.ts:16:19)\n    at D:\\development\\ArchipelFortune\\tests_e2e\\tests\\admin.spec.ts:56:26"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-04-16T14:48:37.765Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "D:\\development\\ArchipelFortune\\tests_e2e\\test-results\\admin-Admin-Panel-Tests-Admin-Authentication-and-Navigation-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "D:\\development\\ArchipelFortune\\tests_e2e\\tests\\test_utils.ts",
+                        "column": 19,
+                        "line": 16
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "d4043a9dd1ab94463227-5cbc78dc533508549768",
+              "file": "admin.spec.ts",
+              "line": 49,
+              "column": 7
+            },
+            {
+              "title": "Modify Player Gold",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 44465,
+                      "error": {
+                        "message": "TimeoutError: locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[aria-label*=\"Panel Admin\"], flt-semantics:has-text(\"Panel Admin\")').first()\u001b[22m\n",
+                        "stack": "TimeoutError: locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[aria-label*=\"Panel Admin\"], flt-semantics:has-text(\"Panel Admin\")').first()\u001b[22m\n\n    at clickCoordinate (D:\\development\\ArchipelFortune\\tests_e2e\\tests\\test_utils.ts:16:19)\n    at D:\\development\\ArchipelFortune\\tests_e2e\\tests\\admin.spec.ts:71:26",
+                        "location": {
+                          "file": "D:\\development\\ArchipelFortune\\tests_e2e\\tests\\test_utils.ts",
+                          "column": 19,
+                          "line": 16
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mtest_utils.ts:16\n\n\u001b[0m \u001b[90m 14 |\u001b[39m \u001b[90m */\u001b[39m\n \u001b[90m 15 |\u001b[39m \u001b[36mexport\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m clickCoordinate(page\u001b[33m:\u001b[39m \u001b[33mPage\u001b[39m\u001b[33m,\u001b[39m locator\u001b[33m:\u001b[39m \u001b[33mLocator\u001b[39m\u001b[33m,\u001b[39m options\u001b[33m:\u001b[39m { timeout\u001b[33m?\u001b[39m\u001b[33m:\u001b[39m number } \u001b[33m=\u001b[39m {}) {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 16 |\u001b[39m     \u001b[36mawait\u001b[39m locator\u001b[33m.\u001b[39mwaitFor({ state\u001b[33m:\u001b[39m \u001b[32m'attached'\u001b[39m\u001b[33m,\u001b[39m timeout\u001b[33m:\u001b[39m options\u001b[33m.\u001b[39mtimeout \u001b[33m||\u001b[39m \u001b[35m30000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                   \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 17 |\u001b[39m     \u001b[36mconst\u001b[39m box \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m locator\u001b[33m.\u001b[39mboundingBox()\u001b[33m;\u001b[39m\n \u001b[90m 18 |\u001b[39m     \u001b[36mif\u001b[39m (box) {\n \u001b[90m 19 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mmouse\u001b[33m.\u001b[39mclick(box\u001b[33m.\u001b[39mx \u001b[33m+\u001b[39m box\u001b[33m.\u001b[39mwidth \u001b[33m/\u001b[39m \u001b[35m2\u001b[39m\u001b[33m,\u001b[39m box\u001b[33m.\u001b[39my \u001b[33m+\u001b[39m box\u001b[33m.\u001b[39mheight \u001b[33m/\u001b[39m \u001b[35m2\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "D:\\development\\ArchipelFortune\\tests_e2e\\tests\\test_utils.ts",
+                            "column": 19,
+                            "line": 16
+                          },
+                          "message": "TimeoutError: locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[aria-label*=\"Panel Admin\"], flt-semantics:has-text(\"Panel Admin\")').first()\u001b[22m\n\n\n   at test_utils.ts:16\n\n  14 |  */\n  15 | export async function clickCoordinate(page: Page, locator: Locator, options: { timeout?: number } = {}) {\n> 16 |     await locator.waitFor({ state: 'attached', timeout: options.timeout || 30000 });\n     |                   ^\n  17 |     const box = await locator.boundingBox();\n  18 |     if (box) {\n  19 |         await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);\n    at clickCoordinate (D:\\development\\ArchipelFortune\\tests_e2e\\tests\\test_utils.ts:16:19)\n    at D:\\development\\ArchipelFortune\\tests_e2e\\tests\\admin.spec.ts:71:26"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-04-16T14:49:33.694Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "D:\\development\\ArchipelFortune\\tests_e2e\\test-results\\admin-Admin-Panel-Tests-Modify-Player-Gold-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "D:\\development\\ArchipelFortune\\tests_e2e\\tests\\test_utils.ts",
+                        "column": 19,
+                        "line": 16
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "d4043a9dd1ab94463227-18f71f9794e70e88b02e",
+              "file": "admin.spec.ts",
+              "line": 64,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "gameplay.spec.ts",
+      "file": "gameplay.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Archipel Fortune Gameplay Loop",
+          "file": "gameplay.spec.ts",
+          "line": 4,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Full Journey: Register -> Prepare -> Navigate",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 58111,
+                      "error": {
+                        "message": "TimeoutError: locator.waitFor: Timeout 20000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[aria-label*=\"START_EXPEDITION_BTN\"], flt-semantics:has-text(\"START_EXPEDITION_BTN\")').first()\u001b[22m\n",
+                        "stack": "TimeoutError: locator.waitFor: Timeout 20000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[aria-label*=\"START_EXPEDITION_BTN\"], flt-semantics:has-text(\"START_EXPEDITION_BTN\")').first()\u001b[22m\n\n    at clickCoordinate (D:\\development\\ArchipelFortune\\tests_e2e\\tests\\test_utils.ts:16:19)\n    at D:\\development\\ArchipelFortune\\tests_e2e\\tests\\gameplay.spec.ts:70:26",
+                        "location": {
+                          "file": "D:\\development\\ArchipelFortune\\tests_e2e\\tests\\test_utils.ts",
+                          "column": 19,
+                          "line": 16
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mtest_utils.ts:16\n\n\u001b[0m \u001b[90m 14 |\u001b[39m \u001b[90m */\u001b[39m\n \u001b[90m 15 |\u001b[39m \u001b[36mexport\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m clickCoordinate(page\u001b[33m:\u001b[39m \u001b[33mPage\u001b[39m\u001b[33m,\u001b[39m locator\u001b[33m:\u001b[39m \u001b[33mLocator\u001b[39m\u001b[33m,\u001b[39m options\u001b[33m:\u001b[39m { timeout\u001b[33m?\u001b[39m\u001b[33m:\u001b[39m number } \u001b[33m=\u001b[39m {}) {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 16 |\u001b[39m     \u001b[36mawait\u001b[39m locator\u001b[33m.\u001b[39mwaitFor({ state\u001b[33m:\u001b[39m \u001b[32m'attached'\u001b[39m\u001b[33m,\u001b[39m timeout\u001b[33m:\u001b[39m options\u001b[33m.\u001b[39mtimeout \u001b[33m||\u001b[39m \u001b[35m30000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                   \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 17 |\u001b[39m     \u001b[36mconst\u001b[39m box \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m locator\u001b[33m.\u001b[39mboundingBox()\u001b[33m;\u001b[39m\n \u001b[90m 18 |\u001b[39m     \u001b[36mif\u001b[39m (box) {\n \u001b[90m 19 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mmouse\u001b[33m.\u001b[39mclick(box\u001b[33m.\u001b[39mx \u001b[33m+\u001b[39m box\u001b[33m.\u001b[39mwidth \u001b[33m/\u001b[39m \u001b[35m2\u001b[39m\u001b[33m,\u001b[39m box\u001b[33m.\u001b[39my \u001b[33m+\u001b[39m box\u001b[33m.\u001b[39mheight \u001b[33m/\u001b[39m \u001b[35m2\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "D:\\development\\ArchipelFortune\\tests_e2e\\tests\\test_utils.ts",
+                            "column": 19,
+                            "line": 16
+                          },
+                          "message": "TimeoutError: locator.waitFor: Timeout 20000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[aria-label*=\"START_EXPEDITION_BTN\"], flt-semantics:has-text(\"START_EXPEDITION_BTN\")').first()\u001b[22m\n\n\n   at test_utils.ts:16\n\n  14 |  */\n  15 | export async function clickCoordinate(page: Page, locator: Locator, options: { timeout?: number } = {}) {\n> 16 |     await locator.waitFor({ state: 'attached', timeout: options.timeout || 30000 });\n     |                   ^\n  17 |     const box = await locator.boundingBox();\n  18 |     if (box) {\n  19 |         await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);\n    at clickCoordinate (D:\\development\\ArchipelFortune\\tests_e2e\\tests\\test_utils.ts:16:19)\n    at D:\\development\\ArchipelFortune\\tests_e2e\\tests\\gameplay.spec.ts:70:26"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-04-16T14:48:37.848Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "D:\\development\\ArchipelFortune\\tests_e2e\\test-results\\gameplay-Archipel-Fortune--95205-gister---Prepare---Navigate-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "D:\\development\\ArchipelFortune\\tests_e2e\\tests\\test_utils.ts",
+                        "column": 19,
+                        "line": 16
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "a8475ef9564cfbc88065-86296628ae52482d3ce1",
+              "file": "gameplay.spec.ts",
+              "line": 34,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-04-16T14:48:34.902Z",
+    "duration": 104379.158,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 3,
+    "flaky": 0
+  }
+}

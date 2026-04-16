@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { getResilientLocator, clickCoordinate } from './test_utils';
+import { getResilientLocator, robustClick } from './test_utils';
 
 test.describe('Archipel Fortune Gameplay Loop', () => {
   test.setTimeout(240000); // Gameplay takes time
@@ -40,22 +40,33 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
     // We want registration mode.
     // "CRÉER UN PROFIL" usually means we are in Login mode and can switch to Register.
     if (toggleText.includes('CRÉER UN PROFIL') || toggleText.includes('RECRUE')) {
-      await clickCoordinate(page, toggleBtn);
+      await robustClick(page, toggleBtn);
       await page.waitForTimeout(1000);
     }
 
+    // If we want to LOGIN, but the toggle says "DÉJÀ MEMBRE ? SE CONNECTER",
+    // it means we are currently in REGISTER mode. Click to switch.
+    if (toggleText.includes('DÉJÀ MEMBRE') || toggleText.includes('CONNECTER')) {
+        await robustClick(page, toggleBtn);
+        await page.waitForTimeout(1000);
+    }
+
+    // Fill email
     const emailField = getResilientLocator(page, 'AUTH_EMAIL_FIELD');
     const passwordField = getResilientLocator(page, 'AUTH_PASSWORD_FIELD');
     const submitBtn = getResilientLocator(page, 'AUTH_SUBMIT_BTN');
 
-    await clickCoordinate(page, emailField);
+    await robustClick(page, emailField);
     await page.keyboard.type(testEmail, { delay: 50 });
     
-    await clickCoordinate(page, passwordField);
+    // Fill password
+    await robustClick(page, passwordField);
     await page.keyboard.type(testPassword, { delay: 50 });
-    
+
     await page.waitForTimeout(1000);
-    await clickCoordinate(page, submitBtn);
+    
+    // Submit
+    await robustClick(page, submitBtn);
 
     // 2. Wait for login to complete
     const profileBtn = getResilientLocator(page, 'PROFILE_BTN');
@@ -63,11 +74,11 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
 
     // 3. Start Expedition
     const exploreBtn = getResilientLocator(page, 'EXPLORE_MAIN_BTN');
-    await clickCoordinate(page, exploreBtn);
+    await robustClick(page, exploreBtn);
 
     // 4. Preparation Dialog
     const startBtn = getResilientLocator(page, 'START_EXPEDITION_BTN');
-    await clickCoordinate(page, startBtn, { timeout: 20000 });
+    await robustClick(page, startBtn, { timeout: 20000 });
 
     // 5. Game Dashboard Navigation
     // Wait for the map to be attached
@@ -82,9 +93,9 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
     const moveForward = getResilientLocator(page, 'MOVE_FORWARD_BTN');
 
     if (await rotateRight.count() > 0) {
-        await clickCoordinate(page, rotateRight);
+        await robustClick(page, rotateRight);
         await page.waitForTimeout(2000);
-        await clickCoordinate(page, moveForward);
+        await robustClick(page, moveForward);
         await page.waitForTimeout(3000);
         await page.screenshot({ path: `screenshots/gameplay-moved-${Date.now()}.png` });
     }
