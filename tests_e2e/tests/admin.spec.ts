@@ -4,8 +4,8 @@ test.describe('Admin Panel Tests', () => {
   // Use a long timeout for admin operations
   test.setTimeout(180000);
 
-  const SUPER_ADMIN_EMAIL = 'stanworld@gmail.com';
-  const SUPER_ADMIN_PASSWORD = 'Stanworld80!';
+  const SUPER_ADMIN_EMAIL = 'stantest@stanworld.org';
+  const SUPER_ADMIN_PASSWORD = 'Tester=2026';
 
   test.beforeEach(async ({ page }) => {
     await page.goto('/', { waitUntil: 'load', timeout: 60000 });
