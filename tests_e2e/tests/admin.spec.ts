@@ -34,18 +34,18 @@ test.describe('Admin Panel Tests', () => {
     const profileBtn = getResilientLocator(page, 'PROFILE_BTN');
     await robustClick(page, profileBtn);
 
-    let adminPanelBtn = getResilientLocator(page, 'ADMIN_PANEL_BTN');
+    // Admin Panel should appear in the popup menu
+    // We try multiple ways to find it as Flutter menus are tricky
+    const adminPanelBtn = page.locator('[aria-label="ADMIN_PANEL_BTN"], flt-semantics:has-text("Panel Admin")').first();
+    
     try {
-        // Wait for the button to appear after menu click
-        await adminPanelBtn.waitFor({ state: 'attached', timeout: 10000 });
+        await adminPanelBtn.waitFor({ state: 'visible', timeout: 15000 });
     } catch (e) {
-        // Retry clicking profile button if menu didn't open
+        // Retry menu click if it didn't open
         await robustClick(page, profileBtn);
-        await adminPanelBtn.waitFor({ state: 'attached', timeout: 60000 });
+        await adminPanelBtn.waitFor({ state: 'visible', timeout: 60000 });
     }
     
-    // Ensure it's visible before clicking
-    await expect(adminPanelBtn).toBeVisible({ timeout: 60000 });
     await robustClick(page, adminPanelBtn);
 
     const title = getResilientLocator(page, 'PANEL ADMINISTRATION');

@@ -258,6 +258,7 @@ jobs:
     if: github.event_name == 'push' || inputs.run_integration-tests == true
     needs: [deploy-web, unit-tests]
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
@@ -279,5 +280,7 @@ jobs:
           # Integration tests on web require flutter drive and a driver file
           # We also need chromedriver running on port 4444
           chromedriver --port=4444 &
+          CHROME_DRIVER_PID=$!
           sleep 5
           xvfb-run -a flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_test.dart -d chrome
+          kill $CHROME_DRIVER_PID
