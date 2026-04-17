@@ -36,13 +36,16 @@ test.describe('Admin Panel Tests', () => {
 
     let adminPanelBtn = getResilientLocator(page, 'ADMIN_PANEL_BTN');
     try {
-        await adminPanelBtn.waitFor({ state: 'attached', timeout: 5000 });
+        // Wait for the button to appear after menu click
+        await adminPanelBtn.waitFor({ state: 'attached', timeout: 10000 });
     } catch (e) {
-        // Retry once if menu didn't open
+        // Retry clicking profile button if menu didn't open
         await robustClick(page, profileBtn);
         await adminPanelBtn.waitFor({ state: 'attached', timeout: 60000 });
     }
     
+    // Ensure it's visible before clicking
+    await expect(adminPanelBtn).toBeVisible({ timeout: 60000 });
     await robustClick(page, adminPanelBtn);
 
     const title = getResilientLocator(page, 'PANEL ADMINISTRATION');
