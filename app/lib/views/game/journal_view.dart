@@ -96,9 +96,40 @@ class JournalView extends ConsumerWidget {
         ],
       ),
     );
+  }  Widget _buildStats(SessionState session, int islandsVisited) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _StatItem(
+            label: "PACKETS",
+            value: session.lootRemaining.toString(),
+            icon: Icons.inventory_2,
+            color: Colors.brown.shade700,
+          ),
+          _StatItem(
+            label: "PROVISIONS",
+            value: session.provisions.toString(),
+            icon: Icons.restaurant,
+            color: Colors.orange.shade800,
+          ),
+          _StatItem(
+            label: "KITS RÉP.",
+            value: session.boisCharpente.toString(),
+            icon: Icons.build,
+            color: Colors.blueGrey.shade700,
+          ),
+          _StatItem(
+            label: "ÎLES",
+            value: islandsVisited.toString(),
+            icon: Icons.landscape,
+            color: Colors.green.shade700,
+          ),
+        ],
+      ),
+    );
   }
-
-
 
   Widget _buildEntry(JournalEntry entry) {
     IconData icon;

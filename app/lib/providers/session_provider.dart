@@ -422,8 +422,9 @@ class SessionNotifier extends Notifier<SessionState?> {
     final current = state;
     if (current == null) return;
     
-    final int finalGold = gold;
-
+    state = current.copyWith(
+      orVolatil: current.orVolatil + gold,
+      provisions: current.provisions + prov,
       boisCharpente: current.boisCharpente + wood,
     );
 
