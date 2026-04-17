@@ -167,7 +167,6 @@ class MapPainter extends CustomPainter {
       case TileType.sand: paint.color = Colors.amber.shade200; break;
       case TileType.grass: paint.color = Colors.green.shade600; break;
       case TileType.forest: paint.color = Colors.green.shade900; break;
-      case TileType.reef: paint.color = Colors.grey.shade800; break;
       case TileType.continent: paint.color = Colors.brown.shade800; break;
       case TileType.snow: paint.color = Colors.white; break;
       case TileType.ice: paint.color = Colors.cyan.shade100; break;
@@ -213,24 +212,10 @@ class MapPainter extends CustomPainter {
           ..colorFilter = whiteToTransparent,
       );
     } else {
-      // Les formes vectorielles sont déjà orientées vers le Nord par défaut
       _drawBrig(canvas, size / 2);
     }
 
     canvas.restore();
-  }
-
-  void _drawSloop(Canvas canvas, double size) {
-    final paint = Paint()..color = Colors.white;
-    final path = Path();
-    path.moveTo(0, -size / 3);
-    path.lineTo(size / 4, size / 4);
-    path.lineTo(-size / 4, size / 4);
-    path.close();
-    canvas.drawPath(path, paint);
-    
-    // Mât unique
-    canvas.drawRect(Rect.fromLTWH(-1, -size/4, 2, size/2), Paint()..color = Colors.brown);
   }
 
   void _drawBrig(Canvas canvas, double size) {
@@ -247,25 +232,6 @@ class MapPainter extends CustomPainter {
     canvas.drawRect(Rect.fromLTWH(size/6, -size/10, 2, size/2.5), Paint()..color = Colors.brown);
   }
 
-  void _drawFrigate(Canvas canvas, double size) {
-    final paint = Paint()..color = Colors.white;
-    final path = Path();
-    path.moveTo(0, -size / 1.8);
-    path.lineTo(size / 2.5, size / 3);
-    path.lineTo(-size / 2.5, size / 3);
-    path.close();
-    canvas.drawPath(path, paint..style = PaintingStyle.fill);
-    canvas.drawPath(path, Paint()..color = Colors.black45..style = PaintingStyle.stroke..strokeWidth = 1);
-    
-    // Trois mâts et détails de proue
-    canvas.drawRect(Rect.fromLTWH(-size/4, -size/6, 2, size/2.5), Paint()..color = Colors.brown);
-    canvas.drawRect(Rect.fromLTWH(0, -size/4, 2, size/2), Paint()..color = Colors.brown);
-    canvas.drawRect(Rect.fromLTWH(size/4, -size/6, 2, size/2.5), Paint()..color = Colors.brown);
-    
-    // Drapeaux (micro-détails)
-    canvas.drawRect(Rect.fromLTWH(1, -size/4, 4, 3), Paint()..color = Colors.red);
-  }
-
   void _drawDiscoveryIndices(Canvas canvas, int visionRadius, double tileSize, double padding) {
     if (session.discoveredIslandCoords.isEmpty) return;
 
@@ -277,13 +243,10 @@ class MapPainter extends CustomPainter {
       final int tx = coord['x']!;
       final int ty = coord['y']!;
 
-      // Distance relative au navire
       final dx = tx - session.x;
       final dy = ty - session.y;
 
-      // Si l'île est hors du champ de vision immédiat, on affiche une flèche/index sur le bord
       if (dx.abs() > visionRadius || dy.abs() > visionRadius) {
-        // Calcul du point sur le bord du carré de vision
         double edgeX = dx.toDouble();
         double edgeY = dy.toDouble();
         
@@ -293,7 +256,6 @@ class MapPainter extends CustomPainter {
 
         final center = Offset(padding + (visionRadius * tileSize) + edgeX + tileSize/2, padding + (visionRadius * tileSize) + edgeY + tileSize/2);
         
-        // Dessiner un petit cercle scintillant ou une boussole
         canvas.drawCircle(center, 6, paintIndex);
         canvas.drawCircle(center, 12, Paint()..color = Colors.tealAccent.withOpacity(0.2)..style = PaintingStyle.stroke..strokeWidth = 2);
       }
@@ -312,16 +274,12 @@ class MapPainter extends CustomPainter {
     path.close();
 
     canvas.drawPath(path, Paint()..color = Colors.grey.shade900);
-    
-    // Lave
     canvas.drawCircle(Offset(center.dx, center.dy - height / 2 + 5), 4, Paint()..color = Colors.orangeAccent);
   }
 
   void _drawShipwreck(Canvas canvas, Rect rect) {
     final center = rect.center;
     final paint = Paint()..color = Colors.brown.shade300..strokeWidth = 3;
-    
-    // Quelques traits horizontaux pour simuler des débris de bois
     canvas.drawLine(center + const Offset(-10, -5), center + const Offset(5, -5), paint);
     canvas.drawLine(center + const Offset(-5, 5), center + const Offset(10, 5), paint);
     canvas.drawLine(center + const Offset(-8, 0), center + const Offset(8, 0), paint);
@@ -331,22 +289,15 @@ class MapPainter extends CustomPainter {
     final center = rect.center;
     final paintHull = Paint()..color = Colors.grey.shade800;
     final paintSails = Paint()..color = Colors.black;
-    
-    // Coque
     canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromCenter(center: center + const Offset(0, 5), width: 25, height: 10), const Radius.circular(3)), paintHull);
-    
-    // Voiles
     final path = Path();
     path.moveTo(center.dx - 10, center.dy - 12);
     path.lineTo(center.dx + 10, center.dy - 12);
     path.lineTo(center.dx, center.dy + 2);
     path.close();
     canvas.drawPath(path, paintSails);
-    
-    // Pavillon (Petit point blanc sur voile noire)
     canvas.drawCircle(center + const Offset(0, -7), 1.5, Paint()..color = Colors.white);
   }
-
 
   @override
   bool shouldRepaint(covariant MapPainter oldDelegate) {
