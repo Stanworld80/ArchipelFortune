@@ -118,7 +118,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                     itemBuilder: (context) => [
                       if (profile.role == 'admin' ||
                           profile.role == 'superAdmin')
-                        const PopupMenuItem<String>(
+                        PopupMenuItem<String>(
                           value: 'admin',
                           child: Semantics(
                             label: 'ADMIN_PANEL_BTN',
