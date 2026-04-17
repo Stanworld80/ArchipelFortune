@@ -10,6 +10,7 @@ class MapPainter extends CustomPainter {
   final ui.Image? background;
   final ui.Image? shipImage;
   final ui.Image? islandImage;
+  final ui.Image? reefImage;
 
   MapPainter({
     required this.session,
@@ -18,6 +19,7 @@ class MapPainter extends CustomPainter {
     this.background,
     this.shipImage,
     this.islandImage,
+    this.reefImage,
   });
 
   @override
@@ -103,6 +105,15 @@ class MapPainter extends CustomPainter {
           );
         } else if (tile == TileType.island) {
           canvas.drawRect(rect, paintIsland);
+        }
+
+        if (tile == TileType.reef && reefImage != null) {
+          canvas.drawImageRect(
+            reefImage!,
+            Rect.fromLTWH(0, 0, reefImage!.width.toDouble(), reefImage!.height.toDouble()),
+            rect,
+            Paint()..filterQuality = ui.FilterQuality.medium,
+          );
         }
 
         if (tile == TileType.port) {
@@ -338,7 +349,9 @@ class MapPainter extends CustomPainter {
 
 
   @override
-  bool shouldRepaint(MapPainter oldDelegate) {
-    return oldDelegate.session != session || oldDelegate.animationValue != animationValue;
+  bool shouldRepaint(covariant MapPainter oldDelegate) {
+    return oldDelegate.session != session || 
+           oldDelegate.animationValue != animationValue ||
+           oldDelegate.reefImage != reefImage;
   }
 }

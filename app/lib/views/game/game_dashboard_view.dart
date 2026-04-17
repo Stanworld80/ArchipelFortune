@@ -27,6 +27,7 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
   ui.Image? _mapBg;
   ui.Image? _shipIcon;
   ui.Image? _islandIcon;
+  ui.Image? _reefIcon;
 
 
   @override
@@ -59,6 +60,7 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
     _mapBg = await _loadImage('assets/images/mer.png');
     _shipIcon = await _loadImage('assets/images/ship_sprite2.png');
     _islandIcon = await _loadImage('assets/images/island_sprite.png');
+    _reefIcon = await _loadImage('assets/images/reef1.png');
     if (mounted) setState(() {});
   }
 
@@ -225,6 +227,7 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
                             background: _mapBg,
                             shipImage: _shipIcon,
                             islandImage: _islandIcon,
+                            reefImage: _reefIcon,
                           ),
                         ),
                       );
