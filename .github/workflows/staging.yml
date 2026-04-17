@@ -227,3 +227,27 @@ jobs:
           name: playwright-report-staging
           path: tests_e2e/playwright-report/
           retention-days: 30
+
+  integration-tests:
+    name: 🦅 Integration Tests (Staging)
+    needs: deploy-web
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🦅 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: 'any'
+          cache: true
+
+      - name: 📦 Install dependencies
+        working-directory: app
+        run: flutter pub get
+
+      - name: 🧪 Run Integration Tests (Web)
+        working-directory: app
+        run: |
+          flutter test integration_test/app_test.dart --platform chrome --web-renderer canvaskit
