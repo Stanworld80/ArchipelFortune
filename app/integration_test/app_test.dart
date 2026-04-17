@@ -43,7 +43,7 @@ void main() {
       await tester.enterText(passwordField, 'password123');
       
       // Trouver le bouton de connexion (par son nouveau texte)
-      final loginButton = find.widgetWithText(ElevatedButton, 'Se connecter');
+      final loginButton = find.widgetWithText(ElevatedButton, 'LANCER L\'AVENTURE');
       expect(loginButton, findsOneWidget);
 
       // Tap sur le bouton

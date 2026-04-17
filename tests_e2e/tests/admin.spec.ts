@@ -34,7 +34,7 @@ test.describe('Admin Panel Tests', () => {
     const profileBtn = getResilientLocator(page, 'PROFILE_BTN');
     await robustClick(page, profileBtn);
 
-    let adminPanelBtn = getResilientLocator(page, 'Panel Admin');
+    let adminPanelBtn = getResilientLocator(page, 'ADMIN_PANEL_BTN');
     try {
         await adminPanelBtn.waitFor({ state: 'attached', timeout: 5000 });
     } catch (e) {
