@@ -203,13 +203,7 @@ class MapPainter extends CustomPainter {
       );
     } else {
       // Les formes vectorielles sont déjà orientées vers le Nord par défaut
-      if (session.hullLevel <= 2) {
-        _drawSloop(canvas, size / 2);
-      } else if (session.hullLevel <= 4) {
-        _drawBrig(canvas, size / 2);
-      } else {
-        _drawFrigate(canvas, size / 2);
-      }
+      _drawBrig(canvas, size / 2);
     }
 
     canvas.restore();

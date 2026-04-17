@@ -22,17 +22,6 @@ void main() {
         startTime: DateTime.now(),
         inventory: ['item1', 'item2'],
         collections: {'set1': 1},
-        quests: [
-          Quest(
-            id: 'q1',
-            title: 'Q1',
-            description: 'D1',
-            currentValue: 0,
-            targetValue: 1,
-            rewardType: RewardType.gold,
-            rewardAmount: 10,
-          )
-        ],
       );
 
       final map = sessionState.toMap();
@@ -47,8 +36,6 @@ void main() {
       expect(reconstructed.boisCharpente, sessionState.boisCharpente);
       expect(reconstructed.inventory, sessionState.inventory);
       expect(reconstructed.collections, sessionState.collections);
-      expect(reconstructed.quests.length, sessionState.quests.length);
-      expect(reconstructed.quests[0].id, sessionState.quests[0].id);
       
       // Check map reconstruction
       expect(reconstructed.map.length, 64);

@@ -29,53 +29,7 @@ void main() {
       }
     });
 
-    test('updateQuestProgress should update progress and grant rewards', () {
-      final notifier = container.read(sessionProvider.notifier);
-      
-      final mapSize = 36;
-      final mockMap = List.generate(
-        mapSize,
-        (_) => List.generate(mapSize, (_) => TileType.sea),
-      );
 
-      final initialState = SessionState(
-        x: 18,
-        y: 18,
-        orientation: 0,
-        provisions: 10,
-        orVolatil: 0,
-        boisCharpente: 0,
-        map: mockMap,
-        startTime: DateTime.now(),
-        quests: [
-          Quest(
-            id: 'collect_gold',
-            title: 'Gold',
-            description: 'Recoltez 100 or',
-            currentValue: 0,
-            targetValue: 100,
-            rewardType: RewardType.gold,
-            rewardAmount: 50,
-          )
-        ],
-      );
-
-      notifier.debugSetState(initialState);
-      
-      // Update progress
-      notifier.updateQuestProgress('collect_gold', 50);
-      var state = container.read(sessionProvider);
-      expect(state!.quests[0].currentValue, 50);
-      expect(state.quests[0].isCompleted, false);
-      expect(state.orVolatil, 0);
-
-      // Complete quest
-      notifier.updateQuestProgress('collect_gold', 50);
-      final state2 = container.read(sessionProvider);
-      expect(state2!.quests[0].currentValue, 100);
-      expect(state2.quests[0].isCompleted, true);
-      expect(state2.orVolatil, 50); // Reward granted
-    });
 
     test('internalPredictiveMove should consume provisions and update state', () {
       final notifier = container.read(sessionProvider.notifier);

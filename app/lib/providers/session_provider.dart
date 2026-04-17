@@ -240,7 +240,6 @@ class SessionNotifier extends Notifier<SessionState?> {
 
     TileType tile = current.map[nextX][nextY];
 
-    final bool consumeProvision = true;
     final statusSuffix = "";
     
     final nextProvisions = (current.provisions - 1).clamp(0, 999);
@@ -500,8 +499,6 @@ class SessionNotifier extends Notifier<SessionState?> {
       discoveredIslandCoords: newList,
       statusMessage: "Un nouvel indice sur la carte !",
     );
-  }
-
   }
 
   @visibleForTesting
