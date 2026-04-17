@@ -3,22 +3,9 @@ import '../core/utils.dart';
 enum TileType {
   sea,
   shallow,
-  sand,
-  grass,
-  forest,
   reef,
   island,
-  continent,
-  port,
-  fishing,
-  snow,
-  ice,
-  jungle,
-  swamp,      // 13
-  unused_14,  // 14
-  volcano,    // 15
-  shipwreck,  // 16
-  pirate      // 17
+  continent
 }
 
 enum RewardType { gold, wood, provisions, keyCopper, keySilver, keyGold }

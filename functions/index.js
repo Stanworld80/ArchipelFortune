@@ -15,21 +15,9 @@ const MAP_SIZE = 64;
 const TileType = {
   sea: 0,
   shallow: 1,
-  sand: 2,
-  grass: 3,
-  forest: 4,
-  reef: 5,
-  island: 6,
-  continent: 7,
-  port: 8,
-  fishing: 9,
-  snow: 10,
-  ice: 11,
-  jungle: 12,
-  swamp: 13,
-  volcano: 15,
-  shipwreck: 16,
-  pirate: 17
+  reef: 2,
+  island: 3,
+  continent: 4
 };
 
 exports.startExpedition = onCall(async (request) => {
@@ -148,41 +136,20 @@ exports.moveShip = onCall(async (request) => {
     update.provisions = 0;
   }
 
-  if (tileType === TileType.reef || tileType === TileType.volcano) {
+  if (tileType === TileType.reef) {
     if (session.wood > 0) {
       update.wood = FieldValue.increment(-1);
-      update.statusMessage = (tileType === TileType.volcano) ? "Chaleur intense ! -1 Kit Rép." : "Collision récif ! -1 Kit Rép.";
+      update.statusMessage = "Collision récif ! -1 Kit Rép.";
     } else {
       update.isGameOver = true;
-      update.statusMessage = (tileType === TileType.volcano) ? "Cendres et feu..." : "Naufrage sur un récif !";
+      update.statusMessage = "Naufrage sur un récif !";
     }
-  } else if (tileType === TileType.shipwreck) {
-      update.wood = FieldValue.increment(2); // Auto-loot de bois
-      update.statusMessage = "Épave fouillée ! +2 Kits Rép.";
-  } else if (tileType === TileType.pirate) {
-      // Combat déterministe pour synchronisation client/serveur
-      const combatRand = new Random(session.seed + nextX * 31 + nextY * 17);
-      const victory = combatRand.next() > 0.4;
-      
-      if (victory) {
-          update.orVolatil = FieldValue.increment(100);
-          update.statusMessage = "Victoire sur les pirates ! +100 Or";
-          session.map[nextX][nextY] = TileType.sea;
-          update.map = session.map.flat();
-      } else {
-          update.provisions = Math.max(0, nextProvisions - 2);
-          update.wood = FieldValue.increment(-2);
-          update.statusMessage = "Défaite navale ! -2 Provisions, -2 Kits Rép.";
-          session.map[nextX][nextY] = TileType.sea;
-          update.map = session.map.flat();
-          if (update.provisions <= 0) update.isGameOver = true;
-      }
-  } else if (tileType === TileType.island || tileType === TileType.port || tileType === TileType.snow || tileType === TileType.jungle) {
+  } else if (tileType === TileType.island) {
     update.isAtStopover = true;
     update.lootRemaining = 2; // 2 paquets
     update.statusMessage = "Escale ! Butin récupéré.";
     
-    session.map[nextX][nextY] = (tileType === TileType.snow) ? TileType.snow : (tileType === TileType.jungle ? TileType.jungle : TileType.grass);
+    session.map[nextX][nextY] = TileType.sea;
     update.map = session.map.flat();
   } else if (tileType === TileType.continent) {
     update.isAtStopover = true;
@@ -192,17 +159,10 @@ exports.moveShip = onCall(async (request) => {
     for (let r = 0; r < MAP_SIZE; r++) {
       for (let c = 0; c < MAP_SIZE; c++) {
         if (session.map[r][c] === TileType.continent) {
-          session.map[r][c] = TileType.grass;
+          session.map[r][c] = TileType.sea;
         }
       }
     }
-    update.map = session.map.flat();
-  } else if (tileType === TileType.fishing) {
-    update.isAtStopover = true;
-    update.lootRemaining = 1; 
-    update.statusMessage = "C'est l'heure de pêcher !";
-    
-    session.map[nextX][nextY] = TileType.sea;
     update.map = session.map.flat();
   } else {
     update.statusMessage = "Pleine mer...";
@@ -269,8 +229,7 @@ function generateProceduralMap(seed) {
 
     if (valid) {
       islandCoords.push({ x: rx, y: ry });
-      const biome = rand.nextInt(3);
-      spawnLand(map, rx, ry, TileType.island, biome, rand);
+      spawnLand(map, rx, ry, TileType.island, rand);
     }
   }
 
@@ -290,48 +249,12 @@ function generateProceduralMap(seed) {
     else if (edge === 3) applyContinent(map, MAP_SIZE - 1, i);
   }
   
-  // Spots de pêche (15 spots aléatoires en mer)
-  for (let i = 0; i < 15; i++) {
-    const rx = rand.nextInt(MAP_SIZE);
-    const ry = rand.nextInt(MAP_SIZE);
-    if (Math.abs(rx - startX) < 3 && Math.abs(ry - startY) < 3) continue;
-    if (map[rx][ry] === TileType.sea) map[rx][ry] = TileType.fishing;
-  }
-
-  // Épaves dérivantes (10 spots aléatoires en mer)
-  for (let i = 0; i < 10; i++) {
-    const rx = rand.nextInt(MAP_SIZE);
-    const ry = rand.nextInt(MAP_SIZE);
-    if (Math.abs(rx - startX) < 3 && Math.abs(ry - startY) < 3) continue;
-    if (map[rx][ry] === TileType.sea) map[rx][ry] = TileType.shipwreck;
-  }
-
-  // Navires pirates (8 spots aléatoires en mer)
-  for (let i = 0; i < 8; i++) {
-    const rx = rand.nextInt(MAP_SIZE);
-    const ry = rand.nextInt(MAP_SIZE);
-    if (Math.abs(rx - startX) < 3 && Math.abs(ry - startY) < 3) continue;
-    if (map[rx][ry] === TileType.sea) map[rx][ry] = TileType.pirate;
-  }
-
   // Flattening for easier storage if needed, but keeping as 2D for logic
   return { map, startX, startY }; 
 }
 
-function spawnLand(map, x, y, type, biome, rand) {
-  // Une île ne doit être représentée que par une seule case
-  if (biome === 1) { // Nordique
-    map[x][y] = TileType.snow;
-  } else if (biome === 2) { // Jungle
-    map[x][y] = TileType.jungle;
-  } else { // Tropical
-    // Chance de volcan (15%) ou port (85%)
-    if (rand.next() > 0.85) {
-      map[x][y] = TileType.volcano;
-    } else {
-      map[x][y] = TileType.port;
-    }
-  }
+function spawnLand(map, x, y, type, rand) {
+  map[x][y] = TileType.island;
 }
 
 

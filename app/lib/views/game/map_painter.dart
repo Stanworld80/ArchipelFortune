@@ -79,16 +79,13 @@ class MapPainter extends CustomPainter {
         TileType tile = session.map[targetX][targetY];
         
         // Dessin de l'eau stylisée
-        if (tile == TileType.sea || tile == TileType.shallow || tile == TileType.fishing || tile == TileType.shipwreck || tile == TileType.pirate) {
+        if (tile == TileType.sea || tile == TileType.shallow) {
            // On utilise des couleurs semi-transparentes pour laisser transparaître le fond mer.png
            canvas.drawRect(rect, paintWater..color = (tile == TileType.shallow ? const Color(0xFF00ACC1) : Colors.transparent).withOpacity(tile == TileType.shallow ? 0.3 : 0.0));
-           // _drawWaves(canvas, rect, animationValue, targetX, targetY);
-        } else {
-           // Autres types de sol (sable, herbe, etc.)
+        } else if (tile == TileType.continent) {
            _drawLand(canvas, rect, tile);
         }
 
-        // Cas spécifiques pour les sprites
         if (tile == TileType.island && islandImage != null) {
           canvas.drawImageRect(
             islandImage!,
@@ -115,26 +112,6 @@ class MapPainter extends CustomPainter {
             Paint()..filterQuality = ui.FilterQuality.medium,
           );
         }
-
-        if (tile == TileType.port) {
-          _drawPortDetails(canvas, rect);
-        }
-
-        if (tile == TileType.volcano) {
-          _drawVolcano(canvas, rect);
-        }
-
-        if (tile == TileType.shipwreck) {
-          _drawShipwreck(canvas, rect);
-        }
-
-        if (tile == TileType.pirate) {
-          _drawPirateShip(canvas, rect);
-        }
-
-        /*if (tile == TileType.fishing) {
-          _drawFishingSpot(canvas, rect, animationValue);
-        }*/
         
         // Bordure de grille fine
         canvas.drawRect(rect, Paint()..color = Colors.black26..style = PaintingStyle.stroke..strokeWidth = 0.5);
@@ -153,27 +130,9 @@ class MapPainter extends CustomPainter {
     // _drawWeather(canvas, size, visionRadius);
   }
 
-  void _drawPortDetails(Canvas canvas, Rect rect) {
-    final detailPaint = Paint()..color = Colors.black26..style = PaintingStyle.stroke..strokeWidth = 2;
-    // Quelques traits pour simuler des planches de bois
-    canvas.drawLine(rect.topLeft + const Offset(5, 5), rect.bottomLeft + const Offset(5, -5), detailPaint);
-    canvas.drawLine(rect.topCenter, rect.bottomCenter, detailPaint);
-    canvas.drawLine(rect.topRight + const Offset(-5, 5), rect.bottomRight + const Offset(-5, -5), detailPaint);
-  }
-
   void _drawLand(Canvas canvas, Rect rect, TileType tile) {
-    final paint = Paint();
-    switch (tile) {
-      case TileType.sand: paint.color = Colors.amber.shade200; break;
-      case TileType.grass: paint.color = Colors.green.shade600; break;
-      case TileType.forest: paint.color = Colors.green.shade900; break;
-      case TileType.continent: paint.color = Colors.brown.shade800; break;
-      case TileType.snow: paint.color = Colors.white; break;
-      case TileType.ice: paint.color = Colors.cyan.shade100; break;
-      case TileType.jungle: paint.color = const Color(0xFF1B5E20); break;
-      case TileType.swamp: paint.color = const Color(0xFF3E2723); break;
-      default: paint.color = Colors.transparent;
-    }
+    if (tile != TileType.continent) return;
+    final paint = Paint()..color = Colors.brown.shade800;
     canvas.drawRRect(RRect.fromRectAndRadius(rect.deflate(1), const Radius.circular(4)), paint);
   }
 
@@ -263,42 +222,6 @@ class MapPainter extends CustomPainter {
     }
   }
 
-  void _drawVolcano(Canvas canvas, Rect rect) {
-    final center = rect.center;
-    final baseWidth = rect.width * 0.8;
-    final height = rect.height * 0.7;
-
-    final path = Path();
-    path.moveTo(center.dx - baseWidth / 2, center.dy + height / 2);
-    path.lineTo(center.dx + baseWidth / 2, center.dy + height / 2);
-    path.lineTo(center.dx, center.dy - height / 2);
-    path.close();
-
-    canvas.drawPath(path, Paint()..color = Colors.grey.shade900);
-    canvas.drawCircle(Offset(center.dx, center.dy - height / 2 + 5), 4, Paint()..color = Colors.orangeAccent);
-  }
-
-  void _drawShipwreck(Canvas canvas, Rect rect) {
-    final center = rect.center;
-    final paint = Paint()..color = Colors.brown.shade300..strokeWidth = 3;
-    canvas.drawLine(center + const Offset(-10, -5), center + const Offset(5, -5), paint);
-    canvas.drawLine(center + const Offset(-5, 5), center + const Offset(10, 5), paint);
-    canvas.drawLine(center + const Offset(-8, 0), center + const Offset(8, 0), paint);
-  }
-
-  void _drawPirateShip(Canvas canvas, Rect rect) {
-    final center = rect.center;
-    final paintHull = Paint()..color = Colors.grey.shade800;
-    final paintSails = Paint()..color = Colors.black;
-    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromCenter(center: center + const Offset(0, 5), width: 25, height: 10), const Radius.circular(3)), paintHull);
-    final path = Path();
-    path.moveTo(center.dx - 10, center.dy - 12);
-    path.lineTo(center.dx + 10, center.dy - 12);
-    path.lineTo(center.dx, center.dy + 2);
-    path.close();
-    canvas.drawPath(path, paintSails);
-    canvas.drawCircle(center + const Offset(0, -7), 1.5, Paint()..color = Colors.white);
-  }
 
   @override
   bool shouldRepaint(covariant MapPainter oldDelegate) {

@@ -110,8 +110,7 @@ class SessionNotifier extends Notifier<SessionState?> {
       
       if ((rx - sX).abs() < 3 && (ry - sY).abs() < 3) continue;
       
-      final biome = rand.nextInt(3);
-      _spawnLand(map, rx, ry, TileType.island, biome, rand);
+      _spawnLand(map, rx, ry, TileType.island, rand);
     }
 
     for (int i = 0; i < 20; i++) {
@@ -119,30 +118,6 @@ class SessionNotifier extends Notifier<SessionState?> {
         int ry = rand.nextInt(mapSize);
         if ((rx - sX).abs() < 3 && (ry - sY).abs() < 3) continue; // Respect 5x5 sea 
         if (map[rx][ry] == TileType.sea) map[rx][ry] = TileType.reef;
-    }
-
-    // Spots de pêche (15 spots aléatoires en mer)
-    for (int i = 0; i < 15; i++) {
-      int rx = rand.nextInt(mapSize);
-      int ry = rand.nextInt(mapSize);
-      if ((rx - sX).abs() < 3 && (ry - sY).abs() < 3) continue;
-      if (map[rx][ry] == TileType.sea) map[rx][ry] = TileType.fishing;
-    }
-
-    // Épaves dérivantes (10 spots aléatoires en mer)
-    for (int i = 0; i < 10; i++) {
-      int rx = rand.nextInt(mapSize);
-      int ry = rand.nextInt(mapSize);
-      if ((rx - sX).abs() < 3 && (ry - sY).abs() < 3) continue;
-      if (map[rx][ry] == TileType.sea) map[rx][ry] = TileType.shipwreck;
-    }
-
-    // Navires pirates (8 spots aléatoires en mer)
-    for (int i = 0; i < 8; i++) {
-      int rx = rand.nextInt(mapSize);
-      int ry = rand.nextInt(mapSize);
-      if ((rx - sX).abs() < 3 && (ry - sY).abs() < 3) continue;
-      if (map[rx][ry] == TileType.sea) map[rx][ry] = TileType.pirate;
     }
 
     int edge = rand.nextInt(4);
@@ -169,20 +144,8 @@ class SessionNotifier extends Notifier<SessionState?> {
     }
   }
 
-  void _spawnLand(List<List<TileType>> map, int x, int y, TileType type, int biome, ArchipelRandom rand) {
-    // Une île ne doit être représentée que par une seule case
-    if (biome == 1) { // Nordique
-      map[x][y] = TileType.snow;
-    } else if (biome == 2) { // Jungle
-      map[x][y] = TileType.jungle;
-    } else { // Tropical
-      // Chance de volcan (15%) ou port (85%)
-      if (rand.next() > 0.85) {
-        map[x][y] = TileType.volcano;
-      } else {
-        map[x][y] = TileType.port;
-      }
-    }
+  void _spawnLand(List<List<TileType>> map, int x, int y, TileType type, ArchipelRandom rand) {
+    map[x][y] = TileType.island;
   }
 
 
@@ -257,7 +220,7 @@ class SessionNotifier extends Notifier<SessionState?> {
     }
 
 
-    if (tile == TileType.reef || tile == TileType.volcano) {
+    if (tile == TileType.reef) {
       if (current.boisCharpente > 0) {
         state = current.copyWith(
           x: nextX,
@@ -265,78 +228,21 @@ class SessionNotifier extends Notifier<SessionState?> {
           orientation: newOrientation,
           provisions: nextProvisions,
           boisCharpente: (current.boisCharpente - 1).clamp(0, 999), 
-          statusMessage: (tile == TileType.volcano) ? "Chaleur intense ! -1 Kit Rép.$statusSuffix" : "Collision ! -1 Kit Rép.$statusSuffix",
+          statusMessage: "Collision ! -1 Kit Rép.$statusSuffix",
         );
-        _logJournal((tile == TileType.volcano) ? "Chaleur volcanique intense !" : "Collision avec un récif !", type: JournalEntryType.incident);
+        _logJournal("Collision avec un récif !", type: JournalEntryType.incident);
       } else {
-        state = current.copyWith(isGameOver: true, statusMessage: (tile == TileType.volcano) ? "Cendres et feu..." : "Naufrage !");
-        _logJournal((tile == TileType.volcano) ? "Perdu dans les flammes..." : "Naufrage !", type: JournalEntryType.incident);
+        state = current.copyWith(isGameOver: true, statusMessage: "Naufrage !");
+        _logJournal("Naufrage !", type: JournalEntryType.incident);
       }
       return;
     }
 
 
-    if (tile == TileType.shipwreck) {
-      // Auto-loot de bois sur l'épave
-      final maxWood = 10; // Valeur par défaut
-      state = current.copyWith(
-        x: nextX,
-        y: nextY,
-        orientation: newOrientation,
-        provisions: nextProvisions,
-        boisCharpente: (current.boisCharpente + 2).clamp(0, maxWood), 
-        statusMessage: "Épave fouillée ! +2 Kits Rép.$statusSuffix",
-      );
-      _logJournal("Épave mystérieuse fouillée aux coordonnées ($nextX, $nextY).", type: JournalEntryType.loot);
-      return;
-    }
-
-
-    if (tile == TileType.pirate) {
-        // Combat déterministe identique au serveur
-        final combatRand = ArchipelRandom(current.seed + nextX * 31 + nextY * 17);
-        bool victory = combatRand.next() > 0.4;
-        
+    if (tile == TileType.island) {
+        // L'île est pillée, on la transforme en 'sea' pour empêcher de re-looter
         final newMap = List<List<TileType>>.generate(mapSize, (i) => List<TileType>.from(current.map[i]));
-        newMap[nextX][nextY] = TileType.sea; // Le navire pirate disparaît
-        
-        if (victory) {
-          state = current.copyWith(
-            x: nextX,
-            y: nextY,
-            orientation: newOrientation,
-            provisions: nextProvisions,
-            orVolatil: current.orVolatil + 100,
-            map: newMap,
-            statusMessage: "Victoire sur les pirates ! +100 Or$statusSuffix",
-          );
-          _logJournal("Victoire navale ! Les pirates ont battu en retraite.", type: JournalEntryType.combat);
-        } else {
-          final lostProvisions = (nextProvisions - 2).clamp(0, 999);
-          if (lostProvisions <= 0) {
-             state = current.copyWith(isGameOver: true, statusMessage: "Famine après combat !", provisions: 0);
-             _logJournal("Défaite fatale face aux pirates...", type: JournalEntryType.combat);
-             return;
-          }
-          state = current.copyWith(
-            x: nextX,
-            y: nextY,
-            orientation: newOrientation,
-            provisions: lostProvisions,
-            boisCharpente: (current.boisCharpente - 2).clamp(0, 999), 
-            map: newMap,
-            statusMessage: "Défaite navale ! -2 Provisions supplémentaires, -2 Kits Rép.",
-          );
-          _logJournal("Défaite navale face aux pirates.", type: JournalEntryType.combat);
-        }
-        return;
-    }
-
-
-    if (tile == TileType.island || tile == TileType.port || tile == TileType.snow || tile == TileType.jungle) {
-        // L'île est pillée, on la transforme en 'grass/snow/jungle' pour empêcher de re-looter
-        final newMap = List<List<TileType>>.generate(mapSize, (i) => List<TileType>.from(current.map[i]));
-        newMap[nextX][nextY] = (tile == TileType.snow) ? TileType.snow : (tile == TileType.jungle ? TileType.jungle : TileType.grass);
+        newMap[nextX][nextY] = TileType.sea;
         
         state = current.copyWith(
             x: nextX,
@@ -348,18 +254,17 @@ class SessionNotifier extends Notifier<SessionState?> {
             map: newMap,
             statusMessage: "Escale ! Butin récupéré.",
         );
-        String label = (tile == TileType.port) ? "un Port" : ((tile == TileType.snow) ? "une île Enneigée" : (tile == TileType.jungle ? "une île de Jungle" : "une Île"));
-        _logJournal("Escale réussie sur $label ($nextX, $nextY).", type: JournalEntryType.discovery);
+        _logJournal("Escale réussie sur une Île ($nextX, $nextY).", type: JournalEntryType.discovery);
         return;
     }
 
 
     if (tile == TileType.continent) {
-        // US06: Tout le continent devient herbe après le premier loot
+        // US06: Tout le continent devient mer après le premier loot (pour respecter 'pas d'herbe')
         final newMap = List<List<TileType>>.generate(mapSize, (i) => List<TileType>.from(current.map[i]));
         for (int r = 0; r < mapSize; r++) {
           for (int c = 0; c < mapSize; c++) {
-            if (newMap[r][c] == TileType.continent) newMap[r][c] = TileType.grass;
+            if (newMap[r][c] == TileType.continent) newMap[r][c] = TileType.sea;
           }
         }
         
@@ -374,25 +279,6 @@ class SessionNotifier extends Notifier<SessionState?> {
             statusMessage: "Continent atteint ! Objectif final en vue.",
         );
         _logJournal("TERRE EN VUE ! Le continent a été atteint.", type: JournalEntryType.discovery);
-        return;
-    }
-
-
-    if (tile == TileType.fishing) {
-        final newMap = List<List<TileType>>.generate(mapSize, (i) => List<TileType>.from(current.map[i]));
-        newMap[nextX][nextY] = TileType.sea;
-        
-        state = current.copyWith(
-            x: nextX,
-            y: nextY,
-            orientation: newOrientation,
-            provisions: nextProvisions,
-            isAtStopover: true,
-            lootRemaining: 1, // Sera ajusté si item "filet supp" possédé
-            map: newMap,
-            statusMessage: "Session de pêche !",
-        );
-        _logJournal("Session de pêche fructueuse.", type: JournalEntryType.loot);
         return;
     }
 
