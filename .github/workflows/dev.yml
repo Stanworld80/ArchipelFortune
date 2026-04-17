@@ -277,4 +277,4 @@ jobs:
         working-directory: app
         run: |
           # Integration tests on web require the app to be built or at least ready
-          flutter test integration_test/app_test.dart --platform chrome
+          flutter create . --platforms=web && flutter test integration_test/app_test.dart -d chrome
