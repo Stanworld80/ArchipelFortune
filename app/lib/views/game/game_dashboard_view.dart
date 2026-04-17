@@ -9,8 +9,6 @@ import 'bank_overlay.dart';
 import 'fishing_overlay.dart';
 import '../../providers/session_provider.dart';
 import '../../models/session_model.dart';
-import 'upgrade_shop_view.dart';
-import 'quest_log_view.dart';
 import 'collections_view.dart';
 
 class GameDashboardView extends ConsumerStatefulWidget {
@@ -125,14 +123,51 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
         backgroundColor: Colors.teal.shade800,
         foregroundColor: Colors.white,
         actions: [
+          // Bouton Collection (petit bouton rond)
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: IconButton(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const CollectionsView()),
+              ),
+              icon: const Icon(Icons.collections_bookmark, size: 20),
+              tooltip: 'Collection',
+              style: IconButton.styleFrom(
+                backgroundColor: Colors.teal.shade900.withValues(alpha: 0.4),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.all(4),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          
+          // Or
+          Center(
+            child: Text(
+              '${session.orVolatil} 🪙',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.amber),
+            ),
+          ),
+          const SizedBox(width: 12),
+
+          // Kits de Réparation
+          Center(
+            child: Text(
+              '${session.boisCharpente} 🛠️',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFFD7CCC8)),
+            ),
+          ),
+          const SizedBox(width: 12),
+
+          // Provisions
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
             child: Center(
               child: AnimatedBuilder(
                 animation: _blinkController,
                 builder: (context, child) {
                   final provisions = session.provisions;
-                  Color color = Colors.grey;
+                  Color color = Colors.white;
                   FontWeight weight = FontWeight.normal;
                   double opacity = 1.0;
 
@@ -233,79 +268,7 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
               ),
             ),
 
-          // HUD en bas à gauche
-          Positioned(
-            bottom: 120,
-            left: 20,
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.7),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('POSITION: ${session.x}, ${session.y}', style: const TextStyle(color: Colors.white70)),
-                  const SizedBox(height: 4),
-                  Text('OR EN MAIN: ${session.orVolatil} 🪙', style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
-                  Text('KITS RÉP.: ${session.boisCharpente} 🛠️', style: const TextStyle(color: Colors.brown)),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      ElevatedButton.icon(
-                        onPressed: () => showModalBottomSheet(
-                          context: context,
-                          backgroundColor: Colors.transparent,
-                          isScrollControlled: true,
-                          builder: (context) => const UpgradeShopView(),
-                        ),
-                        icon: const Icon(Icons.build, size: 14),
-                        label: const Text("AMÉLIORER"),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.amber,
-                          foregroundColor: Colors.black,
-                          textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      ElevatedButton.icon(
-                        onPressed: () => showModalBottomSheet(
-                          context: context,
-                          backgroundColor: Colors.transparent,
-                          isScrollControlled: true,
-                          builder: (context) => const QuestLogView(),
-                        ),
-                        icon: const Icon(Icons.history_edu, size: 14),
-                        label: const Text("JOURNAL"),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFE5D3B3),
-                          foregroundColor: const Color(0xFF5D4037),
-                          textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      ElevatedButton.icon(
-                        onPressed: () => Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => const CollectionsView()),
-                        ),
-                        icon: const Icon(Icons.collections_bookmark, size: 14),
-                        label: const Text("COLLECTION"),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.teal.shade400,
-                          foregroundColor: Colors.white,
-                          textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
+
 
           // Contrôles de Navigation (Barre de Gouvernail)
           Positioned(

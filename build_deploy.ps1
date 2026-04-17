@@ -46,8 +46,8 @@ $Config = @{
     dev     = @{
         ProjectId          = 'archipel-fortune-dev'
         AndroidAppId       = '1:83241971458:android:dde10259edb60d45711c1b'
-        DartDefines        = 'APP_ENV=dev,SUPER_ADMIN_EMAIL=tester-admin@archipel-fortune.net'
-        #DartDefines       = 'APP_ENV=dev,SUPER_ADMIN_EMAIL=stanworld@gmail.com'
+        GoogleSignInClientId = '83241971458-14tiragdibb39tnm9op5nd6fqnm4ct53.apps.googleusercontent.com'
+        DartDefines        = 'APP_ENV=dev,SUPER_ADMIN_EMAIL=stantest@stanworld.org'
         Flavor             = ''
         EntryPoint         = 'lib/main.dart'
         GoogleServicesPath = 'android/app/google-services.dev.json'
@@ -56,8 +56,8 @@ $Config = @{
     staging = @{
         ProjectId          = 'archipel-fortune-staging'
         AndroidAppId       = '1:344541548510:android:631fa078fb9926677d174f'
-        DartDefines        = 'APP_ENV=staging,SUPER_ADMIN_EMAIL=tester-admin@archipel-fortune.net'
-        #DartDefines       = 'APP_ENV=staging,SUPER_ADMIN_EMAIL=stanworld@gmail.com'
+        GoogleSignInClientId = '344541548510-k1vncr9ufjii7r3k4425p8sqgq5p47r6.apps.googleusercontent.com'
+        DartDefines        = 'APP_ENV=staging,SUPER_ADMIN_EMAIL=stanworld@gmail.com'
         Flavor             = ''
         EntryPoint         = 'lib/main.dart'
         GoogleServicesPath = 'android/app/google-services.staging.json'
@@ -66,6 +66,7 @@ $Config = @{
     prod    = @{
         ProjectId          = 'archipel-fortune-prod'
         AndroidAppId       = '1:417958901427:android:afebbbc0aa7ded9b0762c6'
+        GoogleSignInClientId = '48301164525-6lqqh5tc0m0jpsm4ovdpgalosve17a1m.apps.googleusercontent.com'
         DartDefines        = 'APP_ENV=prod,SUPER_ADMIN_EMAIL=stanworld@gmail.com'
         Flavor             = ''
         EntryPoint         = 'lib/main.dart'
@@ -160,6 +161,19 @@ $CommonArgs = $DartDefineArgs + @(
 )
 
 if ($Platform -eq 'web' -or $Platform -eq 'all') {
+    Write-Host '   Configuring Web index.html...' -ForegroundColor Yellow
+    flutter create . --platforms web
+    $templatePath = 'web/index-template.html'
+    $indexPath = 'web/index.html'
+    if (Test-Path $templatePath) {
+        $content = Get-Content $templatePath -Raw
+        $content = $content -replace '##GOOGLE_SIGNIN_CLIENT_ID_PLACEHOLDER##', $EnvConfig.GoogleSignInClientId
+        $content | Out-File -FilePath $indexPath -Encoding utf8 -Force
+        Write-Host "   ✅ index.html generated with Client ID: $($EnvConfig.GoogleSignInClientId)" -ForegroundColor Green
+    } else {
+        Write-Warning "web/index-template.html not found. Using existing index.html."
+    }
+
     Write-Host '   Building Web...' -ForegroundColor Yellow
     flutter build web @CommonArgs
     if ($LASTEXITCODE -ne 0) { throw '❌ Web Build Failed' }

@@ -67,10 +67,6 @@ class SessionNotifier extends Notifier<SessionState?> {
         map: generateMap(seed: actualSeed, startX: startX, startY: startY),
         startTime: DateTime.now(),
         seed: actualSeed,
-        quests: [
-          Quest(id: "explore_islands", title: "Explorateur en herbe", description: "Découvrez 3 îles inexplorées.", currentValue: 0, targetValue: 3, rewardType: RewardType.keyCopper, rewardAmount: 1),
-          Quest(id: "collect_gold", title: "Fièvre de l'Or", description: "Récoltez 1000 pièces d'or.", currentValue: 0, targetValue: 1000, rewardType: RewardType.keySilver, rewardAmount: 1),
-        ],
       );
     } catch (e) {
       rethrow;
@@ -244,12 +240,10 @@ class SessionNotifier extends Notifier<SessionState?> {
 
     TileType tile = current.map[nextX][nextY];
 
-    // Voiles Améliorées : Chance de ne pas consommer de provisions (US12)
-    final sailsChance = (current.sailsLevel - 1) * 0.1;
-    final bool consumeProvision = Random().nextDouble() > sailsChance;
+    final bool consumeProvision = true;
+    final statusSuffix = "";
     
-    final nextProvisions = (consumeProvision ? current.provisions - 1 : current.provisions).clamp(0, 999);
-    final statusSuffix = consumeProvision ? "" : " (Vent favorable !)";
+    final nextProvisions = (current.provisions - 1).clamp(0, 999);
 
     if (nextProvisions <= 0) {
       state = current.copyWith(
@@ -278,7 +272,7 @@ class SessionNotifier extends Notifier<SessionState?> {
 
     if (tile == TileType.shipwreck) {
       // Auto-loot de bois sur l'épave
-      final maxWood = 5 + (current.hullLevel * 2);
+      final maxWood = 10; // Valeur par défaut
       state = current.copyWith(
         x: nextX,
         y: nextY,
@@ -342,9 +336,6 @@ class SessionNotifier extends Notifier<SessionState?> {
             map: newMap,
             statusMessage: "Escale ! Butin récupéré.",
         );
-        
-        // Progression Quête : Exploration (US13)
-        updateQuestProgress("explore_islands", 1);
         return;
     }
 
@@ -412,18 +403,13 @@ class SessionNotifier extends Notifier<SessionState?> {
     final current = state;
     if (current == null) return;
     
-    // Bonus de Soute (US12)
-    final cargoMult = 1.0 + (current.cargoLevel - 1) * 0.2;
-    final int finalGold = (gold * cargoMult).round();
+    final int finalGold = gold;
 
     state = current.copyWith(
       orVolatil: current.orVolatil + finalGold,
       provisions: current.provisions + prov,
       boisCharpente: current.boisCharpente + wood,
     );
-
-    // Progression Quête : Or (US13)
-    updateQuestProgress("collect_gold", finalGold);
   }
 
   void addSpecialLoot({String? keyType, String? itemId}) {
@@ -516,91 +502,6 @@ class SessionNotifier extends Notifier<SessionState?> {
     );
   }
 
-  Future<void> upgradeHull() async {
-    final current = state;
-    if (current == null) return;
-    final cost = 100 * current.hullLevel;
-    if (current.orVolatil < cost) return;
-    
-    state = current.copyWith(
-      orVolatil: current.orVolatil - cost,
-      hullLevel: current.hullLevel + 1,
-      statusMessage: "Coque renforcée ! (Niv. ${current.hullLevel})",
-    );
-  }
-
-  Future<void> upgradeSails() async {
-    final current = state;
-    if (current == null) return;
-    final cost = 100 * current.sailsLevel;
-    if (current.orVolatil < cost) return;
-    
-    state = current.copyWith(
-      orVolatil: current.orVolatil - cost,
-      sailsLevel: current.sailsLevel + 1,
-      statusMessage: "Voiles améliorées ! (Niv. ${current.sailsLevel})",
-    );
-  }
-
-  Future<void> upgradeCargo() async {
-    final current = state;
-    if (current == null) return;
-    final cost = 100 * current.cargoLevel;
-    if (current.orVolatil < cost) return;
-    
-    state = current.copyWith(
-      orVolatil: current.orVolatil - cost,
-      cargoLevel: current.cargoLevel + 1,
-      statusMessage: "Soute agrandie ! (Niv. ${current.cargoLevel})",
-    );
-  }
-
-  void updateQuestProgress(String questId, int increment) {
-    if (state == null) return;
-    final List<Quest> newQuests = state!.quests.map((q) {
-      if (q.id == questId && !q.isCompleted) {
-        int newVal = q.currentValue + increment;
-        bool completed = newVal >= q.targetValue;
-        if (completed) {
-           grantQuestReward(q.rewardType, q.rewardAmount);
-        }
-        return q.copyWith(currentValue: newVal, isCompleted: completed);
-      }
-      return q;
-    }).toList();
-
-    state = state!.copyWith(quests: newQuests);
-  }
-
-  void grantQuestReward(RewardType type, int amount) {
-    if (state == null) return;
-    final current = state!;
-
-    int ck = current.copperKeys;
-    int sk = current.silverKeys;
-    int gk = current.goldKeys;
-    int gold = current.orVolatil;
-    int prov = current.provisions;
-    int wood = current.boisCharpente;
-
-    switch (type) {
-      case RewardType.gold: gold += amount; break;
-      case RewardType.provisions: prov += amount; break;
-      case RewardType.wood: wood += amount; break;
-      case RewardType.keyCopper: ck += amount; break;
-      case RewardType.keySilver: sk += amount; break;
-      case RewardType.keyGold: gk += amount; break;
-    }
-
-    state = current.copyWith(
-      orVolatil: gold,
-      provisions: prov,
-      boisCharpente: wood,
-      copperKeys: ck,
-      silverKeys: sk,
-      goldKeys: gk,
-      statusMessage: "QUÊTE TERMINÉE ! Récompense reçue.",
-    );
   }
 
   @visibleForTesting

@@ -149,15 +149,18 @@ case "$ENVIRONMENT" in
     dev)
         CURRENT_FIREBASE_PROJECT_ID="$FIREBASE_PROJECT_ID_DEV"; CURRENT_GOOGLE_SIGNIN_CLIENT_ID_WEB="$GOOGLE_SIGNIN_CLIENT_ID_WEB_DEV"
         CURRENT_GOOGLE_SERVICES_JSON_SOURCE_PATH="$GOOGLE_SERVICES_JSON_DEV_PATH"; CURRENT_FIREBASE_ANDROID_APP_ID="$FIREBASE_ANDROID_APP_ID_DEV"
-        CURRENT_TESTER_GROUPS="$TESTER_GROUPS_DEV"; CURRENT_FIREBASE_CONFIG_FILE_SOURCE_PATH="$FIREBASE_CONFIG_FILE_DEV" ;;
+        CURRENT_TESTER_GROUPS="$TESTER_GROUPS_DEV"; CURRENT_FIREBASE_CONFIG_FILE_SOURCE_PATH="$FIREBASE_CONFIG_FILE_DEV" 
+        CURRENT_SUPER_ADMIN_EMAIL="stantest@stanworld.org" ;;
     staging)
         CURRENT_FIREBASE_PROJECT_ID="$FIREBASE_PROJECT_ID_STAGING"; CURRENT_GOOGLE_SIGNIN_CLIENT_ID_WEB="$GOOGLE_SIGNIN_CLIENT_ID_WEB_STAGING"
         CURRENT_GOOGLE_SERVICES_JSON_SOURCE_PATH="$GOOGLE_SERVICES_JSON_STAGING_PATH"; CURRENT_FIREBASE_ANDROID_APP_ID="$FIREBASE_ANDROID_APP_ID_STAGING"
-        CURRENT_TESTER_GROUPS="$TESTER_GROUPS_STAGING"; CURRENT_FIREBASE_CONFIG_FILE_SOURCE_PATH="$FIREBASE_CONFIG_FILE_STAGING" ;;
+        CURRENT_TESTER_GROUPS="$TESTER_GROUPS_STAGING"; CURRENT_FIREBASE_CONFIG_FILE_SOURCE_PATH="$FIREBASE_CONFIG_FILE_STAGING"
+        CURRENT_SUPER_ADMIN_EMAIL="stanworld@gmail.com" ;;
     prod)
         CURRENT_FIREBASE_PROJECT_ID="$FIREBASE_PROJECT_ID_PROD"; CURRENT_GOOGLE_SIGNIN_CLIENT_ID_WEB="$GOOGLE_SIGNIN_CLIENT_ID_WEB_PROD"
         CURRENT_GOOGLE_SERVICES_JSON_SOURCE_PATH="$GOOGLE_SERVICES_JSON_PROD_PATH"; CURRENT_FIREBASE_ANDROID_APP_ID="$FIREBASE_ANDROID_APP_ID_PROD"
-        CURRENT_TESTER_GROUPS="$TESTER_GROUPS_PROD"; CURRENT_FIREBASE_CONFIG_FILE_SOURCE_PATH="$FIREBASE_CONFIG_FILE_PROD" ;;
+        CURRENT_TESTER_GROUPS="$TESTER_GROUPS_PROD"; CURRENT_FIREBASE_CONFIG_FILE_SOURCE_PATH="$FIREBASE_CONFIG_FILE_PROD"
+        CURRENT_SUPER_ADMIN_EMAIL="stanworld@gmail.com" ;;
 esac
 
 # --- Affichage de la Configuration ---
@@ -223,6 +226,7 @@ fi
 echo "-> Étape 3/6 : Préparation des fichiers de configuration..."
 if [[ " ${PLATFORMS[*]} " =~ " web " ]]; then
     echo "   - Configuration de 'index.html' pour le web..."
+    execute_verbose "Initialisation plateforme web" flutter create . --platforms web
     execute_verbose "Copie du template index.html" cp "$WEB_INDEX_TEMPLATE_PATH" "$WEB_INDEX_PATH"
     execute_verbose "Remplacement du placeholder Google Client ID" sed -i.bak "s|$WEB_INDEX_PLACEHOLDER|$CURRENT_GOOGLE_SIGNIN_CLIENT_ID_WEB|g" "$WEB_INDEX_PATH" && rm "$WEB_INDEX_PATH.bak"
 fi
@@ -274,20 +278,20 @@ echo "-> Étape 6/6 : Compilation des plateformes..."
 for PLATFORM in "${PLATFORMS[@]}"; do
     echo "   -> Lancement de la compilation pour : $PLATFORM"
     if [ "$PLATFORM" == "web" ]; then
-        execute_verbose "Build Web" flutter build web --"$BUILD_TYPE" --dart-define=APP_ENV="$ENVIRONMENT" --dart-define=SUPER_ADMIN_EMAIL="stanworld@gmail.com"
+        execute_verbose "Build Web" flutter build web --"$BUILD_TYPE" --dart-define=APP_ENV="$ENVIRONMENT" --dart-define=SUPER_ADMIN_EMAIL="$CURRENT_SUPER_ADMIN_EMAIL"
         if [ $? -ne 0 ]; then echo "ERREUR : La compilation web a échoué."; exit 1; fi
         echo "   Compilation web terminée avec succès."
     elif [ "$PLATFORM" == "android" ]; then
         if [ -z "$SPECIFIC_ANDROID_BUILD" ] || [ "$SPECIFIC_ANDROID_BUILD" == "apk" ]; then
             echo "      -> Construction de l'APK Android..."
-            execute_verbose "Build APK" flutter build apk --"$BUILD_TYPE" --dart-define=APP_ENV="$ENVIRONMENT" --build-name "$VERSION_NAME" --build-number "$NEW_BUILD_NUMBER"
+            execute_verbose "Build APK" flutter build apk --"$BUILD_TYPE" --dart-define=APP_ENV="$ENVIRONMENT" --dart-define=SUPER_ADMIN_EMAIL="$CURRENT_SUPER_ADMIN_EMAIL" --build-name "$VERSION_NAME" --build-number "$NEW_BUILD_NUMBER"
             if [ $? -ne 0 ]; then echo "ERREUR : La compilation APK a échoué."; exit 1; fi
             execute_verbose "Renommage APK" mv "build/app/outputs/flutter-apk/app-$BUILD_TYPE.apk" "build/app/outputs/flutter-apk/ArchipelFortune-$TAG_NAME.apk"
             echo "      APK construit : build/app/outputs/flutter-apk/ArchipelFortune-$TAG_NAME.apk"
         fi
         if [[ "$BUILD_TYPE" == "release" && (-z "$SPECIFIC_ANDROID_BUILD" || "$SPECIFIC_ANDROID_BUILD" == "aab") ]]; then
             echo "      -> Construction de l'Android App Bundle (AAB)..."
-            execute_verbose "Build AAB" flutter build appbundle --"$BUILD_TYPE" --dart-define=APP_ENV="$ENVIRONMENT" --build-name "$VERSION_NAME" --build-number "$NEW_BUILD_NUMBER"
+            execute_verbose "Build AAB" flutter build appbundle --"$BUILD_TYPE" --dart-define=APP_ENV="$ENVIRONMENT" --dart-define=SUPER_ADMIN_EMAIL="$CURRENT_SUPER_ADMIN_EMAIL" --build-name "$VERSION_NAME" --build-number "$NEW_BUILD_NUMBER"
             if [ $? -ne 0 ]; then echo "ERREUR : La compilation AAB a échoué."; exit 1; fi
             execute_verbose "Renommage AAB" mv "build/app/outputs/bundle/$BUILD_TYPE/app-$BUILD_TYPE.aab" "build/app/outputs/bundle/$BUILD_TYPE/ArchipelFortune-$TAG_NAME.aab"
             echo "      AAB construit : build/app/outputs/bundle/$BUILD_TYPE/ArchipelFortune-$TAG_NAME.aab"
