@@ -70,7 +70,7 @@ class MapPainter extends CustomPainter {
         // Si hors limites, on dessine du vide ou de l'eau
         if (targetX < 0 || targetX >= session.map.length || targetY < 0 || targetY >= session.map[0].length) {
           canvas.drawRect(rect, paintWater..color = const Color(0xFF003366).withOpacity(0.5));
-          _drawWaves(canvas, rect, animationValue, targetX, targetY);
+          // _drawWaves(canvas, rect, animationValue, targetX, targetY);
           continue;
         }
 
@@ -80,7 +80,7 @@ class MapPainter extends CustomPainter {
         if (tile == TileType.sea || tile == TileType.shallow || tile == TileType.fishing || tile == TileType.shipwreck || tile == TileType.pirate) {
            // On utilise des couleurs semi-transparentes pour laisser transparaître le fond mer.png
            canvas.drawRect(rect, paintWater..color = (tile == TileType.shallow ? const Color(0xFF00ACC1) : Colors.transparent).withOpacity(tile == TileType.shallow ? 0.3 : 0.0));
-           _drawWaves(canvas, rect, animationValue, targetX, targetY);
+           // _drawWaves(canvas, rect, animationValue, targetX, targetY);
         } else {
            // Autres types de sol (sable, herbe, etc.)
            _drawLand(canvas, rect, tile);
@@ -121,9 +121,9 @@ class MapPainter extends CustomPainter {
           _drawPirateShip(canvas, rect);
         }
 
-        if (tile == TileType.fishing) {
+        /*if (tile == TileType.fishing) {
           _drawFishingSpot(canvas, rect, animationValue);
-        }
+        }*/
         
         // Bordure de grille fine
         canvas.drawRect(rect, Paint()..color = Colors.black26..style = PaintingStyle.stroke..strokeWidth = 0.5);
@@ -139,37 +139,7 @@ class MapPainter extends CustomPainter {
     _drawDiscoveryIndices(canvas, visionRadius, actualTileSize, gridPadding);
 
     // Dessin de la météo (US10)
-    _drawWeather(canvas, size, visionRadius);
-  }
-
-  void _drawWaves(Canvas canvas, Rect rect, double anim, int tx, int ty) {
-    // Utilisation des coordonnées pour un décalage déterministe par case
-    final randSeed = (tx * 7 + ty * 13) % 100 / 100.0;
-    final paintWave = Paint()
-      ..color = Colors.white24
-      ..strokeWidth = 1.5
-      ..strokeCap = StrokeCap.round;
-
-    final double phase = (anim + randSeed) % 1.0;
-    final double waveX = rect.left + (phase * rect.width);
-    final double waveY = rect.top + (randSeed * rect.height);
-
-    // Dessine deux petits traits qui défilent
-    canvas.drawLine(
-      Offset(waveX, waveY), 
-      Offset(waveX + 10, waveY), 
-      paintWave
-    );
-    
-    // Deuxième vaguelette décalée
-    final double phase2 = (phase + 0.5) % 1.0;
-    final double waveX2 = rect.left + (phase2 * rect.width);
-    final double waveY2 = rect.top + ((1.0 - randSeed) * rect.height);
-    canvas.drawLine(
-      Offset(waveX2, waveY2), 
-      Offset(waveX2 + 8, waveY2), 
-      paintWave
-    );
+    // _drawWeather(canvas, size, visionRadius);
   }
 
   void _drawPortDetails(Canvas canvas, Rect rect) {
@@ -325,25 +295,6 @@ class MapPainter extends CustomPainter {
     }
   }
 
-  void _drawFishingSpot(Canvas canvas, Rect rect, double anim) {
-    final paintFish = Paint()
-      ..color = Colors.white70
-      ..strokeWidth = 2
-      ..style = PaintingStyle.fill;
-
-    // Dessiner quelques points scintillants ou silhouettes de poissons
-    final double phase = (anim * 2) % 1.0;
-    final double offset = phase * 10;
-    
-    canvas.drawCircle(rect.center + Offset(-10 + offset, -5), 2.5, paintFish);
-    canvas.drawCircle(rect.center + Offset(15 - offset, 10), 2.0, paintFish);
-    canvas.drawCircle(rect.center + Offset(5, -15 + offset), 1.5, paintFish);
-    
-    // Silhouette de filet discret
-    final paintNet = Paint()..color = Colors.white10..style = PaintingStyle.stroke..strokeWidth = 1;
-    canvas.drawOval(rect.deflate(10), paintNet);
-  }
-
   void _drawVolcano(Canvas canvas, Rect rect) {
     final center = rect.center;
     final baseWidth = rect.width * 0.8;
@@ -391,71 +342,9 @@ class MapPainter extends CustomPainter {
     canvas.drawCircle(center + const Offset(0, -7), 1.5, Paint()..color = Colors.white);
   }
 
-  void _drawWeather(Canvas canvas, Size size, int visionRadius) {
-    if (session.x < 0 || session.x >= session.map.length || session.y < 0 || session.y >= session.map[0].length) return;
-    
-    final currentTile = session.map[session.x][session.y];
-    
-    if (currentTile == TileType.snow || currentTile == TileType.ice) {
-      _drawSnow(canvas, size);
-    } else if (currentTile == TileType.jungle || currentTile == TileType.swamp) {
-      _drawRain(canvas, size);
-    } else {
-      _drawFog(canvas, size);
-    }
-  }
-
-  void _drawRain(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.blue.withOpacity(0.4)
-      ..strokeWidth = 2.0;
-
-    // Éclairs (Flash blanc aléatoire)
-    final randLightning = Random(session.x + session.y + (animationValue * 10).toInt());
-    if (randLightning.nextDouble() > 0.98) {
-      canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), Paint()..color = Colors.white.withOpacity(0.3));
-    }
-    
-    final rand = Random(42);
-    for (int i = 0; i < 60; i++) {
-      final x = rand.nextDouble() * size.width;
-      final yStart = (rand.nextDouble() * size.height + (animationValue * 300)) % size.height;
-      final yEnd = yStart + 20; 
-      canvas.drawLine(Offset(x, yStart), Offset(x - 5, yEnd), paint);
-    }
-  }
-
-  void _drawSnow(Canvas canvas, Size size) {
-    final paint = Paint()..color = Colors.white.withOpacity(0.8);
-    final rand = Random(123);
-    for (int i = 0; i < 80; i++) {
-      final x = (rand.nextDouble() * size.width + (animationValue * 30)) % size.width; // Vent latéral
-      final y = (rand.nextDouble() * size.height + (animationValue * 100)) % size.height;
-      canvas.drawCircle(Offset(x, y), 2.0, paint);
-    }
-  }
-
-  void _drawFog(Canvas canvas, Size size) {
-    // Brume légère et mouvante
-    final paint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.05 + (0.05 * sin(animationValue * pi * 2)))
-      ..style = PaintingStyle.fill;
-    
-    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), paint);
-    
-    // Bancs de brumes locaux
-    final rand = Random(7);
-    for (int i = 0; i < 5; i++) {
-        final center = Offset(
-          rand.nextDouble() * size.width + sin(animationValue * pi) * 20,
-          rand.nextDouble() * size.height
-        );
-        canvas.drawCircle(center, 40, paint..color = Colors.white.withOpacity(0.1));
-    }
-  }
 
   @override
-  bool shouldRepaint(covariant MapPainter oldDelegate) {
+  bool shouldRepaint(MapPainter oldDelegate) {
     return oldDelegate.session != session || oldDelegate.animationValue != animationValue;
   }
 }
