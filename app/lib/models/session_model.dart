@@ -23,6 +23,37 @@ enum TileType {
 
 enum RewardType { gold, wood, provisions, keyCopper, keySilver, keyGold }
 
+enum JournalEntryType { discovery, incident, combat, start, loot, info }
+
+class JournalEntry {
+  final String message;
+  final DateTime timestamp;
+  final JournalEntryType type;
+
+  JournalEntry({
+    required this.message,
+    required this.timestamp,
+    this.type = JournalEntryType.info,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'message': message,
+      'timestamp': timestamp.toIso8601String(),
+      'type': type.index,
+    };
+  }
+
+  factory JournalEntry.fromMap(Map<String, dynamic> map) {
+    return JournalEntry(
+      message: map['message'] ?? '',
+      timestamp: map['timestamp'] != null ? DateTime.parse(map['timestamp']) : DateTime.now(),
+      type: JournalEntryType.values[map['type'] ?? JournalEntryType.info.index],
+    );
+  }
+}
+
+
 
 
 class SessionState {
@@ -46,6 +77,8 @@ class SessionState {
   final Map<String, int> collections; // Ex: {"panoplie_pirate": 2}
   final List<Map<String, int>> discoveredIslandCoords; // Liste de {x, y}
     final int seed;
+  final List<JournalEntry> journalEntries;
+
 
   SessionState({
     this.sessionId,
@@ -68,7 +101,9 @@ class SessionState {
     this.collections = const {},
     this.discoveredIslandCoords = const [],
     this.seed = 0,
+    this.journalEntries = const [],
   });
+
 
   SessionState copyWith({
     int? x,
@@ -90,7 +125,9 @@ class SessionState {
     String? sessionId,
     List<Map<String, int>>? discoveredIslandCoords,
     int? seed,
+    List<JournalEntry>? journalEntries,
   }) {
+
     return SessionState(
       sessionId: sessionId ?? this.sessionId,
       x: x ?? this.x,
@@ -112,7 +149,9 @@ class SessionState {
       statusMessage: statusMessage ?? this.statusMessage,
       discoveredIslandCoords: discoveredIslandCoords ?? this.discoveredIslandCoords,
       seed: seed ?? this.seed,
+      journalEntries: journalEntries ?? this.journalEntries,
     );
+
   }
 
   Map<String, dynamic> toMap() {
@@ -137,7 +176,9 @@ class SessionState {
       'collections': collections,
       'discoveredIslandCoords': discoveredIslandCoords,
       'seed': seed,
+      'journalEntries': journalEntries.map((e) => e.toMap()).toList(),
     };
+
   }
 
   factory SessionState.fromMap(Map<String, dynamic> mapData, {String? id}) {
@@ -184,6 +225,8 @@ class SessionState {
       collections: Map<String, int>.from(mapData['collections'] ?? {}),
       discoveredIslandCoords: (mapData['discoveredIslandCoords'] as List? ?? []).map((e) => Map<String, int>.from(e as Map)).toList(),
       seed: toInt(mapData['seed']),
+      journalEntries: (mapData['journalEntries'] as List? ?? []).map((e) => JournalEntry.fromMap(Map<String, dynamic>.from(e))).toList(),
     );
+
   }
 }

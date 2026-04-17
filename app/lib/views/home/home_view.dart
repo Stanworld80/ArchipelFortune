@@ -357,7 +357,7 @@ class _HomeViewState extends ConsumerState<HomeView>
         return StatefulBuilder(
           builder: (context, setState) {
             int totalCost =
-                (provisionsToBuy ~/ 10) * 5 + (woodToBuy * 10);
+                (provisionsToBuy ~/ 20) * 5 + (woodToBuy * 10);
             bool canAfford = profile.piecesOr >= totalCost;
 
             return AlertDialog(
@@ -375,7 +375,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                    Text(
-                    'Combien de provisions et de bois souhaitez-vous emporter ?',
+                    'Choisissez vos ressources pour l\'expédition. Les provisions sont vitales pour votre équipage, et les kits de réparation vous permettront de franchir les récifs sans sombrer.',
                     style: GoogleFonts.crimsonText(
                         color: Colors.white70, fontSize: 16),
                   ),
@@ -384,15 +384,15 @@ class _HomeViewState extends ConsumerState<HomeView>
                     icon: Icons.apple,
                     iconColor: Colors.redAccent,
                     label: 'Provisions ($provisionsToBuy)',
-                    onDecrement: provisionsToBuy > 10
-                        ? () => setState(() => provisionsToBuy -= 10)
+                    onDecrement: provisionsToBuy > 20
+                        ? () => setState(() => provisionsToBuy -= 20)
                         : null,
-                    onIncrement: () => setState(() => provisionsToBuy += 10),
+                    onIncrement: () => setState(() => provisionsToBuy += 20),
                   ),
                   _SupplyRow(
                     icon: Icons.handyman,
                     iconColor: Colors.brown.shade300,
-                    label: 'Bois ($woodToBuy)',
+                    label: 'Kit de réparation ($woodToBuy)',
                     onDecrement: woodToBuy > 0
                         ? () => setState(() => woodToBuy -= 1)
                         : null,

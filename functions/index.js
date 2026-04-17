@@ -37,7 +37,7 @@ exports.startExpedition = onCall(async (request) => {
   if (!auth) throw new HttpsError("unauthenticated", "Utilisateurs authentifiés uniquement.");
 
   const { provisions, wood, seed } = request.data;
-  const cost = (Math.floor(provisions / 10) * 5) + (wood * 10);
+  const cost = (Math.floor(provisions / 20) * 5) + (wood * 10);
 
   const userRef = db.collection("users").doc(auth.uid);
   const userDoc = await userRef.get();

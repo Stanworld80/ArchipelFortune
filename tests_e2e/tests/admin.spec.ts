@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { getResilientLocator, robustClick, archipelLogin } from './test_utils';
+import { getResilientLocator, robustClick, archipelLogin, waitForAppLoaded } from './test_utils';
 
 test.describe('Admin Panel Tests', () => {
   // Use a long timeout for admin operations
@@ -10,26 +10,7 @@ test.describe('Admin Panel Tests', () => {
 
   test.beforeEach(async ({ page }) => {
     await page.goto('/', { waitUntil: 'load', timeout: 60000 });
-    await page.waitForSelector('flutter-view', { timeout: 30000 });
-
-    // Enable accessibility
-    await page.evaluate(() => {
-      const findAndClick = () => {
-        const btns = Array.from(document.querySelectorAll('flt-semantics-placeholder, [aria-label="Enable accessibility"]'));
-        const accessBtn = btns.find(el => el.getAttribute('aria-label') === 'Enable accessibility' || el.textContent?.includes('accessibility'));
-        if (accessBtn instanceof HTMLElement) {
-          accessBtn.click();
-          return true;
-        }
-        return false;
-      };
-      if (!findAndClick()) {
-        window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab' }));
-        setTimeout(findAndClick, 1000);
-      }
-    });
-
-    await page.waitForTimeout(3000);
+    await waitForAppLoaded(page);
   });
 
   async function performAdminLogin(page) {

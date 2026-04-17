@@ -68,7 +68,9 @@ class SessionNotifier extends Notifier<SessionState?> {
         startTime: DateTime.now(),
         seed: actualSeed,
       );
+      _logJournal("L'expédition Archipel Fortune commence !", type: JournalEntryType.start);
     } catch (e) {
+
       rethrow;
     }
   }
@@ -250,8 +252,10 @@ class SessionNotifier extends Notifier<SessionState?> {
         statusMessage: "Famine ! Plus de provisions pour l'équipage.",
         provisions: 0
       );
+      _logJournal("Famine ! L'équipage n'a plus de provisions.", type: JournalEntryType.incident);
       return;
     }
+
 
     if (tile == TileType.reef || tile == TileType.volcano) {
       if (current.boisCharpente > 0) {
@@ -263,11 +267,14 @@ class SessionNotifier extends Notifier<SessionState?> {
           boisCharpente: (current.boisCharpente - 1).clamp(0, 999), 
           statusMessage: (tile == TileType.volcano) ? "Chaleur intense ! -1 Kit Rép.$statusSuffix" : "Collision ! -1 Kit Rép.$statusSuffix",
         );
+        _logJournal((tile == TileType.volcano) ? "Chaleur volcanique intense !" : "Collision avec un récif !", type: JournalEntryType.incident);
       } else {
         state = current.copyWith(isGameOver: true, statusMessage: (tile == TileType.volcano) ? "Cendres et feu..." : "Naufrage !");
+        _logJournal((tile == TileType.volcano) ? "Perdu dans les flammes..." : "Naufrage !", type: JournalEntryType.incident);
       }
       return;
     }
+
 
     if (tile == TileType.shipwreck) {
       // Auto-loot de bois sur l'épave
@@ -280,8 +287,10 @@ class SessionNotifier extends Notifier<SessionState?> {
         boisCharpente: (current.boisCharpente + 2).clamp(0, maxWood), 
         statusMessage: "Épave fouillée ! +2 Kits Rép.$statusSuffix",
       );
+      _logJournal("Épave mystérieuse fouillée aux coordonnées ($nextX, $nextY).", type: JournalEntryType.loot);
       return;
     }
+
 
     if (tile == TileType.pirate) {
         // Combat déterministe identique au serveur
@@ -301,10 +310,12 @@ class SessionNotifier extends Notifier<SessionState?> {
             map: newMap,
             statusMessage: "Victoire sur les pirates ! +100 Or$statusSuffix",
           );
+          _logJournal("Victoire navale ! Les pirates ont battu en retraite.", type: JournalEntryType.combat);
         } else {
           final lostProvisions = (nextProvisions - 2).clamp(0, 999);
           if (lostProvisions <= 0) {
              state = current.copyWith(isGameOver: true, statusMessage: "Famine après combat !", provisions: 0);
+             _logJournal("Défaite fatale face aux pirates...", type: JournalEntryType.combat);
              return;
           }
           state = current.copyWith(
@@ -316,9 +327,11 @@ class SessionNotifier extends Notifier<SessionState?> {
             map: newMap,
             statusMessage: "Défaite navale ! -2 Provisions supplémentaires, -2 Kits Rép.",
           );
+          _logJournal("Défaite navale face aux pirates.", type: JournalEntryType.combat);
         }
         return;
     }
+
 
     if (tile == TileType.island || tile == TileType.port || tile == TileType.snow || tile == TileType.jungle) {
         // L'île est pillée, on la transforme en 'grass/snow/jungle' pour empêcher de re-looter
@@ -335,8 +348,11 @@ class SessionNotifier extends Notifier<SessionState?> {
             map: newMap,
             statusMessage: "Escale ! Butin récupéré.",
         );
+        String label = (tile == TileType.port) ? "un Port" : ((tile == TileType.snow) ? "une île Enneigée" : (tile == TileType.jungle ? "une île de Jungle" : "une Île"));
+        _logJournal("Escale réussie sur $label ($nextX, $nextY).", type: JournalEntryType.discovery);
         return;
     }
+
 
     if (tile == TileType.continent) {
         // US06: Tout le continent devient herbe après le premier loot
@@ -357,8 +373,10 @@ class SessionNotifier extends Notifier<SessionState?> {
             map: newMap,
             statusMessage: "Continent atteint ! Objectif final en vue.",
         );
+        _logJournal("TERRE EN VUE ! Le continent a été atteint.", type: JournalEntryType.discovery);
         return;
     }
+
 
     if (tile == TileType.fishing) {
         final newMap = List<List<TileType>>.generate(mapSize, (i) => List<TileType>.from(current.map[i]));
@@ -374,8 +392,10 @@ class SessionNotifier extends Notifier<SessionState?> {
             map: newMap,
             statusMessage: "Session de pêche !",
         );
+        _logJournal("Session de pêche fructueuse.", type: JournalEntryType.loot);
         return;
     }
+
 
     state = current.copyWith(
       x: nextX,
@@ -404,12 +424,14 @@ class SessionNotifier extends Notifier<SessionState?> {
     
     final int finalGold = gold;
 
-    state = current.copyWith(
-      orVolatil: current.orVolatil + finalGold,
-      provisions: current.provisions + prov,
       boisCharpente: current.boisCharpente + wood,
     );
+
+    if (gold >= 50) _logJournal("Directement dans le coffre : +$gold Or !", type: JournalEntryType.loot);
+    else if (prov >= 5) _logJournal("Ravitaillement important : +$prov Provisions.", type: JournalEntryType.loot);
+    else if (wood >= 2) _logJournal("Réparations effectuées : +$wood Kits.", type: JournalEntryType.loot);
   }
+
 
   void addSpecialLoot({String? keyType, String? itemId}) {
     final current = state;
@@ -426,6 +448,7 @@ class SessionNotifier extends Notifier<SessionState?> {
 
     if (itemId != null) {
       newInventory.add(itemId);
+      _logJournal("Objet de collection découvert : ${itemId.replaceAll('_', ' ')}", type: JournalEntryType.discovery);
       checkCollectionsProgress(itemId, current.collections, (newCollections) {
         state = current.copyWith(
           copperKeys: ck,
@@ -436,6 +459,8 @@ class SessionNotifier extends Notifier<SessionState?> {
         );
       });
     } else {
+      String keyName = keyType == 'copper' ? "en Cuivre" : (keyType == 'silver' ? "en Argent" : "en Or");
+      _logJournal("Clé $keyName trouvée !", type: JournalEntryType.loot);
       state = current.copyWith(
         copperKeys: ck,
         silverKeys: sk,
@@ -443,6 +468,7 @@ class SessionNotifier extends Notifier<SessionState?> {
         inventory: newInventory,
       );
     }
+
   }
 
   void checkCollectionsProgress(String itemId, Map<String, int> currentCollections, Function(Map<String, int>) onUpdate) {
@@ -499,9 +525,27 @@ class SessionNotifier extends Notifier<SessionState?> {
       discoveredIslandCoords: newList,
       statusMessage: "Un nouvel indice sur la carte !",
     );
+    _logJournal("Nouvel indice sur la carte découvert.", type: JournalEntryType.info);
+  }
+
+  void _logJournal(String message, {JournalEntryType type = JournalEntryType.info}) {
+    final current = state;
+    if (current == null) return;
+
+    final entry = JournalEntry(
+      message: message,
+      timestamp: DateTime.now(),
+      type: type,
+    );
+
+    final newList = List<JournalEntry>.from(current.journalEntries);
+    newList.add(entry);
+
+    state = current.copyWith(journalEntries: newList);
   }
 
   @visibleForTesting
+
   void debugSetState(SessionState? nextState) {
     state = nextState;
   }

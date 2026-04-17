@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { waitForAppLoaded, getResilientLocator } from './test_utils';
 
 test.describe('Archipel Fortune Visual & Button Tests', () => {
   test.setTimeout(90000);
@@ -6,27 +7,7 @@ test.describe('Archipel Fortune Visual & Button Tests', () => {
   test.beforeEach(async ({ page }) => {
     // Naviguation vers la page et attente du chargement de Flutter
     await page.goto('/', { waitUntil: 'load', timeout: 60000 });
-    await page.waitForSelector('flutter-view', { timeout: 30000 });
-
-    // Activation de l'accessibilité Flutter
-    await page.evaluate(() => {
-      const activate = () => {
-        const btns = Array.from(document.querySelectorAll('flt-semantics-placeholder, [aria-label="Enable accessibility"]'));
-        const accessBtn = btns.find(el => el.getAttribute('aria-label') === 'Enable accessibility' || el.textContent?.includes('accessibility'));
-        if (accessBtn instanceof HTMLElement) {
-          accessBtn.click();
-          return true;
-        }
-        return false;
-      };
-      
-      activate();
-      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab' }));
-      setTimeout(activate, 1000);
-    });
-
-    // Attente du chargement des sémantiques
-    await page.waitForTimeout(5000);
+    await waitForAppLoaded(page);
   });
 
   test('Visual Regression - Landing Page', async ({ page }) => {

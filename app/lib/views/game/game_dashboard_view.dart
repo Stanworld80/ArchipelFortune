@@ -10,6 +10,8 @@ import 'fishing_overlay.dart';
 import '../../providers/session_provider.dart';
 import '../../models/session_model.dart';
 import 'collections_view.dart';
+import 'journal_view.dart';
+
 
 class GameDashboardView extends ConsumerStatefulWidget {
   const GameDashboardView({super.key});
@@ -89,6 +91,35 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
     }
   }
 
+  void _showProvisionWarning(int threshold) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF2D1B13),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15), side: const BorderSide(color: Colors.amber, width: 2)),
+        title: Row(
+          children: [
+            Icon(threshold == 5 ? Icons.report_problem : Icons.warning, color: Colors.amber),
+            const SizedBox(width: 10),
+            const Text('Attention Matelot !', style: TextStyle(color: Colors.white)),
+          ],
+        ),
+        content: Text(
+          threshold == 10 
+            ? 'Vos provisions sont basses (moins de 10). Pensez à pêcher ou à accoster bientôt !'
+            : 'ALERTE : Provisions critiques (moins de 5) ! La famine guette votre équipage.',
+          style: const TextStyle(color: Colors.white70, fontSize: 16),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('COMPRIS', style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final session = ref.watch(sessionProvider);
@@ -100,6 +131,18 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
         _triggerFeedback(session.statusMessage!);
       });
     }
+
+    // Low provisions warnings
+    ref.listen<int?>(sessionProvider.select((s) => s?.provisions), (previous, next) {
+      if (next == null) return;
+      if (previous != null) {
+        if (next < 10 && previous >= 10) {
+          _showProvisionWarning(10);
+        } else if (next < 5 && previous >= 5) {
+          _showProvisionWarning(5);
+        }
+      }
+    });
 
     if (session == null) {
       return Scaffold(
@@ -142,6 +185,26 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
             ),
           ),
           const SizedBox(width: 8),
+
+          // Bouton Journal
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: IconButton(
+              onPressed: () => showDialog(
+                context: context,
+                builder: (_) => const JournalView(),
+              ),
+              icon: const Icon(Icons.history_edu, size: 20),
+              tooltip: 'Journal de bord',
+              style: IconButton.styleFrom(
+                backgroundColor: Colors.teal.shade900.withValues(alpha: 0.4),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.all(4),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+
           
           // Or
           Center(

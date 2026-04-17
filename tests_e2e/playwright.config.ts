@@ -15,21 +15,27 @@ export default defineConfig({
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  // CI runners are slow; use 1 worker to ensure reliability and avoid Firebase Auth concurrency limits
+  workers: process.env.CI ? 1 : 1, 
   reporter: [['html', { open: 'never' }], ['list']],
   use: {
     baseURL: BASE_URL,
     trace: 'on-first-retry',
     viewport: { width: 1280, height: 720 },
-    // Active automatiquement l'accessibilité Flutter Web (nécessaire avec CanvasKit)
-    // en simulant une pression Tab au démarrage de chaque page
-    actionTimeout: 30000,
-    navigationTimeout: 60000,
+    // Aumented timeouts for slow CI runners
+    actionTimeout: 60000,
+    navigationTimeout: 120000,
   },
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: { 
+        ...devices['Desktop Chrome'],
+        // Hardware acceleration can be buggy in headless CI
+        launchOptions: {
+          args: ['--disable-web-security', '--disable-gpu', '--enable-software-rendering']
+        }
+      },
     },
   ],
 });

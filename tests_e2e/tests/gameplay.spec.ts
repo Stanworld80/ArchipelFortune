@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { getResilientLocator, robustClick } from './test_utils';
+import { getResilientLocator, robustClick, waitForAppLoaded } from './test_utils';
 
 test.describe('Archipel Fortune Gameplay Loop', () => {
   test.setTimeout(240000); // Gameplay takes time
@@ -9,26 +9,7 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
 
   test.beforeEach(async ({ page }) => {
     await page.goto('/', { waitUntil: 'load', timeout: 60000 });
-    await page.waitForSelector('flutter-view', { timeout: 30000 });
-
-    // activation de l'accessibilité
-    await page.evaluate(() => {
-        const findAndClick = () => {
-            const btns = Array.from(document.querySelectorAll('flt-semantics-placeholder, [aria-label="Enable accessibility"]'));
-            const accessBtn = btns.find(el => el.getAttribute('aria-label') === 'Enable accessibility' || el.textContent?.includes('accessibility'));
-            if (accessBtn instanceof HTMLElement) {
-                accessBtn.click();
-                return true;
-            }
-            return false;
-        };
-        if (!findAndClick()) {
-            window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab' }));
-            setTimeout(findAndClick, 1000);
-        }
-    });
-
-    await page.waitForTimeout(3000);
+    await waitForAppLoaded(page);
   });
 
   test('Full Journey: Register -> Prepare -> Navigate', async ({ page }) => {
