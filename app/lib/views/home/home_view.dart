@@ -9,6 +9,11 @@ import '../game/game_dashboard_view.dart';
 import '../../models/user_model.dart';
 import '../../core/widgets/sprite_button.dart';
 import '../../core/environment.dart';
+import '../pages/help_page.dart';
+import '../pages/about_page.dart';
+import '../pages/privacy_policy_page.dart';
+import '../pages/legal_mentions_page.dart';
+import '../pages/contact_page.dart';
 
 class HomeView extends ConsumerStatefulWidget {
   const HomeView({super.key});
@@ -63,6 +68,26 @@ class _HomeViewState extends ConsumerState<HomeView>
                         Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const AdminView()),
                         );
+                      } else if (value == 'help') {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const HelpPage()),
+                        );
+                      } else if (value == 'about') {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const AboutPage()),
+                        );
+                      } else if (value == 'privacy_policy') {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const PrivacyPolicyPage()),
+                        );
+                      } else if (value == 'legal_mentions') {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const LegalMentionsPage()),
+                        );
+                      } else if (value == 'contact') {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const ContactPage()),
+                        );
                       } else if (value == 'logout') {
                         ref.read(authControllerProvider).signOut();
                       }
@@ -102,6 +127,46 @@ class _HomeViewState extends ConsumerState<HomeView>
                             contentPadding: EdgeInsets.zero,
                           ),
                         ),
+                      const PopupMenuItem<String>(
+                        value: 'help',
+                        child: ListTile(
+                          leading: Icon(Icons.help_outline, color: Color(0xFF3D2B1F)),
+                          title: Text('Aide'),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'about',
+                        child: ListTile(
+                          leading: Icon(Icons.info_outline, color: Color(0xFF3D2B1F)),
+                          title: Text('À propos'),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'privacy_policy',
+                        child: ListTile(
+                          leading: Icon(Icons.privacy_tip_outlined, color: Color(0xFF3D2B1F)),
+                          title: Text('Politique de confidentialité'),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'legal_mentions',
+                        child: ListTile(
+                          leading: Icon(Icons.gavel, color: Color(0xFF3D2B1F)),
+                          title: Text('Mentions légales'),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'contact',
+                        child: ListTile(
+                          leading: Icon(Icons.contact_mail_outlined, color: Color(0xFF3D2B1F)),
+                          title: Text('Contact'),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
                       const PopupMenuItem<String>(
                         value: 'logout',
                         child: ListTile(
