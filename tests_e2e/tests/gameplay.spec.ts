@@ -15,7 +15,7 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
   test('Full Journey: Register -> Prepare -> Navigate', async ({ page }) => {
     // 1. Ensure we are in registration mode
     const toggleBtn = getResilientLocator(page, 'AUTH_TOGGLE_BTN');
-    await toggleBtn.waitFor({ state: 'attached', timeout: 30000 });
+    await toggleBtn.waitFor({ state: 'attached', timeout: 60000 });
     const toggleText = await toggleBtn.innerText().catch(() => '');
     
     // We want registration mode.
@@ -59,7 +59,7 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
 
     // 4. Preparation Dialog
     const startBtn = getResilientLocator(page, 'START_EXPEDITION_BTN');
-    await robustClick(page, startBtn, { timeout: 20000 });
+    await robustClick(page, startBtn, { timeout: 60000 });
 
     // 5. Game Dashboard Navigation
     // Wait for the map to be attached

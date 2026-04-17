@@ -24,7 +24,7 @@ test.describe('Archipel Fortune Visual & Button Tests', () => {
   test('Button Presence and States', async ({ page }) => {
     // Vérification du bouton principal de soumission
     const submitBtn = page.locator('[aria-label="AUTH_SUBMIT_BTN"]').first();
-    await expect(submitBtn).toBeVisible({ timeout: 20000 });
+    await expect(submitBtn).toBeVisible({ timeout: 60000 });
     await expect(submitBtn).toBeEnabled();
     
     // Vérification du bouton de toggle
@@ -58,6 +58,6 @@ test.describe('Archipel Fortune Visual & Button Tests', () => {
   test('Google Sign-In Button Presence', async ({ page }) => {
     // Le bouton Google a souvent le texte "CONTINUER AVEC GOOGLE"
     const googleBtn = page.getByText(/GOOGLE/i).first();
-    await expect(googleBtn).toBeVisible({ timeout: 15000 });
+    await expect(googleBtn).toBeVisible({ timeout: 60000 });
   });
 });

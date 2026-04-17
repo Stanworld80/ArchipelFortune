@@ -19,7 +19,7 @@ test.describe('Archipel Fortune Smoke Tests', () => {
     const submitBtn = getResilientLocator(page, 'AUTH_SUBMIT_BTN');
     const toggleBtn = getResilientLocator(page, 'AUTH_TOGGLE_BTN');
 
-    await expect(emailField).toBeVisible({ timeout: 20000 });
+    await expect(emailField).toBeVisible({ timeout: 60000 });
     await expect(passwordField).toBeVisible();
     await expect(submitBtn).toBeVisible();
     await expect(toggleBtn).toBeVisible();

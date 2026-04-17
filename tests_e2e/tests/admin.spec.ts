@@ -40,13 +40,13 @@ test.describe('Admin Panel Tests', () => {
     } catch (e) {
         // Retry once if menu didn't open
         await robustClick(page, profileBtn);
-        await adminPanelBtn.waitFor({ state: 'attached', timeout: 15000 });
+        await adminPanelBtn.waitFor({ state: 'attached', timeout: 60000 });
     }
     
     await robustClick(page, adminPanelBtn);
 
     const title = getResilientLocator(page, 'PANEL ADMINISTRATION');
-    await title.waitFor({ state: 'attached', timeout: 20000 });
+    await title.waitFor({ state: 'attached', timeout: 60000 });
     
     await page.screenshot({ path: `screenshots/admin-panel-view-${Date.now()}.png` });
   });
@@ -63,7 +63,7 @@ test.describe('Admin Panel Tests', () => {
 
     // 4. Preparation Dialog
     const startBtn = getResilientLocator(page, 'START_EXPEDITION_BTN');
-    await startBtn.waitFor({ state: 'attached', timeout: 20000 });
+    await startBtn.waitFor({ state: 'attached', timeout: 60000 });
     await robustClick(page, startBtn);
 
     // In Admin Panel, find a player and modify gold

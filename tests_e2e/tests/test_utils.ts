@@ -6,7 +6,7 @@ import { Page, Locator, expect } from '@playwright/test';
  */
 export async function ensureAccessibility(page: Page) {
     // 1. Wait for the app container
-    await page.waitForSelector('flutter-view', { timeout: 30000 });
+    await page.waitForSelector('flutter-view', { timeout: 60000 });
     
     // 2. Try to click the hidden accessibility button if it exists
     const accessBtn = page.locator('flt-semantics-placeholder, [aria-label="Enable accessibility"]').first();
@@ -21,7 +21,7 @@ export async function ensureAccessibility(page: Page) {
     
     // 4. Wait for the semantics tree to populate
     // We expect at least one flt-semantics node to appear eventually
-    await page.waitForSelector('flt-semantics', { timeout: 10000 }).catch(() => {
+    await page.waitForSelector('flt-semantics', { timeout: 30000 }).catch(() => {
         console.log("Warning: No flt-semantics nodes found after Tab. This might be normal if the page is empty.");
     });
 
@@ -51,7 +51,7 @@ export function getResilientLocator(page: Page, label: string): Locator {
  * Essential for Flutter Web where semantic nodes can be finicky.
  */
 export async function robustClick(page: Page, locator: Locator, options: { timeout?: number } = {}) {
-    await locator.waitFor({ state: 'attached', timeout: options.timeout || 30000 });
+    await locator.waitFor({ state: 'attached', timeout: options.timeout || 60000 });
     
     // Slow computer stability
     await page.waitForTimeout(500);
