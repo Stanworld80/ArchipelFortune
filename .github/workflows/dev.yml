@@ -277,4 +277,5 @@ jobs:
         working-directory: app
         run: |
           # Integration tests on web require flutter drive and a driver file
-          flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_test.dart -d chrome
+          # We use xvfb-run to provide a virtual display for Chrome in headless CI
+          xvfb-run -a flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_test.dart -d chrome
