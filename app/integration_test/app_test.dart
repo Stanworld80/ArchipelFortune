@@ -28,10 +28,10 @@ void main() {
       await tester.pumpAndSettle(const Duration(seconds: 3));
 
       // 1. Basculer en mode INSCRIPTION
-      final toggleButton = find.textContaining('CRÉER UN PROFIL');
+      final toggleButton = find.bySemanticsLabel('AUTH_TOGGLE_BTN');
       if (toggleButton.evaluate().isNotEmpty) {
         await tester.tap(toggleButton);
-        await tester.pumpAndSettle(const Duration(seconds: 2));
+        await tester.pumpAndSettle(const Duration(seconds: 4));
       }
 
       // 2. Remplir les champs avec des finders de sémantique pour plus de robustesse
