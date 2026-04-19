@@ -70,11 +70,11 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
     await page.screenshot({ path: `screenshots/gameplay-map-${Date.now()}.png` });
 
     // 6. Navigate (Try to rotate or move)
-    const rotateRight = getResilientLocator(page, 'ROTATE_RIGHT_BTN');
-    const moveForward = getResilientLocator(page, 'MOVE_FORWARD_BTN');
+    const moveRight = getResilientLocator(page, 'MOVE_RIGHT_BTN');
+    const moveForward = getResilientLocator(page, 'MOVE_UP_BTN');
 
-    if (await rotateRight.count() > 0) {
-        await robustClick(page, rotateRight);
+    if (await moveRight.count() > 0) {
+        await robustClick(page, moveRight);
         await page.waitForTimeout(2000);
         await robustClick(page, moveForward);
         await page.waitForTimeout(3000);

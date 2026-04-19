@@ -282,15 +282,18 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
 
                       return Transform.translate(
                         offset: Offset(shake, shake / 2),
-                        child: CustomPaint(
-                          painter: MapPainter(
-                            session: session, 
-                            tileSize: MediaQuery.of(context).size.shortestSide / 5,
-                            animationValue: _animationController.value,
-                            background: _mapBg,
-                            shipImage: _shipIcon,
-                            islandImage: _islandIcon,
-                            reefImage: _reefIcon,
+                        child: Semantics(
+                          label: 'SHIP_ICON',
+                          child: CustomPaint(
+                            painter: MapPainter(
+                              session: session, 
+                              tileSize: MediaQuery.of(context).size.shortestSide / 5,
+                              animationValue: _animationController.value,
+                              background: _mapBg,
+                              shipImage: _shipIcon,
+                              islandImage: _islandIcon,
+                              reefImage: _reefIcon,
+                            ),
                           ),
                         ),
                       );
