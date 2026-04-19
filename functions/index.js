@@ -192,9 +192,9 @@ function generateProceduralMap(seed) {
     }
   }
 
-  // Génération des îles (5 îles) avec distance de Manhattan minimale de 7
+  // Génération des îles (9 îles) avec distance de Manhattan minimale de 7
   const islandCoords = [{ x: startX, y: startY }];
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 9; i++) {
     let rx, ry;
     let valid = false;
     let attempts = 0;

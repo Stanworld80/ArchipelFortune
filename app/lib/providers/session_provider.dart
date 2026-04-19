@@ -98,7 +98,7 @@ class SessionNotifier extends Notifier<SessionState?> {
         }
     }
 
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 9; i++) {
       int rx, ry;
       if (i == 0) {
         rx = sX + (rand.nextBool() ? 1 : -1) * (rand.nextInt(3) + 5);
