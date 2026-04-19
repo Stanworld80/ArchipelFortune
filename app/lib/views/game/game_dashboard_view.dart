@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'map_painter.dart';
 import 'loot_overlay.dart';
 import 'bank_overlay.dart';
-import 'fishing_overlay.dart';
+
 import '../../providers/session_provider.dart';
 import '../../models/session_model.dart';
 import 'collections_view.dart';
@@ -106,7 +106,7 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
         ),
         content: Text(
           threshold == 10 
-            ? 'Vos provisions sont basses (moins de 10). Pensez à pêcher ou à accoster bientôt !'
+            ? 'Vos provisions sont basses (moins de 10). Pensez à accoster bientôt !'
             : 'ALERTE : Provisions critiques (moins de 5) ! La famine guette votre équipage.',
           style: const TextStyle(color: Colors.white70, fontSize: 16),
         ),
@@ -393,15 +393,8 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
 
           // --- NOUVEAUX OVERLAYS D'ESCALE ---
           
-          // Phase de Butin (Grattage sur les îles)
           if (session.isAtStopover && session.lootRemaining > 0)
-            Builder(builder: (context) {
-              final currentTile = session.map[session.x][session.y];
-              if (currentTile == TileType.fishing) {
-                return const Positioned.fill(child: FishingOverlay());
-              }
-              return const Positioned.fill(child: LootOverlay());
-            }),
+            const Positioned.fill(child: LootOverlay()),
 
           // Phase de Banque et Ravitaillement
           if (session.isAtStopover && session.lootRemaining == 0)
