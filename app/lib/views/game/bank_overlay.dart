@@ -47,11 +47,7 @@ class BankOverlay extends ConsumerWidget {
                     icon: const Icon(Icons.security),
                     label: const Text('SÉCURISER L\'OR SUR LE PROFIL', style: TextStyle(fontWeight: FontWeight.bold)),
                     onPressed: session.orVolatil > 0 ? () async {
-                      final newPermanentGold = userProfile.piecesOr + session.orVolatil;
-                      // Update Firestore via firestoreServiceProvider
-                      await ref.read(firestoreServiceProvider).updateUserField(userProfile.uid, 'piecesOr', newPermanentGold);
-                      // Reset volatile gold in session
-                      ref.read(sessionProvider.notifier).addLootToCargaison(-session.orVolatil, 0, 0);
+                      await ref.read(sessionProvider.notifier).secureGold();
                     } : null,
                   ),
                   const SizedBox(height: 16),
@@ -82,8 +78,7 @@ class BankOverlay extends ConsumerWidget {
                           style: ElevatedButton.styleFrom(backgroundColor: Colors.red.shade900, foregroundColor: Colors.white),
                           onPressed: () async {
                             if (session.orVolatil > 0) {
-                              final newPermanentGold = userProfile.piecesOr + session.orVolatil;
-                              await ref.read(firestoreServiceProvider).updateUserField(userProfile.uid, 'piecesOr', newPermanentGold);
+                              await ref.read(sessionProvider.notifier).secureGold();
                             }
                             if (context.mounted) {
                               Navigator.of(context).pop();

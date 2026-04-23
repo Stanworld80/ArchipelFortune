@@ -12,9 +12,12 @@ final authStateProvider = StreamProvider<User?>((ref) {
   return ref.watch(authServiceProvider).authStateChanges;
 });
 
-final userProfileProvider = FutureProvider<UserModel?>((ref) async {
+final userProfileProvider = StreamProvider<UserModel?>((ref) async* {
   final user = ref.watch(authStateProvider).value;
-  if (user == null) return null;
+  if (user == null) {
+    yield null;
+    return;
+  }
 
   final firestoreService = ref.watch(firestoreServiceProvider);
   UserModel? profile = await firestoreService.getUserProfile(user.uid);
@@ -42,8 +45,9 @@ final userProfileProvider = FutureProvider<UserModel?>((ref) async {
     await firestoreService.saveUserProfile(profile);
   }
 
-  return profile;
+  yield* firestoreService.getUserProfileStream(user.uid);
 });
+
 
 final authControllerProvider = Provider<AuthController>((ref) {
   return AuthController(ref);

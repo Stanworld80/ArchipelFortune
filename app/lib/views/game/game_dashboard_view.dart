@@ -417,12 +417,20 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
                     const SizedBox(height: 40),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
-                      onPressed: () {
+                      onPressed: () async {
+                        // Sauvegarde de l'or si game over (Naufrage/Famine)
+                        if (session.orVolatil > 0) {
+                          await ref.read(sessionProvider.notifier).secureGold();
+                        }
+                        
                         // Retour au port
-                        Navigator.of(context).pop();
+                        if (context.mounted) {
+                          Navigator.of(context).pop();
+                        }
                       },
                       child: const Text('RETOUR AU PORT'),
                     ),
+
                   ],
                 ),
               ),

@@ -169,7 +169,73 @@ exports.moveShip = onCall(async (request) => {
   }
 
   await sessionRef.update(update);
+
+  // Si la partie se termine, on transfère l'or volatil vers l'or permanent de l'utilisateur
+  if (update.isGameOver) {
+    const finalSessionSnap = await sessionRef.get();
+    const finalSession = finalSessionSnap.data();
+    const goldToTransfer = finalSession.orVolatil || 0;
+    
+    if (goldToTransfer > 0) {
+      const userRef = db.collection("users").doc(auth.uid);
+      await userRef.update({
+        piecesOr: FieldValue.increment(goldToTransfer)
+      });
+    }
+  }
+
   return { success: true };
+});
+
+exports.updateSessionLoot = onCall(async (request) => {
+  const auth = request.auth;
+  if (!auth) throw new HttpsError("unauthenticated", "Auth requise.");
+
+  const { sessionId, gold, wood, provisions } = request.data;
+  const sessionRef = db.collection("sessions").doc(sessionId);
+  const sessionSnap = await sessionRef.get();
+
+  if (!sessionSnap.exists || sessionSnap.data().uid !== auth.uid) {
+    throw new HttpsError("not-found", "Session invalide.");
+  }
+
+  const session = sessionSnap.data();
+  if (session.isGameOver) throw new HttpsError("failed-precondition", "La partie est déjà terminée.");
+
+  await sessionRef.update({
+    orVolatil: FieldValue.increment(gold || 0),
+    wood: FieldValue.increment(wood || 0),
+    provisions: FieldValue.increment(provisions || 0)
+  });
+
+  return { success: true };
+});
+
+exports.secureGold = onCall(async (request) => {
+  const auth = request.auth;
+  if (!auth) throw new HttpsError("unauthenticated", "Auth requise.");
+
+  const { sessionId } = request.data;
+  const sessionRef = db.collection("sessions").doc(sessionId);
+  const sessionSnap = await sessionRef.get();
+
+  if (!sessionSnap.exists || sessionSnap.data().uid !== auth.uid) {
+    throw new HttpsError("not-found", "Session invalide.");
+  }
+
+  const session = sessionSnap.data();
+  const goldToTransfer = session.orVolatil || 0;
+
+  if (goldToTransfer <= 0) return { success: true, transferred: 0 };
+
+  const userRef = db.collection("users").doc(auth.uid);
+  
+  await db.runTransaction(async (t) => {
+    t.update(userRef, { piecesOr: FieldValue.increment(goldToTransfer) });
+    t.update(sessionRef, { orVolatil: 0 });
+  });
+
+  return { success: true, transferred: goldToTransfer };
 });
 
 // Helper pour simuler le Random déterministe

@@ -18,6 +18,17 @@ class FirestoreService {
     }
   }
 
+  // Stream user profile
+  Stream<UserModel?> getUserProfileStream(String uid) {
+    return _db.collection('users').doc(uid).snapshots().map((doc) {
+      if (doc.exists) {
+        return UserModel.fromMap(doc.data() as Map<String, dynamic>);
+      }
+      return null;
+    });
+  }
+
+
   // Create or update user profile
   Future<void> saveUserProfile(UserModel user) async {
     try {

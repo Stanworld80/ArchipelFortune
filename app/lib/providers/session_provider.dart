@@ -319,9 +319,37 @@ class SessionNotifier extends Notifier<SessionState?> {
       boisCharpente: current.boisCharpente + wood,
     );
 
+    // Synchronisation backend (Optionnel mais recommandé pour éviter les pertes)
+    _functions.httpsCallable('updateSessionLoot').call({
+      'sessionId': current.sessionId,
+      'gold': gold,
+      'wood': wood,
+      'provisions': prov,
+    }).catchError((e) => print("Erreur sync loot: $e"));
+
     if (gold >= 50) _logJournal("Directement dans le coffre : +$gold Or !", type: JournalEntryType.loot);
     else if (prov >= 5) _logJournal("Ravitaillement important : +$prov Provisions.", type: JournalEntryType.loot);
     else if (wood >= 2) _logJournal("Réparations effectuées : +$wood Kits.", type: JournalEntryType.loot);
+  }
+
+  Future<void> secureGold() async {
+    final current = state;
+    if (current == null || current.sessionId == null) return;
+
+    try {
+      final result = await _functions.httpsCallable('secureGold').call({
+        'sessionId': current.sessionId,
+      });
+      
+      if (result.data['success'] == true) {
+        state = current.copyWith(
+          orVolatil: 0,
+          statusMessage: "Or sécurisé à la banque !",
+        );
+      }
+    } catch (e) {
+      print("Erreur secure gold: $e");
+    }
   }
 
 
