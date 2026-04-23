@@ -156,14 +156,14 @@ exports.moveShip = onCall(async (request) => {
     update.lootRemaining = 5; // 5 paquets
     update.statusMessage = "Continent atteint ! Objectif final en vue.";
     
-    for (let r = 0; r < MAP_SIZE; r++) {
-      for (let c = 0; c < MAP_SIZE; c++) {
-        if (session.map[r][c] === TileType.continent) {
-          session.map[r][c] = TileType.sea;
-        }
-      }
+    // Optimised boundary-only check since continents are only generated on map edges.
+    for (let i = 0; i < MAP_SIZE; i++) {
+      if (session.map[i * MAP_SIZE] === TileType.continent) session.map[i * MAP_SIZE] = TileType.sea;
+      if (session.map[i * MAP_SIZE + (MAP_SIZE - 1)] === TileType.continent) session.map[i * MAP_SIZE + (MAP_SIZE - 1)] = TileType.sea;
+      if (session.map[i] === TileType.continent) session.map[i] = TileType.sea;
+      if (session.map[(MAP_SIZE - 1) * MAP_SIZE + i] === TileType.continent) session.map[(MAP_SIZE - 1) * MAP_SIZE + i] = TileType.sea;
     }
-    update.map = session.map.flat();
+    update.map = session.map;
   } else {
     update.statusMessage = "Pleine mer...";
   }
