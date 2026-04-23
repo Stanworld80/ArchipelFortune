@@ -11,6 +11,7 @@ setGlobalOptions({ region: "us-central1" });
 
 // Constantes partagées avec le client
 const MAP_SIZE = 64;
+const REEF_COUNT = 180;
 
 const TileType = {
   sea: 0,
@@ -233,7 +234,7 @@ function generateProceduralMap(seed) {
   }
 
   // Récifs
-  for (let i = 0; i < 80; i++) {
+  for (let i = 0; i < REEF_COUNT; i++) {
     const rx = rand.nextInt(MAP_SIZE);
     const ry = rand.nextInt(MAP_SIZE);
     if (map[rx][ry] === TileType.sea) map[rx][ry] = TileType.reef;

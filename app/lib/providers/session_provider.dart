@@ -20,6 +20,7 @@ class SessionNotifier extends Notifier<SessionState?> {
   }
 
   static const int mapSize = 64;
+  static const int reefCount = 180;
 
   int _toInt(dynamic value, [int defaultValue = 0]) => ArchipelUtils.toInt(value, defaultValue);
 
@@ -114,7 +115,7 @@ class SessionNotifier extends Notifier<SessionState?> {
       _spawnLand(map, rx, ry, TileType.island, rand);
     }
 
-    for (int i = 0; i < 80; i++) {
+    for (int i = 0; i < reefCount; i++) {
         int rx = rand.nextInt(mapSize);
         int ry = rand.nextInt(mapSize);
         if ((rx - sX).abs() < 3 && (ry - sY).abs() < 3) continue; // Respect 5x5 sea 
