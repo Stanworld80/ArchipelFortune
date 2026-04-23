@@ -18,13 +18,7 @@ void main() {
       // Vérifier la landing page
       expect(find.textContaining('Fortune'), findsWidgets);
       
-      final embarquerButton = find.widgetWithText(ElevatedButton, 'Embarquer');
-      if (embarquerButton.evaluate().isNotEmpty) {
-        await tester.tap(embarquerButton);
-        await tester.pumpAndSettle(const Duration(seconds: 3));
-      }
-
-      // S'assurer qu'on est au moins sur la page d'auth
+      // On s'assure qu'on est au moins sur la page d'auth
       await tester.pumpAndSettle(const Duration(seconds: 3));
 
       // 1. Basculer en mode INSCRIPTION

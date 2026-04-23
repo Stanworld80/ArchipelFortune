@@ -96,9 +96,10 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
     const journalBtn = getResilientLocator(page, 'JOURNAL_BTN');
     await robustClick(page, journalBtn);
     await page.waitForTimeout(1000);
-    const journalTitle = page.locator('text=Journal de Bord');
+    // Casing match for "JOURNAL DE BORD"
+    const journalTitle = page.locator('text=JOURNAL DE BORD');
     await expect(journalTitle).toBeVisible();
-    const journalClose = page.locator('text=Fermer');
+    const journalClose = page.locator('text=RETOUR À LA NAVIGATION');
     await robustClick(page, journalClose);
     await page.waitForTimeout(500);
   });

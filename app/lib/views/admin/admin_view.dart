@@ -70,10 +70,14 @@ class AdminView extends ConsumerWidget {
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  TextField(
-                    controller: goldController,
-                    decoration: const InputDecoration(labelText: 'Pièces d\'Or'),
-                    keyboardType: TextInputType.number,
+                  Semantics(
+                    label: 'GOLD_INPUT',
+                    textField: true,
+                    child: TextField(
+                      controller: goldController,
+                      decoration: const InputDecoration(labelText: 'Pièces d\'Or'),
+                      keyboardType: TextInputType.number,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   DropdownButtonFormField<String>(
@@ -95,21 +99,28 @@ class AdminView extends ConsumerWidget {
                   onPressed: () => Navigator.pop(context),
                   child: const Text('Annuler'),
                 ),
-                ElevatedButton(
-                  key: const ValueKey('save_user_btn'),
-                  onPressed: () async {
-                    final newGold = int.tryParse(goldController.text) ?? user.piecesOr;
-                    final firestore = ref.read(firestoreServiceProvider);
-                    
-                    if (newGold != user.piecesOr) {
-                      await firestore.updateUserField(user.uid, 'piecesOr', newGold);
-                    }
-                    if (selectedRole != user.role) {
-                      await firestore.updateUserField(user.uid, 'role', selectedRole);
-                    }
-                    if (context.mounted) Navigator.pop(context);
+                Semantics(
+                  label: 'SAVE_USER_BTN',
+                  button: true,
+                  onTap: () {
+                    // Triggers logic
                   },
-                  child: const Text('Sauvegarder'),
+                  child: ElevatedButton(
+                    key: const ValueKey('save_user_btn'),
+                    onPressed: () async {
+                      final newGold = int.tryParse(goldController.text) ?? user.piecesOr;
+                      final firestore = ref.read(firestoreServiceProvider);
+                      
+                      if (newGold != user.piecesOr) {
+                        await firestore.updateUserField(user.uid, 'piecesOr', newGold);
+                      }
+                      if (selectedRole != user.role) {
+                        await firestore.updateUserField(user.uid, 'role', selectedRole);
+                      }
+                      if (context.mounted) Navigator.pop(context);
+                    },
+                    child: const Text('Sauvegarder'),
+                  ),
                 ),
               ],
             );

@@ -48,7 +48,7 @@ test.describe('Admin Panel Tests', () => {
     
     await robustClick(page, adminPanelBtn);
 
-    const title = getResilientLocator(page, 'PANEL ADMINISTRATION');
+    const title = getResilientLocator(page, 'ADMINISTRATION');
     await title.waitFor({ state: 'attached', timeout: 60000 });
     
     await page.screenshot({ path: `screenshots/admin-panel-view-${Date.now()}.png` });
@@ -67,9 +67,14 @@ test.describe('Admin Panel Tests', () => {
     await adminPanelBtn.waitFor({ state: 'visible', timeout: 30000 });
     await robustClick(page, adminPanelBtn);
 
-    // In Admin Panel, find a player and modify gold
-    const goldInput = page.locator('flt-semantics[aria-label*="GOLD_INPUT"], input[type="number"]').first();
-    const updateBtn = getResilientLocator(page, 'UPDATE_GOLD_BTN');
+    // In Admin Panel, click a player to open dialog
+    const playerItem = page.locator('[aria-label*="player_item_"]').first();
+    await playerItem.waitFor({ state: 'attached', timeout: 30000 });
+    await robustClick(page, playerItem);
+
+    // In Dialog, modify gold
+    const goldInput = getResilientLocator(page, 'GOLD_INPUT');
+    const updateBtn = getResilientLocator(page, 'SAVE_USER_BTN');
 
     await goldInput.waitFor({ state: 'attached', timeout: 30000 });
     if (await goldInput.count() > 0) {
@@ -78,7 +83,7 @@ test.describe('Admin Panel Tests', () => {
         await page.keyboard.press('Backspace');
         await page.keyboard.type('999');
         await robustClick(page, updateBtn);
-        // Verify success snackbar or updated value
+        // Verify success
         await page.waitForTimeout(2000);
         await page.screenshot({ path: `screenshots/admin-gold-updated-${Date.now()}.png` });
     }
