@@ -43,7 +43,7 @@ Aucun retour en arrière n'est permis. Le jeu se joue sur une rotation de 90° :
 - **Tribord :** Tourne de +90° puis avance d'une case.
 
 ### Phase 3 : L'Escale
-La carte contient 9 Îles isolées et 1 grand Continent connecté le long d'un bord au hasard. Coster sur une de ces entités ouvre la Phase d'Escale. Les tuiles des îles ne disparaissent plus une fois visitées, elles restent affichées sur la carte du joueur bien qu'elles aient été "pillées".
+La carte contient 9 Îles isolées et 1 grand Continent connecté le long d'un bord au hasard. Accoster sur une de ces entités ouvre la Phase d'Escale. Les tuiles des îles ne disparaissent plus une fois visitées, elles restent affichées sur la carte du joueur bien qu'elles aient été "pillées".
 
 **L'Île :**
 - 5 zones de "butin" pour obtenir divers butins.
@@ -116,7 +116,7 @@ Pendant les "grattages", des objets divers et rares peuvent être gagnés et s'a
 - **Expérience Utilisateur (UX) :** Assurer des transitions visuelles franches (Brouillard plus sombre en mer / Lumière chaude et couleurs vives à l'arrivée sur la plage d'une Île) pour gratifier psychologiquement le joueur du "Soulagement".
 
 ### 6.3 Interactions Réseau et Back-End
-- **Anti-Cheat :** Logique serveur forte via Firebase (Cloud Functions). La génération de carte 36x36 est côté serveur. Les mouvements du joueur sont des "requêtes de déplacement". Le Backend valide l'action, décrémente les provisions, et répond en révélant la seule case sur laquelle le joueur atterrit : "Mer ?", "Récif ?", "Île ?".
+- **Anti-Cheat :** Logique serveur forte via Firebase (Cloud Functions). La génération de carte 64x64 est côté serveur. Les mouvements du joueur sont des "requêtes de déplacement". Le Backend valide l'action, décrémente les provisions, et répond en révélant la case sur laquelle le joueur atterrit.
 - **Gestion Profil & Authentification :** Utilisation de **Firebase Authentication** pour l'identification des joueurs (connexion par Email/Mot de passe ou via **Google Sign-In**) et **Firestore** pour stocker l'Or sécurisé de façon persistante.
 - **Gestion des Droits (Admin & Super Admin) :** 
   - Un **Super Administrateur** est identifié via une variable d'environnement (ex: un email précis forcé dans `APP_ENV` ou `--dart-define=SUPER_ADMIN_EMAIL="..."`).
