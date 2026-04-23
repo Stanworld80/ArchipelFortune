@@ -12,7 +12,15 @@ class JournalView extends ConsumerWidget {
     if (session == null) return const SizedBox.shrink();
 
     final entries = session.journalEntries.reversed.toList();
-    final islandsVisited = session.discoveredIslandCoords.length;
+    
+    int islandsVisited = 0;
+    for (int tile in session.discoveredTiles) {
+      int tx = tile ~/ 64;
+      int ty = tile % 64;
+      if (tx >= 0 && tx < session.map.length && ty >= 0 && ty < session.map[tx].length) {
+        if (session.map[tx][ty] == TileType.island) islandsVisited++;
+      }
+    }
 
     return Dialog(
       backgroundColor: Colors.transparent,
