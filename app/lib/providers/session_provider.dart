@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:meta/meta.dart';
+import 'package:flutter/foundation.dart';
 import '../models/session_model.dart';
 import '../core/utils.dart';
 
@@ -206,7 +206,7 @@ class SessionNotifier extends Notifier<SessionState?> {
       // Dans une version plus robuste, on écouterait le document Firestore (stream).
       internalPredictiveMove(direction);
     } catch (e) {
-      print("Erreur move: $e");
+      debugPrint("Erreur move: $e");
     }
   }
 
@@ -354,7 +354,7 @@ class SessionNotifier extends Notifier<SessionState?> {
           'provisions': prov,
         });
       } catch (e) {
-        print("Erreur sync loot: $e");
+        debugPrint("Erreur sync loot: $e");
       }
     }();
 
@@ -379,7 +379,7 @@ class SessionNotifier extends Notifier<SessionState?> {
         );
       }
     } catch (e) {
-      print("Erreur secure gold: $e");
+      debugPrint("Erreur secure gold: $e");
     }
   }
 
