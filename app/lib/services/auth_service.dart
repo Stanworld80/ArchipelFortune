@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'google_login_stub.dart'
     if (dart.library.html) 'google_login_web.dart'
     if (dart.library.io) 'google_login_mobile.dart';
