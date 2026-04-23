@@ -194,12 +194,13 @@ class _LoginViewState extends ConsumerState<LoginView> {
                                 if (_isLoading)
                                   const CircularProgressIndicator(color: Colors.amber)
                                 else ...[
-                                  Semantics(
-                                    label: 'AUTH_SUBMIT_BTN',
-                                    button: true,
-                                    enabled: true,
-                                    child: _buildActionButton(
-                                      onPressed: _submit,
+                                    Semantics(
+                                      label: 'AUTH_SUBMIT_BTN',
+                                      button: true,
+                                      enabled: !_isLoading,
+                                      onTap: !_isLoading ? _submit : null,
+                                      child: _buildActionButton(
+                                        onPressed: _submit,
                                       label: _isLogin ? 'LANCER L\'AVENTURE' : 'SIGNER LE CONTRAT',
                                       isPrimary: true,
                                       icon: ColorFiltered(
@@ -222,6 +223,11 @@ class _LoginViewState extends ConsumerState<LoginView> {
                                     label: 'AUTH_TOGGLE_BTN',
                                     button: true,
                                     enabled: true,
+                                    onTap: () {
+                                      setState(() {
+                                        _isLogin = !_isLogin;
+                                      });
+                                    },
                                     child: TextButton(
                                       onPressed: () {
                                         setState(() {

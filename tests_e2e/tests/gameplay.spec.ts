@@ -56,6 +56,7 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
     // 3. Start Expedition
     const exploreBtn = getResilientLocator(page, 'EXPLORE_MAIN_BTN');
     await robustClick(page, exploreBtn);
+    await page.waitForTimeout(2000); // Wait for dialog to open
 
     // 4. Preparation Dialog
     const startBtn = getResilientLocator(page, 'START_EXPEDITION_BTN');

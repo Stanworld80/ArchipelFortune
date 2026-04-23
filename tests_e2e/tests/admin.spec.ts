@@ -57,22 +57,21 @@ test.describe('Admin Panel Tests', () => {
   test('Modify Player Gold', async ({ page }) => {
     await performAdminLogin(page);
     
-    // Stability delay for gameplay start
+    // Stability delay
     await page.waitForTimeout(2000);
     
-    // 3. Start Expedition
-    const exploreBtn = getResilientLocator(page, 'EXPLORE_MAIN_BTN');
-    await robustClick(page, exploreBtn);
+    const profileBtn = getResilientLocator(page, 'PROFILE_BTN');
+    await robustClick(page, profileBtn);
 
-    // 4. Preparation Dialog
-    const startBtn = getResilientLocator(page, 'START_EXPEDITION_BTN');
-    await startBtn.waitFor({ state: 'attached', timeout: 60000 });
-    await robustClick(page, startBtn);
+    const adminPanelBtn = page.locator('[aria-label="ADMIN_PANEL_BTN"], flt-semantics:has-text("Panel Admin")').first();
+    await adminPanelBtn.waitFor({ state: 'visible', timeout: 30000 });
+    await robustClick(page, adminPanelBtn);
 
     // In Admin Panel, find a player and modify gold
     const goldInput = page.locator('flt-semantics[aria-label*="GOLD_INPUT"], input[type="number"]').first();
     const updateBtn = getResilientLocator(page, 'UPDATE_GOLD_BTN');
 
+    await goldInput.waitFor({ state: 'attached', timeout: 30000 });
     if (await goldInput.count() > 0) {
         await robustClick(page, goldInput);
         await page.keyboard.press('Control+A');

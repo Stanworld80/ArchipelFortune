@@ -192,6 +192,10 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
             child: Semantics(
               label: 'JOURNAL_BTN',
               button: true,
+              onTap: () => showDialog(
+                context: context,
+                builder: (_) => const JournalView(),
+              ),
               child: IconButton(
                 onPressed: () => showDialog(
                   context: context,
@@ -215,6 +219,10 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
             child: Semantics(
               label: 'MINIMAP_BTN',
               button: true,
+              onTap: () => showDialog(
+                context: context,
+                builder: (_) => const MiniMapView(),
+              ),
               child: IconButton(
                 onPressed: () => showDialog(
                   context: context,

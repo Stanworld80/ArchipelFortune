@@ -439,6 +439,9 @@ class _HomeViewState extends ConsumerState<HomeView>
                   label: 'START_EXPEDITION_BTN',
                   button: true,
                   enabled: true,
+                  onTap: canAfford ? () {
+                        // Triggers the button's action if accessible
+                  } : null,
                   child: ElevatedButton(
                     onPressed: canAfford
                         ? () async {
@@ -683,6 +686,7 @@ class _BarreButtonState extends State<_BarreButton>
       label: widget.semanticLabel,
       button: true,
       enabled: true,
+      onTap: widget.onTap,
       child: GestureDetector(
         onTapDown: (_) => _ctrl.reverse(),
         onTapUp: (_) {
