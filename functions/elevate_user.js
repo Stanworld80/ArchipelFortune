@@ -1,4 +1,5 @@
 const admin = require('firebase-admin');
+const logger = require('firebase-functions/logger');
 
 // Initialize with application default credentials (works if logged in via firebase login)
 admin.initializeApp({
@@ -25,7 +26,7 @@ async function elevateUser(email) {
 
     console.log(`Successfully elevated user ${email} (${uid}) to superAdmin.`);
   } catch (error) {
-    console.error('Error elevating user:', error);
+    logger.error('Error elevating user:', error);
     process.exit(1);
   }
 }
