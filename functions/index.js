@@ -258,9 +258,9 @@ function generateProceduralMap(seed) {
     }
   }
 
-  // Génération des îles (9 îles) avec distance de Manhattan minimale de 7
+  // Génération des îles (50 îles) avec distance de Manhattan minimale de 3
   const islandCoords = [{ x: startX, y: startY }];
-  for (let i = 0; i < 9; i++) {
+  for (let i = 0; i < 50; i++) {
     let rx, ry;
     let valid = false;
     let attempts = 0;
@@ -276,10 +276,10 @@ function generateProceduralMap(seed) {
       }
 
       valid = true;
-      // Vérification de la distance de Manhattan minimale de 7 par rapport au départ et aux autres îles
+      // Vérification de la distance de Manhattan minimale de 3 par rapport au départ et aux autres îles
       for (const other of islandCoords) {
         const dist = Math.abs(rx - other.x) + Math.abs(ry - other.y);
-        if (dist < 7) {
+        if (dist < 3) {
           valid = false;
           break;
         }

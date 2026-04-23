@@ -100,19 +100,44 @@ class SessionNotifier extends Notifier<SessionState?> {
         }
     }
 
-    for (int i = 0; i < 9; i++) {
-      int rx, ry;
-      if (i == 0) {
-        rx = sX + (rand.nextBool() ? 1 : -1) * (rand.nextInt(3) + 5);
-        ry = sY + (rand.nextBool() ? 1 : -1) * (rand.nextInt(3) + 5);
-      } else {
-        rx = rand.nextInt(mapSize - 10) + 5;
-        ry = rand.nextInt(mapSize - 10) + 5;
+    final List<Map<String, int>> islandCoords = [{'x': sX, 'y': sY}];
+    for (int i = 0; i < 50; i++) {
+      int rx = 0, ry = 0;
+      bool valid = false;
+      int attempts = 0;
+
+      while (!valid && attempts < 100) {
+        if (i == 0) {
+          rx = sX + (rand.nextBool() ? 1 : -1) * (rand.nextInt(3) + 7);
+          ry = sY + (rand.nextBool() ? 1 : -1) * (rand.nextInt(3) + 7);
+        } else {
+          // Au moins 9 cases du bord (index 9 à 54 sur une grille de 64)
+          rx = rand.nextInt(mapSize - 18) + 9;
+          ry = rand.nextInt(mapSize - 18) + 9;
+        }
+
+        valid = true;
+        // Vérification de la distance de Manhattan minimale de 3 par rapport au départ et aux autres îles
+        for (final other in islandCoords) {
+          final dist = (rx - other['x']!).abs() + (ry - other['y']!).abs();
+          if (dist < 3) {
+            valid = false;
+            break;
+          }
+        }
+
+        // Sécurité supplémentaire : s'assurer qu'on ne sort pas des 9 cases de marge
+        if (rx < 9 || rx > mapSize - 10 || ry < 9 || ry > mapSize - 10) {
+          valid = false;
+        }
+
+        attempts++;
       }
-      
-      if ((rx - sX).abs() < 3 && (ry - sY).abs() < 3) continue;
-      
-      _spawnLand(map, rx, ry, TileType.island, rand);
+
+      if (valid) {
+        islandCoords.add({'x': rx, 'y': ry});
+        _spawnLand(map, rx, ry, TileType.island, rand);
+      }
     }
 
     for (int i = 0; i < reefCount; i++) {
