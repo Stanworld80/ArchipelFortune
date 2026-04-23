@@ -67,6 +67,7 @@ class SessionNotifier extends Notifier<SessionState?> {
         map: generateMap(seed: actualSeed, startX: startX, startY: startY),
         startTime: DateTime.now(),
         seed: actualSeed,
+        discoveredTiles: _calculateVisibleArea(startX, startY),
       );
       _logJournal("L'expédition Archipel Fortune commence !", type: JournalEntryType.start);
     } catch (e) {
@@ -113,7 +114,7 @@ class SessionNotifier extends Notifier<SessionState?> {
       _spawnLand(map, rx, ry, TileType.island, rand);
     }
 
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 80; i++) {
         int rx = rand.nextInt(mapSize);
         int ry = rand.nextInt(mapSize);
         if ((rx - sX).abs() < 3 && (ry - sY).abs() < 3) continue; // Respect 5x5 sea 
@@ -203,6 +204,9 @@ class SessionNotifier extends Notifier<SessionState?> {
         return;
     }
 
+    final newDiscovered = Set<int>.from(current.discoveredTiles);
+    newDiscovered.addAll(_calculateVisibleArea(nextX, nextY));
+
     TileType tile = current.map[nextX][nextY];
 
     final statusSuffix = "";
@@ -213,7 +217,8 @@ class SessionNotifier extends Notifier<SessionState?> {
       state = current.copyWith(
         isGameOver: true, 
         statusMessage: "Famine ! Plus de provisions pour l'équipage.",
-        provisions: 0
+        provisions: 0,
+        discoveredTiles: newDiscovered
       );
       _logJournal("Famine ! L'équipage n'a plus de provisions.", type: JournalEntryType.incident);
       return;
@@ -229,10 +234,11 @@ class SessionNotifier extends Notifier<SessionState?> {
           provisions: nextProvisions,
           boisCharpente: (current.boisCharpente - 1).clamp(0, 999), 
           statusMessage: "Collision ! -1 Kit Rép.$statusSuffix",
+          discoveredTiles: newDiscovered,
         );
         _logJournal("Collision avec un récif !", type: JournalEntryType.incident);
       } else {
-        state = current.copyWith(isGameOver: true, statusMessage: "Naufrage !");
+        state = current.copyWith(isGameOver: true, statusMessage: "Naufrage !", discoveredTiles: newDiscovered);
         _logJournal("Naufrage !", type: JournalEntryType.incident);
       }
       return;
@@ -240,10 +246,6 @@ class SessionNotifier extends Notifier<SessionState?> {
 
 
     if (tile == TileType.island) {
-        // L'île est pillée, on la transforme en 'sea' pour empêcher de re-looter
-        final newMap = List<List<TileType>>.generate(mapSize, (i) => List<TileType>.from(current.map[i]));
-        newMap[nextX][nextY] = TileType.sea;
-        
         state = current.copyWith(
             x: nextX,
             y: nextY,
@@ -251,8 +253,8 @@ class SessionNotifier extends Notifier<SessionState?> {
             provisions: nextProvisions,
             isAtStopover: true,
             lootRemaining: 2, // 2 paquets
-            map: newMap,
             statusMessage: "Escale ! Butin récupéré.",
+            discoveredTiles: newDiscovered,
         );
         _logJournal("Escale réussie sur une Île ($nextX, $nextY).", type: JournalEntryType.discovery);
         return;
@@ -277,6 +279,7 @@ class SessionNotifier extends Notifier<SessionState?> {
             lootRemaining: 5, // 5 paquets
             map: newMap,
             statusMessage: "Continent atteint ! Objectif final en vue.",
+            discoveredTiles: newDiscovered,
         );
         _logJournal("TERRE EN VUE ! Le continent a été atteint.", type: JournalEntryType.discovery);
         return;
@@ -289,6 +292,7 @@ class SessionNotifier extends Notifier<SessionState?> {
       orientation: newOrientation,
       provisions: nextProvisions,
       statusMessage: "Pleine mer...$statusSuffix",
+      discoveredTiles: newDiscovered,
     );
   }
 
@@ -378,42 +382,7 @@ class SessionNotifier extends Notifier<SessionState?> {
     onUpdate(newCollections);
   }
 
-  void addDiscoveryMap() {
-    final current = state;
-    if (current == null) return;
 
-    // Trouver toutes les cases d'îles ou de continent
-    final List<Map<String, int>> allTargets = [];
-    for (int i = 0; i < mapSize; i++) {
-      for (int j = 0; j < mapSize; j++) {
-        if (current.map[i][j] == TileType.island || current.map[i][j] == TileType.continent) {
-          // Éviter l'île actuelle (grossièrement)
-          if ((i - current.x).abs() > 5 || (j - current.y).abs() > 5) {
-            allTargets.add({'x': i, 'y': j});
-          }
-        }
-      }
-    }
-
-    if (allTargets.isEmpty) return;
-
-    // En choisir une aléatoirement par indice
-    final target = allTargets[Random().nextInt(allTargets.length)];
-    
-    // Éviter les doublons
-    if (current.discoveredIslandCoords.any((c) => c['x'] == target['x'] && c['y'] == target['y'])) {
-      return; 
-    }
-
-    final newList = List<Map<String, int>>.from(current.discoveredIslandCoords);
-    newList.add(target);
-
-    state = current.copyWith(
-      discoveredIslandCoords: newList,
-      statusMessage: "Un nouvel indice sur la carte !",
-    );
-    _logJournal("Nouvel indice sur la carte découvert.", type: JournalEntryType.info);
-  }
 
   void _logJournal(String message, {JournalEntryType type = JournalEntryType.info}) {
     final current = state;
@@ -435,6 +404,20 @@ class SessionNotifier extends Notifier<SessionState?> {
 
   void debugSetState(SessionState? nextState) {
     state = nextState;
+  }
+
+  Set<int> _calculateVisibleArea(int centerX, int centerY) {
+    final Set<int> visible = {};
+    for (int dx = -2; dx <= 2; dx++) {
+      for (int dy = -2; dy <= 2; dy++) {
+        int tx = centerX + dx;
+        int ty = centerY + dy;
+        if (tx >= 0 && tx < mapSize && ty >= 0 && ty < mapSize) {
+          visible.add(tx * mapSize + ty);
+        }
+      }
+    }
+    return visible;
   }
 }
 

@@ -46,38 +46,49 @@ Ce document centralise l'ensemble des fonctionnalités du jeu sous forme de User
 **En tant que** joueur, **je veux** participer à un mini-jeu de pêche avec un filet oscillant pour remonter des trésors ou des objets bonus.
 - **Statut :** ✅ Terminé (FishingOverlay oscillant et butin aléatoire).
 
-### US03 : Exploration du monde (5 Îles)
-**En tant que** joueur, **je veux** pouvoir découvrir au moins 5 îles distinctes dans le monde, **afin que** l'exploration soit consistante.
-- **Statut :** ✅ Terminé (Carte étendue à 50x50 et génération de 5 îles au lieu de 3).
+### US03 : Exploration du monde (9 Îles)
+**En tant que** joueur, **je veux** pouvoir découvrir au moins 9 îles distinctes dans le monde de grande taille, **afin que** l'exploration soit consistante.
+- **Statut :** ✅ Terminé (Carte étendue à 64x64 et génération de 9 îles au lieu de 5).
 
 ### US04 : Indices de découverte (Cartes Mystérieuses)
 **En tant que** joueur, **je veux** trouver des "cartes mystérieuses" donnant des indices visuels sur la position d'autres îles.
-- **Statut :** ✅ Terminé (Loot de cartes et pings visuels sur la bordure de vision).
+- **Statut :** ❌ Retiré (Le jeu a été simplifié et ce mécanisme visuel a été retiré, favorisant la Mini-Carte intégrée).
 
 ---
 
-## 3. Fonctionnalités à Venir (Backlog)
+## 3. Fonctionnalités Simplifiées (Retirées du périmètre)
 
 ### US05 : Diversité thématique des îles
-**En tant que** joueur, **je veux** que les îles aient des styles variés (Caraïbes, Nordique, Jungle, etc.) avec des points d'intérêt spécifiques.
-- **Statut :** ✅ Terminé (Biomes Tropique, Nordique et Jungle implémentés avec types de cases dédiés, plus POIs : Volcans et Temples).
+**Statut :** ❌ Retiré (Reste limité à 5 types de terrain de base standard).
 
 ### US09 : Événements Aléatoires
-**En tant que** joueur, **je veux** rencontrer des événements imprévus lors de ma navigation.
-- **Statut :** ✅ Terminé (Épaves dérivantes fournissant des kits de réparation ajoutées en mer).
+**Statut :** ❌ Retiré.
 
 ### US10 : Météo Dynamique et Ambiances Visuelles
-**En tant que** joueur, **je veux** que l'ambiance visuelle s'adapte à l'environnement.
-- **Statut :** ✅ Terminé (Effets de pluie dans la jungle, neige en zone nordique et brume sur l'océan implémentés).
+**Statut :** ❌ Retiré.
 
 ### US11 : Rencontres de Pirates et Système de Combat
-**En tant que** joueur, **je veux** affronter des ennemis pour gagner des récompenses ou protéger mes ressources.
-- **Statut :** ✅ Terminé (Navires pirates ajoutés sur la carte avec résolution de combat aléatoire impactant les ressources).
+**Statut :** ❌ Retiré.
 
 ### US12 : Système de Progression et Améliorations du Navire
-**En tant que** joueur, **je veux** dépenser mon or pour améliorer les capacités de mon navire.
-- **Statut :** ✅ Terminé (Atelier Naval implémenté avec niveaux pour la Coque, les Voiles et la Soute).
+**Statut :** ❌ Retiré (Seulement base UI).
 
-### US13 : Système de Quêtes et Journal d'Aventure
-**En tant que** joueur, **je veux** des objectifs clairs à accomplir pour gagner des récompenses.
-- **Statut :** ✅ Terminé (Journal d'aventure implémenté, suivi en temps réel de l'or et de l'exploration).
+### US13 : Système de Quêtes
+**Statut :** ❌ Retiré.
+
+---
+
+## 4. Nouvelles Fonctionnalités Récentes
+
+### US14 : Mini-Carte et Brouillard de Guerre Exploratoire
+**En tant que** joueur, **je veux** pouvoir ouvrir une mini-carte montrant la grille intégrale 64x64 gardant en mémoire toutes les tuiles que mon navire a explorées, **afin de** me repérer précisément.
+- **Statut :** ✅ Terminé (Sauvegarde des tuiles découvertes dans `SessionState` et affichage Modale).
+
+### US15 : Journal de Bord d'Expédition
+**En tant que** joueur, **je veux** consulter un journal de bord listant l'historique de l'expédition actuelle, **afin de** comprendre l'évolution du voyage et les découvertes.
+- **Statut :** ✅ Terminé (Journal UI et Logging implémentés au niveau du SessionNotifier).
+
+### US16 : Économie de Préparation Réajustée
+**En tant que** joueur, **je veux** que les coûts et dotations par défaut encouragent un meilleur départ sans ruiner la trésorerie.
+- **Statut :** ✅ Terminé (5 Or = 20 Provisions, Départ avec 2 kits de charpente suggérés).
+

@@ -149,8 +149,7 @@ exports.moveShip = onCall(async (request) => {
     update.lootRemaining = 2; // 2 paquets
     update.statusMessage = "Escale ! Butin récupéré.";
     
-    session.map[nextX][nextY] = TileType.sea;
-    update.map = session.map.flat();
+
   } else if (tileType === TileType.continent) {
     update.isAtStopover = true;
     update.lootRemaining = 5; // 5 paquets
@@ -234,7 +233,7 @@ function generateProceduralMap(seed) {
   }
 
   // Récifs
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 80; i++) {
     const rx = rand.nextInt(MAP_SIZE);
     const ry = rand.nextInt(MAP_SIZE);
     if (map[rx][ry] === TileType.sea) map[rx][ry] = TileType.reef;

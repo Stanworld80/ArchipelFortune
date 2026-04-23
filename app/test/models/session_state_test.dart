@@ -22,6 +22,8 @@ void main() {
         startTime: DateTime.now(),
         inventory: ['item1', 'item2'],
         collections: {'set1': 1},
+        discoveredTiles: {100, 200},
+        journalEntries: [JournalEntry(message: 'Test message', timestamp: DateTime.now(), type: JournalEntryType.start)],
       );
 
       final map = sessionState.toMap();
@@ -36,6 +38,9 @@ void main() {
       expect(reconstructed.boisCharpente, sessionState.boisCharpente);
       expect(reconstructed.inventory, sessionState.inventory);
       expect(reconstructed.collections, sessionState.collections);
+      expect(reconstructed.discoveredTiles, sessionState.discoveredTiles);
+      expect(reconstructed.journalEntries.length, 1);
+      expect(reconstructed.journalEntries.first.message, 'Test message');
       
       // Check map reconstruction
       expect(reconstructed.map.length, 64);

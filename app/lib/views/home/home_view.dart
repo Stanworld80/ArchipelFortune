@@ -354,7 +354,7 @@ class _HomeViewState extends ConsumerState<HomeView>
   void _showPreparationDialog(
       BuildContext context, WidgetRef ref, UserModel profile) {
     int provisionsToBuy = 20;
-    int woodToBuy = 1;
+    int woodToBuy = 2;
 
     showDialog(
       context: context,

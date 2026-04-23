@@ -62,8 +62,8 @@ class SessionState {
   final bool isGameOver;
   final String? statusMessage;
   final Map<String, int> collections; // Ex: {"panoplie_pirate": 2}
-  final List<Map<String, int>> discoveredIslandCoords; // Liste de {x, y}
     final int seed;
+  final Set<int> discoveredTiles;
   final List<JournalEntry> journalEntries;
 
 
@@ -86,8 +86,8 @@ class SessionState {
     this.isGameOver = false,
     this.statusMessage,
     this.collections = const {},
-    this.discoveredIslandCoords = const [],
     this.seed = 0,
+    this.discoveredTiles = const {},
     this.journalEntries = const [],
   });
 
@@ -110,8 +110,8 @@ class SessionState {
     bool? isGameOver,
     String? statusMessage,
     String? sessionId,
-    List<Map<String, int>>? discoveredIslandCoords,
     int? seed,
+    Set<int>? discoveredTiles,
     List<JournalEntry>? journalEntries,
   }) {
 
@@ -134,8 +134,8 @@ class SessionState {
       startTime: startTime,
       isGameOver: isGameOver ?? this.isGameOver,
       statusMessage: statusMessage ?? this.statusMessage,
-      discoveredIslandCoords: discoveredIslandCoords ?? this.discoveredIslandCoords,
       seed: seed ?? this.seed,
+      discoveredTiles: discoveredTiles ?? this.discoveredTiles,
       journalEntries: journalEntries ?? this.journalEntries,
     );
 
@@ -161,8 +161,8 @@ class SessionState {
       'isGameOver': isGameOver,
       'statusMessage': statusMessage,
       'collections': collections,
-      'discoveredIslandCoords': discoveredIslandCoords,
       'seed': seed,
+      'discoveredTiles': discoveredTiles.toList(),
       'journalEntries': journalEntries.map((e) => e.toMap()).toList(),
     };
 
@@ -210,8 +210,8 @@ class SessionState {
       isGameOver: mapData['isGameOver'] ?? false,
       statusMessage: mapData['statusMessage']?.toString(),
       collections: Map<String, int>.from(mapData['collections'] ?? {}),
-      discoveredIslandCoords: (mapData['discoveredIslandCoords'] as List? ?? []).map((e) => Map<String, int>.from(e as Map)).toList(),
       seed: toInt(mapData['seed']),
+      discoveredTiles: (mapData['discoveredTiles'] as List? ?? []).map((e) => toInt(e)).toSet(),
       journalEntries: (mapData['journalEntries'] as List? ?? []).map((e) => JournalEntry.fromMap(Map<String, dynamic>.from(e))).toList(),
     );
 

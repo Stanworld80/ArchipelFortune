@@ -30,10 +30,11 @@ Le jeu commence sur une ile sécurisée (Port de Départ) à un endroit aléatoi
 - **Récompense de départ :** Le joueur a droit à un "grattage" gratuit de caisses de ravitaillement pour obtenir un petit bonus (Provisions additionnelles ou Kits de Réparation).
 
 ### Phase 2 : En Haute Mer
-- **Carte :** Matrice générée de **36x36** cases. Elle n'est générée et connue que côté serveur (Anti-Cheat).
+- **Carte :** Matrice générée de **64x64** cases. Elle n'est générée et connue que côté serveur (Anti-Cheat).
 - **Vision (Limitation) :** Le joueur n'a qu'un aperçu d'une grille **5x5** autour du navire. Le reste est caché (Brouillard de guerre).
-- **Position d'affichage :** Le navire reste fixe au centre de la vue. Ce sont les éléments de la carte qui glissent.
-- **Les Dangers (Récifs) :** Naviguer sur un récif à 50% de chance de détruire le navire (Game Over) à moins de posséder un Kit de Réparation, il est alors automatiquement consommé si besoin.
+- **Cartographie :** Une fonctionnalité de Mini-Carte permet au joueur de visualiser la totalité des 64x64 cases, dévoilant de façon permanente (sans brouillard) toutes les tuiles explorées. Le navire est repositionné sur cette vue.
+- **Position d'affichage :** Le navire reste fixe au centre de la vue (lors de la navigation principale). Ce sont les éléments de la carte qui glissent.
+- **Les Dangers (Récifs) :** Naviguer sur un récif à 50% de chance de détruire le navire (Game Over) à moins de posséder un Kit de Réparation, il est alors automatiquement consommé si besoin. Ils sont désormais très fréquents (Génération augmentée).
 
 **Mouvements & Navigation relative (Coût : 1 Provision)** :
 Aucun retour en arrière n'est permis. Le jeu se joue sur une rotation de 90° :
@@ -42,7 +43,7 @@ Aucun retour en arrière n'est permis. Le jeu se joue sur une rotation de 90° :
 - **Tribord :** Tourne de +90° puis avance d'une case.
 
 ### Phase 3 : L'Escale
-La carte contient 5 Îles isolées et 1 grand Continent connecté le long d'un bord au hasard. Coster sur une de ces entités ouvre la Phase d'Escale.
+La carte contient 9 Îles isolées et 1 grand Continent connecté le long d'un bord au hasard. Coster sur une de ces entités ouvre la Phase d'Escale. Les tuiles des îles ne disparaissent plus une fois visitées, elles restent affichées sur la carte du joueur bien qu'elles aient été "pillées".
 
 **L'Île :**
 - 5 zones de "butin" pour obtenir divers butins.
@@ -57,13 +58,12 @@ La carte contient 5 Îles isolées et 1 grand Continent connecté le long d'un b
   - **Pièces d'or** (2, 5, 10, 25 ou 50, les gros montants étant les plus rares).
   - **Éléments de kit de réparation** (5 éléments nécessaires pour constituer 1 kit complet).
   - **Éléments de kit de provisions** (5 éléments nécessaires pour constituer 1 kit complet offrant 5 Provisions).
-  - **Cartes mystérieuses** (Révèlent un point d'intérêt / une île sur la carte à la fin de la série).
   - **Déchets** (Aucune utilité).
 - **Apparition visuelle :** Paquets de 6 tombant dans une grille de 3x2. 2 paquets à gratter lors d'une escale sur une île (5 pour le Continent). Leur contenu est révélé en interagissant avec, puis l'ensemble du butin crafté est ajouté à votre soute à la fin.
 
-**La Banque du Capitaine :**
+**La Banque du Capitaine & Marché de Départ:**
 - *Sécuriser* : Convertir "Or en main" en "Pièces d'Or".
-- *Se Ravitailler* : Dépenser des "Pièces d'Or Sécurisées" pour payer de nouvelles Provisions.
+- *Se Ravitailler (Début)* : Dépenser des "Pièces d'Or Sécurisées" pour acheter de nouvelles Provisions. Formule ajustée : 5 d'Or = 20 Provisions. L'équipement de base par défaut fourni est de 20 Provisions et 2 kits de réparation.
 - *Risquer plus* : Retirer des "Pièces d'Or Sécurisées" en "Or en main" (Optionnel selon Gameplay visé mais indiqué).
 
 **Le Choix Fin d'Escale (sur l'Île) :**
@@ -106,6 +106,8 @@ Pendant les "grattages", des objets divers et rares peuvent être gagnés et s'a
 - **State Management :** Utilisation de **Riverpod** (ou Provider) pour gérer :
   - Les ressources : `OrPermanent`, `OrVolatile`, `Provisions`, `Kits de Réparation`.
   - L'état de Session : "Au Port", "En Navigation", "En Escale Île", "Au Continent", "GameOver".
+  - Les historiques d'événements : Le Journal de bord intégré mémorise divers événements durant le trajet.
+  - Les tuiles découvertes : `discoveredTiles` mémorise globalement chaque tuile visitée par la vue 5x5.
   - Les objets contenus en soute.
 
 ### 6.2 Rendering et Expérience Utilisateur

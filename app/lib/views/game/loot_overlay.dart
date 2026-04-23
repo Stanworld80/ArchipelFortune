@@ -27,7 +27,7 @@ class _LootOverlayState extends State<LootOverlay> {
   int _provisionKitsGained = 0;
   
   // Special items
-  int _mapsFound = 0;
+
 
   @override
   void initState() {
@@ -35,7 +35,7 @@ class _LootOverlayState extends State<LootOverlay> {
     _goldGained = 0;
     _repairKitsGained = 0;
     _provisionKitsGained = 0;
-    _mapsFound = 0;
+
     _repairPartsFound.clear();
     _provisionPartsFound = 0;
     _generateCrates();
@@ -77,15 +77,10 @@ class _LootOverlayState extends State<LootOverlay> {
         return _CrateContent(type: 'repair_part', value: 1, icon: Icons.build, color: Colors.brown, label: part['nom'], itemId: part['id']);
       }
       
-      // -- Éléments Kit de provisions (25%)
-      if (roll < 95) {
-         final provs = ['Poisson', 'Viande', 'Bouteille de vin', 'Eau'];
-         final p = provs[rand.nextInt(provs.length)];
-         return _CrateContent(type: 'prov_part', value: 1, icon: Icons.fastfood, color: Colors.redAccent, label: p);
-      }
-      
-      // -- Carte mystérieuse (5%)
-      return _CrateContent(type: 'map', value: 1, icon: Icons.map, color: Colors.tealAccent, label: "Carte mystérieuse");
+      // -- Éléments Kit de provisions (30%)
+      final provs = ['Poisson', 'Viande', 'Bouteille de vin', 'Eau'];
+      final p = provs[rand.nextInt(provs.length)];
+      return _CrateContent(type: 'prov_part', value: 1, icon: Icons.fastfood, color: Colors.redAccent, label: p);
     });
     
     _allRevealed = false;
@@ -107,8 +102,6 @@ class _LootOverlayState extends State<LootOverlay> {
           _provisionKitsGained++;
           _provisionPartsFound = 0;
        }
-    } else if (content.type == 'map') {
-       _mapsFound++;
     }
     
     if (_crates.every((c) => c.revealed)) {
@@ -238,10 +231,7 @@ class _LootOverlayState extends State<LootOverlay> {
                             // On considère qu'un kit de provisions donne 5 unités de provisions au bateau
                             ref.read(sessionProvider.notifier).addLootToCargaison(_goldGained, _provisionKitsGained * 5, _repairKitsGained);
                             
-                            for (int i = 0; i < _mapsFound; i++) {
-                              ref.read(sessionProvider.notifier).addDiscoveryMap();
-                            }
-                            
+
                             ref.read(sessionProvider.notifier).endLootSerie();
                           }
                         } : null,

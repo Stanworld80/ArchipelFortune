@@ -80,5 +80,25 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
         await page.waitForTimeout(3000);
         await page.screenshot({ path: `screenshots/gameplay-moved-${Date.now()}.png` });
     }
+
+    // 7. Check Minimap
+    const mapBtn = getResilientLocator(page, 'MINIMAP_BTN');
+    await robustClick(page, mapBtn);
+    await page.waitForTimeout(1000);
+    // Dialog should show "Carte du Monde" or "Fermer"
+    const mapClose = page.locator('text=Fermer');
+    await expect(mapClose).toBeVisible();
+    await robustClick(page, mapClose);
+    await page.waitForTimeout(500);
+
+    // 8. Check Journal
+    const journalBtn = getResilientLocator(page, 'JOURNAL_BTN');
+    await robustClick(page, journalBtn);
+    await page.waitForTimeout(1000);
+    const journalTitle = page.locator('text=Journal de Bord');
+    await expect(journalTitle).toBeVisible();
+    const journalClose = page.locator('text=Fermer');
+    await robustClick(page, journalClose);
+    await page.waitForTimeout(500);
   });
 });

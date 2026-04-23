@@ -11,7 +11,7 @@ import '../../providers/session_provider.dart';
 import '../../models/session_model.dart';
 import 'collections_view.dart';
 import 'journal_view.dart';
-
+import 'minimap_view.dart';
 
 class GameDashboardView extends ConsumerStatefulWidget {
   const GameDashboardView({super.key});
@@ -189,22 +189,48 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
           // Bouton Journal
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
-            child: IconButton(
-              onPressed: () => showDialog(
-                context: context,
-                builder: (_) => const JournalView(),
-              ),
-              icon: const Icon(Icons.history_edu, size: 20),
-              tooltip: 'Journal de bord',
-              style: IconButton.styleFrom(
-                backgroundColor: Colors.teal.shade900.withValues(alpha: 0.4),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.all(4),
+            child: Semantics(
+              label: 'JOURNAL_BTN',
+              button: true,
+              child: IconButton(
+                onPressed: () => showDialog(
+                  context: context,
+                  builder: (_) => const JournalView(),
+                ),
+                icon: const Icon(Icons.history_edu, size: 20),
+                tooltip: 'Journal de bord',
+                style: IconButton.styleFrom(
+                  backgroundColor: Colors.teal.shade900.withValues(alpha: 0.4),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.all(4),
+                ),
               ),
             ),
           ),
           const SizedBox(width: 8),
 
+          // Bouton Minimap
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Semantics(
+              label: 'MINIMAP_BTN',
+              button: true,
+              child: IconButton(
+                onPressed: () => showDialog(
+                  context: context,
+                  builder: (_) => const MiniMapView(),
+                ),
+                icon: const Icon(Icons.map, size: 20),
+                tooltip: 'Carte du Monde',
+                style: IconButton.styleFrom(
+                  backgroundColor: Colors.teal.shade900.withValues(alpha: 0.4),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.all(4),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
           
           // Or
           Center(

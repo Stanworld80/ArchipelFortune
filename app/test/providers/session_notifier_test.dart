@@ -33,7 +33,7 @@ void main() {
 
     test('internalPredictiveMove should consume provisions and update state', () {
       final notifier = container.read(sessionProvider.notifier);
-      final mapSize = 36;
+      final mapSize = 64;
       final mockMap = List.generate(
         mapSize,
         (_) => List.generate(mapSize, (_) => TileType.sea),
@@ -48,6 +48,7 @@ void main() {
         boisCharpente: 0,
         map: mockMap,
         startTime: DateTime.now(),
+        discoveredTiles: {18 * 64 + 18}, // Initial discovered center
       );
 
       notifier.debugSetState(initialState);
@@ -61,11 +62,12 @@ void main() {
       expect(state.y, 17);
       expect(state.provisions, 9);
       expect(state.statusMessage, contains("Pleine mer"));
+      expect(state.discoveredTiles.contains(18 * 64 + 17), isTrue); // Should add current tile
     });
 
     test('internalPredictiveMove should handle port/starboard rotation', () {
       final notifier = container.read(sessionProvider.notifier);
-      final mapSize = 36;
+      final mapSize = 64;
       final mockMap = List.generate(
         mapSize,
         (_) => List.generate(mapSize, (_) => TileType.sea),

@@ -123,9 +123,6 @@ class MapPainter extends CustomPainter {
 
     canvas.restore();
 
-    // Dessin des indices de découverte (US04)
-    _drawDiscoveryIndices(canvas, visionRadius, actualTileSize, gridPadding);
-
     // Dessin de la météo (US10)
     // _drawWeather(canvas, size, visionRadius);
   }
@@ -192,35 +189,7 @@ class MapPainter extends CustomPainter {
     canvas.drawRect(Rect.fromLTWH(size/6, -size/10, 2, size/2.5), Paint()..color = Colors.brown);
   }
 
-  void _drawDiscoveryIndices(Canvas canvas, int visionRadius, double tileSize, double padding) {
-    if (session.discoveredIslandCoords.isEmpty) return;
 
-    final paintIndex = Paint()
-      ..color = Colors.tealAccent.withOpacity(0.8)
-      ..style = PaintingStyle.fill;
-
-    for (var coord in session.discoveredIslandCoords) {
-      final int tx = coord['x']!;
-      final int ty = coord['y']!;
-
-      final dx = tx - session.x;
-      final dy = ty - session.y;
-
-      if (dx.abs() > visionRadius || dy.abs() > visionRadius) {
-        double edgeX = dx.toDouble();
-        double edgeY = dy.toDouble();
-        
-        final double maxCoord = max(edgeX.abs(), edgeY.abs());
-        edgeX = (edgeX / maxCoord) * (visionRadius + 0.5) * tileSize;
-        edgeY = (edgeY / maxCoord) * (visionRadius + 0.5) * tileSize;
-
-        final center = Offset(padding + (visionRadius * tileSize) + edgeX + tileSize/2, padding + (visionRadius * tileSize) + edgeY + tileSize/2);
-        
-        canvas.drawCircle(center, 6, paintIndex);
-        canvas.drawCircle(center, 12, Paint()..color = Colors.tealAccent.withOpacity(0.2)..style = PaintingStyle.stroke..strokeWidth = 2);
-      }
-    }
-  }
 
 
   @override
