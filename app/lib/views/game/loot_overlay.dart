@@ -15,6 +15,7 @@ class _LootOverlayState extends State<LootOverlay> {
   late List<_CrateContent> _crates;
   bool _allRevealed = false;
   bool _isAutoRevealing = false;
+  bool _isSaving = false;
   
   int _goldGained = 0;
   
@@ -217,25 +218,34 @@ class _LootOverlayState extends State<LootOverlay> {
                   Stack(
                     clipBehavior: Clip.none,
                     children: [
-                      _RoundActionButton(
-                        icon: session.lootRemaining > 1 ? Icons.arrow_forward : Icons.check,
-                        label: session.lootRemaining > 1 ? "SUIVANT" : "FIN",
-                        color: Colors.amber,
-                        onPressed: _allRevealed ? () {
-                          if (session.lootRemaining > 1) {
-                            // On passe au paquet suivant en gardant la progression
-                            ref.read(sessionProvider.notifier).endLootSerie();
-                            setState(() => _generateCrates());
-                          } else {
-                            // Fin du Loot - Les pièces incomplètes sont perdues
-                            // On considère qu'un kit de provisions donne 5 unités de provisions au bateau
-                            ref.read(sessionProvider.notifier).addLootToCargaison(_goldGained, _provisionKitsGained * 5, _repairKitsGained);
-                            
+                      if (_isSaving)
+                        const Padding(
+                          padding: EdgeInsets.all(12.0),
+                          child: CircularProgressIndicator(color: Colors.amber),
+                        )
+                      else
+                        _RoundActionButton(
+                          icon: session.lootRemaining > 1 ? Icons.arrow_forward : Icons.check,
+                          label: session.lootRemaining > 1 ? "SUIVANT" : "FIN",
+                          color: Colors.amber,
+                          onPressed: _allRevealed && !_isSaving ? () async {
+                            if (session.lootRemaining > 1) {
+                              // On passe au paquet suivant en gardant la progression
+                              ref.read(sessionProvider.notifier).endLootSerie();
+                              setState(() => _generateCrates());
+                            } else {
+                              setState(() => _isSaving = true);
+                              // Fin du Loot - Les pièces incomplètes sont perdues
+                              // On considère qu'un kit de provisions donne 5 unités de provisions au bateau
+                              await ref.read(sessionProvider.notifier).addLootToCargaison(_goldGained, _provisionKitsGained * 5, _repairKitsGained);
 
-                            ref.read(sessionProvider.notifier).endLootSerie();
-                          }
-                        } : null,
-                      ),
+                              if (mounted) {
+                                ref.read(sessionProvider.notifier).endLootSerie();
+                                setState(() => _isSaving = false);
+                              }
+                            }
+                          } : null,
+                        ),
                       if (session.lootRemaining > 1)
                         Positioned(
                           right: -5,

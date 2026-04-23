@@ -1,7 +1,7 @@
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:meta/meta.dart';
 import '../models/session_model.dart';
 import '../core/utils.dart';
 
@@ -334,7 +334,7 @@ class SessionNotifier extends Notifier<SessionState?> {
     state = current.copyWith(lootRemaining: current.lootRemaining - 1);
   }
 
-  void addLootToCargaison(int gold, int prov, int wood) {
+  Future<void> addLootToCargaison(int gold, int prov, int wood) async {
     final current = state;
     if (current == null) return;
     
@@ -344,19 +344,17 @@ class SessionNotifier extends Notifier<SessionState?> {
       boisCharpente: current.boisCharpente + wood,
     );
 
-    // Synchronisation backend (Optionnel mais recommandé pour éviter les pertes)
-    () async {
-      try {
-        await _functions.httpsCallable('updateSessionLoot').call({
-          'sessionId': current.sessionId,
-          'gold': gold,
-          'wood': wood,
-          'provisions': prov,
-        });
-      } catch (e) {
-        print("Erreur sync loot: $e");
-      }
-    }();
+    // Synchronisation backend
+    try {
+      await _functions.httpsCallable('updateSessionLoot').call({
+        'sessionId': current.sessionId,
+        'gold': gold,
+        'wood': wood,
+        'provisions': prov,
+      });
+    } catch (e) {
+      debugPrint("Erreur sync loot: $e");
+    }
 
     if (gold >= 50) _logJournal("Directement dans le coffre : +$gold Or !", type: JournalEntryType.loot);
     else if (prov >= 5) _logJournal("Ravitaillement important : +$prov Provisions.", type: JournalEntryType.loot);

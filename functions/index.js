@@ -172,16 +172,21 @@ exports.moveShip = onCall(async (request) => {
 
   // Si la partie se termine, on transfère l'or volatil vers l'or permanent de l'utilisateur
   if (update.isGameOver) {
-    const finalSessionSnap = await sessionRef.get();
-    const finalSession = finalSessionSnap.data();
-    const goldToTransfer = finalSession.orVolatil || 0;
-    
-    if (goldToTransfer > 0) {
-      const userRef = db.collection("users").doc(auth.uid);
-      await userRef.update({
-        piecesOr: FieldValue.increment(goldToTransfer)
-      });
-    }
+    const userRef = db.collection("users").doc(auth.uid);
+    await db.runTransaction(async (t) => {
+      const finalSessionSnap = await t.get(sessionRef);
+      const finalSession = finalSessionSnap.data();
+      const goldToTransfer = finalSession.orVolatil || 0;
+
+      if (goldToTransfer > 0) {
+        t.update(userRef, {
+          piecesOr: FieldValue.increment(goldToTransfer)
+        });
+        t.update(sessionRef, {
+          orVolatil: 0
+        });
+      }
+    });
   }
 
   return { success: true };
@@ -217,20 +222,21 @@ exports.secureGold = onCall(async (request) => {
 
   const { sessionId } = request.data;
   const sessionRef = db.collection("sessions").doc(sessionId);
-  const sessionSnap = await sessionRef.get();
-
-  if (!sessionSnap.exists || sessionSnap.data().uid !== auth.uid) {
-    throw new HttpsError("not-found", "Session invalide.");
-  }
-
-  const session = sessionSnap.data();
-  const goldToTransfer = session.orVolatil || 0;
-
-  if (goldToTransfer <= 0) return { success: true, transferred: 0 };
-
   const userRef = db.collection("users").doc(auth.uid);
-  
+
+  let goldToTransfer = 0;
   await db.runTransaction(async (t) => {
+    const sessionSnap = await t.get(sessionRef);
+
+    if (!sessionSnap.exists || sessionSnap.data().uid !== auth.uid) {
+      throw new HttpsError("not-found", "Session invalide.");
+    }
+
+    const session = sessionSnap.data();
+    goldToTransfer = session.orVolatil || 0;
+
+    if (goldToTransfer <= 0) return;
+
     t.update(userRef, { piecesOr: FieldValue.increment(goldToTransfer) });
     t.update(sessionRef, { orVolatil: 0 });
   });
