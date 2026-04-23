@@ -19,18 +19,12 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
     const toggleText = await toggleBtn.innerText().catch(() => '');
     
     // We want registration mode.
-    // "CRÉER UN PROFIL" usually means we are in Login mode and can switch to Register.
+    // "CRÉER UN PROFIL" means we are in Login mode and must switch to Register.
     if (toggleText.includes('CRÉER UN PROFIL') || toggleText.includes('RECRUE')) {
       await robustClick(page, toggleBtn);
       await page.waitForTimeout(1000);
     }
-
-    // If we want to LOGIN, but the toggle says "DÉJÀ MEMBRE ? SE CONNECTER",
-    // it means we are currently in REGISTER mode. Click to switch.
-    if (toggleText.includes('DÉJÀ MEMBRE') || toggleText.includes('CONNECTER')) {
-        await robustClick(page, toggleBtn);
-        await page.waitForTimeout(1000);
-    }
+    // If it already says "DÉJÀ MEMBRE", we are in Register mode, do nothing.
 
     // Fill email
     const emailField = getResilientLocator(page, 'AUTH_EMAIL_FIELD');

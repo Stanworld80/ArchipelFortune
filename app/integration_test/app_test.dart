@@ -48,7 +48,7 @@ void main() {
 
       await tester.tap(submitButton);
       // On attend que la navigation ou l'erreur arrive (Firebase met du temps)
-      await tester.pumpAndSettle(const Duration(seconds: 8));
+      await tester.pump(const Duration(seconds: 8));
       
       // On vérifie qu'on avance vers la home (on devrait voir le titre de l'app ou un indicateur de profil)
       // expect(find.bySemanticsLabel('APP_TITLE'), findsWidgets);

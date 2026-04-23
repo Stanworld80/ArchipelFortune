@@ -345,12 +345,18 @@ class SessionNotifier extends Notifier<SessionState?> {
     );
 
     // Synchronisation backend (Optionnel mais recommandé pour éviter les pertes)
-    _functions.httpsCallable('updateSessionLoot').call({
-      'sessionId': current.sessionId,
-      'gold': gold,
-      'wood': wood,
-      'provisions': prov,
-    }).catchError((e) => print("Erreur sync loot: $e"));
+    () async {
+      try {
+        await _functions.httpsCallable('updateSessionLoot').call({
+          'sessionId': current.sessionId,
+          'gold': gold,
+          'wood': wood,
+          'provisions': prov,
+        });
+      } catch (e) {
+        print("Erreur sync loot: $e");
+      }
+    }();
 
     if (gold >= 50) _logJournal("Directement dans le coffre : +$gold Or !", type: JournalEntryType.loot);
     else if (prov >= 5) _logJournal("Ravitaillement important : +$prov Provisions.", type: JournalEntryType.loot);

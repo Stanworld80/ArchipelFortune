@@ -36,7 +36,7 @@ test.describe('Admin Panel Tests', () => {
 
     // Admin Panel should appear in the popup menu
     // We try multiple ways to find it as Flutter menus are tricky
-    const adminPanelBtn = page.locator('[aria-label="ADMIN_PANEL_BTN"], flt-semantics:has-text("Panel Admin")').first();
+    const adminPanelBtn = page.locator('[aria-label="ADMIN_PANEL_BTN"], flt-semantics:has-text("Panel Admin"), text="Panel Admin"').first();
     
     try {
         await adminPanelBtn.waitFor({ state: 'visible', timeout: 15000 });
@@ -63,7 +63,7 @@ test.describe('Admin Panel Tests', () => {
     const profileBtn = getResilientLocator(page, 'PROFILE_BTN');
     await robustClick(page, profileBtn);
 
-    const adminPanelBtn = page.locator('[aria-label="ADMIN_PANEL_BTN"], flt-semantics:has-text("Panel Admin")').first();
+    const adminPanelBtn = page.locator('[aria-label="ADMIN_PANEL_BTN"], flt-semantics:has-text("Panel Admin"), text="Panel Admin"').first();
     await adminPanelBtn.waitFor({ state: 'visible', timeout: 30000 });
     await robustClick(page, adminPanelBtn);
 
