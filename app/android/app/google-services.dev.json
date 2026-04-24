@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1025390075112-ooniajaenqs1kg37rck6gpvrffju67q7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "fr.stanislasselleinformatique.archipelfortune",
+            "certificate_hash": "cf5d3075321dba7f987463b506b29a8857d3ae8f"
+          }
+        },
+        {
           "client_id": "1025390075112-935ujpbqg9tr6tg2cnumqtljucpqpo4i.apps.googleusercontent.com",
           "client_type": 3
         }

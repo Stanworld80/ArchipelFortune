@@ -14,7 +14,7 @@
 ```
 TimeoutError: locator.waitFor: Timeout 60000ms exceeded.
 Call log:
-  - waiting for getByText('Panel Admin').first() to be visible
+  - waiting for locator('flt-semantics, [role="menuitem"], [role="button"]').filter({ hasText: /Panel Admin/i }).first() to be visible
 
 ```
 
@@ -88,60 +88,61 @@ Call log:
   35 |     await robustClick(page, profileBtn);
   36 | 
   37 |     // Admin Panel should appear in the popup menu
-  38 |     const adminPanelBtn = page.getByText('Panel Admin').first();
-  39 |     await page.screenshot({ path: `screenshots/admin-before-menu-click-${Date.now()}.png` });
+  38 |     // We try multiple ways to find it as Flutter menus are tricky
+  39 |     const adminPanelBtn = page.locator('flt-semantics, [role="menuitem"], [role="button"]').filter({ hasText: /Panel Admin/i }).first();
   40 |     
   41 |     try {
   42 |         await adminPanelBtn.waitFor({ state: 'visible', timeout: 15000 });
   43 |     } catch (e) {
-  44 |         // Retry menu click if it didn't open
-  45 |         await robustClick(page, profileBtn);
-> 46 |         await adminPanelBtn.waitFor({ state: 'visible', timeout: 60000 });
+  44 |         // Retry menu click if it didn't open - use a simpler click this time
+  45 |         await profileBtn.click({ force: true });
+  46 |         await page.waitForTimeout(1000);
+> 47 |         await adminPanelBtn.waitFor({ state: 'visible', timeout: 60000 });
      |                             ^ TimeoutError: locator.waitFor: Timeout 60000ms exceeded.
-  47 |     }
-  48 |     
-  49 |     await robustClick(page, adminPanelBtn);
-  50 | 
-  51 |     const title = getResilientLocator(page, 'ADMINISTRATION');
-  52 |     await title.waitFor({ state: 'attached', timeout: 60000 });
-  53 |     
-  54 |     await page.screenshot({ path: `screenshots/admin-panel-view-${Date.now()}.png` });
-  55 |   });
-  56 | 
-  57 |   test('Modify Player Gold', async ({ page }) => {
-  58 |     await performAdminLogin(page);
-  59 |     
-  60 |     // Stability delay
-  61 |     await page.waitForTimeout(2000);
-  62 |     
-  63 |     const profileBtn = getResilientLocator(page, 'PROFILE_BTN');
-  64 |     await robustClick(page, profileBtn);
-  65 | 
-  66 |     const adminPanelBtn = page.getByText('Panel Admin').first();
-  67 |     await adminPanelBtn.waitFor({ state: 'visible', timeout: 30000 });
-  68 |     await robustClick(page, adminPanelBtn);
-  69 | 
-  70 |     // In Admin Panel, click a player to open dialog
-  71 |     const playerItem = page.locator('[aria-label*="player_item_"]').first();
-  72 |     await playerItem.waitFor({ state: 'attached', timeout: 30000 });
-  73 |     await robustClick(page, playerItem);
-  74 | 
-  75 |     // In Dialog, modify gold
-  76 |     const goldInput = getResilientLocator(page, 'GOLD_INPUT');
-  77 |     const updateBtn = getResilientLocator(page, 'SAVE_USER_BTN');
-  78 | 
-  79 |     await goldInput.waitFor({ state: 'attached', timeout: 30000 });
-  80 |     if (await goldInput.count() > 0) {
-  81 |         await robustClick(page, goldInput);
-  82 |         await page.keyboard.press('Control+A');
-  83 |         await page.keyboard.press('Backspace');
-  84 |         await page.keyboard.type('999');
-  85 |         await robustClick(page, updateBtn);
-  86 |         // Verify success
-  87 |         await page.waitForTimeout(2000);
-  88 |         await page.screenshot({ path: `screenshots/admin-gold-updated-${Date.now()}.png` });
-  89 |     }
-  90 |   });
-  91 | });
-  92 | 
+  48 |     }
+  49 |     
+  50 |     await robustClick(page, adminPanelBtn);
+  51 | 
+  52 |     const title = getResilientLocator(page, 'ADMINISTRATION');
+  53 |     await title.waitFor({ state: 'attached', timeout: 60000 });
+  54 |     
+  55 |     await page.screenshot({ path: `screenshots/admin-panel-view-${Date.now()}.png` });
+  56 |   });
+  57 | 
+  58 |   test('Modify Player Gold', async ({ page }) => {
+  59 |     await performAdminLogin(page);
+  60 |     
+  61 |     // Stability delay
+  62 |     await page.waitForTimeout(2000);
+  63 |     
+  64 |     const profileBtn = getResilientLocator(page, 'PROFILE_BTN');
+  65 |     await robustClick(page, profileBtn);
+  66 | 
+  67 |     const adminPanelBtn = page.locator('flt-semantics, [role="menuitem"], [role="button"]').filter({ hasText: /Panel Admin/i }).first();
+  68 |     await adminPanelBtn.waitFor({ state: 'visible', timeout: 30000 });
+  69 |     await robustClick(page, adminPanelBtn);
+  70 | 
+  71 |     // In Admin Panel, click a player to open dialog
+  72 |     const playerItem = page.locator('[aria-label*="player_item_"]').first();
+  73 |     await playerItem.waitFor({ state: 'attached', timeout: 30000 });
+  74 |     await robustClick(page, playerItem);
+  75 | 
+  76 |     // In Dialog, modify gold
+  77 |     const goldInput = getResilientLocator(page, 'GOLD_INPUT');
+  78 |     const updateBtn = getResilientLocator(page, 'SAVE_USER_BTN');
+  79 | 
+  80 |     await goldInput.waitFor({ state: 'attached', timeout: 30000 });
+  81 |     if (await goldInput.count() > 0) {
+  82 |         await robustClick(page, goldInput);
+  83 |         await page.keyboard.press('Control+A');
+  84 |         await page.keyboard.press('Backspace');
+  85 |         await page.keyboard.type('999');
+  86 |         await robustClick(page, updateBtn);
+  87 |         // Verify success
+  88 |         await page.waitForTimeout(2000);
+  89 |         await page.screenshot({ path: `screenshots/admin-gold-updated-${Date.now()}.png` });
+  90 |     }
+  91 |   });
+  92 | });
+  93 | 
 ```

@@ -195,7 +195,7 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
                 builder: (_) => const JournalView(),
               ),
               icon: const Icon(Icons.history_edu, size: 20),
-              tooltip: 'JOURNAL_BTN', // Using the tag as tooltip for easy E2E finding
+              tooltip: 'JOURNAL_BTN',
               style: IconButton.styleFrom(
                 backgroundColor: Colors.teal.shade900.withValues(alpha: 0.4),
                 foregroundColor: Colors.white,

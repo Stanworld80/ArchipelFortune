@@ -77,7 +77,7 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
     }
 
     // 7. Check Minimap
-    const mapBtn = page.getByLabel('MINIMAP_BTN').first();
+    const mapBtn = getResilientLocator(page, 'MINIMAP_BTN');
     await robustClick(page, mapBtn);
     await page.waitForTimeout(1000);
     // Dialog should show "Carte du Monde" or "Fermer"
@@ -88,7 +88,7 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
 
     // 8. Check Journal
     await page.screenshot({ path: `screenshots/gameplay-before-journal-${Date.now()}.png` });
-    const journalBtn = page.getByLabel('JOURNAL_BTN').first();
+    const journalBtn = getResilientLocator(page, 'JOURNAL_BTN');
     await robustClick(page, journalBtn);
     await page.waitForTimeout(1000);
     // Casing match for "JOURNAL DE BORD"
