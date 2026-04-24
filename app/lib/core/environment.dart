@@ -15,6 +15,18 @@ class AppEnvironment {
   static bool get isStaging => envName == 'staging';
   static bool get isProd => envName == 'prod';
 
+  static String get googleSignInServerClientId {
+    switch (envName) {
+      case 'prod':
+        return '417958901427-c88hjkvao549h2fpl5jn5bum21b735hl.apps.googleusercontent.com';
+      case 'staging':
+        return '344541548510-k1vncr9ufjii7r3k4425p8sqgq5p47r6.apps.googleusercontent.com';
+      case 'dev':
+      default:
+        return '1025390075112-935ujpbqg9tr6tg2cnumqtljucpqpo4i.apps.googleusercontent.com';
+    }
+  }
+
   static void printEnv() {
     debugPrint('Current Environment: $envName');
     if (superAdminEmail.isNotEmpty) {

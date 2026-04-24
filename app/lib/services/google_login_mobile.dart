@@ -1,24 +1,33 @@
+import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-
-// Le serverClientId correspond au "Web Client ID" du projet Firebase prod.
-// À récupérer dans Firebase Console > Authentication > Sign-in method > Google > Configuration web.
-// Il faut aussi que le SHA-1 du keystore soit enregistré dans Firebase Console Android app :
-//   SHA-1 prod : B1:AC:12:B7:A9:DF:20:9A:71:01:63:DB:D6:E3:B1:87:73:35:74:67
-const String _serverClientIdProd = '417958901427-c88hjkvao549h2fpl5jn5bum21b735hl.apps.googleusercontent.com';
+import '../core/environment.dart';
 
 Future<UserCredential?> googleLogin(FirebaseAuth auth) async {
-  final GoogleSignIn googleSignIn = GoogleSignIn(
-    serverClientId: _serverClientIdProd,
-  );
-  final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-  if (googleUser == null) return null;
+  try {
+    final GoogleSignIn googleSignIn = GoogleSignIn(
+      serverClientId: AppEnvironment.googleSignInServerClientId,
+    );
+    
+    debugPrint('Starting Google Sign-In with serverClientId: ${AppEnvironment.googleSignInServerClientId}');
+    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+    
+    if (googleUser == null) {
+      debugPrint('Google Sign-In cancelled by user.');
+      return null;
+    }
 
-  final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-  final AuthCredential credential = GoogleAuthProvider.credential(
-    accessToken: googleAuth.accessToken,
-    idToken: googleAuth.idToken,
-  );
+    debugPrint('Google Sign-In success: ${googleUser.email}');
+    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+    
+    final AuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
 
-  return await auth.signInWithCredential(credential);
+    return await auth.signInWithCredential(credential);
+  } catch (e) {
+    debugPrint('Error during Google Sign-In: $e');
+    rethrow;
+  }
 }

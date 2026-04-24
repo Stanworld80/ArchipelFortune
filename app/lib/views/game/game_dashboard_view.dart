@@ -189,25 +189,17 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
           // Bouton Journal
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Semantics(
-              label: 'JOURNAL_BTN',
-              button: true,
-              onTap: () => showDialog(
+            child: IconButton(
+              onPressed: () => showDialog(
                 context: context,
                 builder: (_) => const JournalView(),
               ),
-              child: IconButton(
-                onPressed: () => showDialog(
-                  context: context,
-                  builder: (_) => const JournalView(),
-                ),
-                icon: const Icon(Icons.history_edu, size: 20),
-                tooltip: 'Journal de bord',
-                style: IconButton.styleFrom(
-                  backgroundColor: Colors.teal.shade900.withValues(alpha: 0.4),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.all(4),
-                ),
+              icon: const Icon(Icons.history_edu, size: 20),
+              tooltip: 'JOURNAL_BTN', // Using the tag as tooltip for easy E2E finding
+              style: IconButton.styleFrom(
+                backgroundColor: Colors.teal.shade900.withValues(alpha: 0.4),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.all(4),
               ),
             ),
           ),
@@ -216,25 +208,17 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
           // Bouton Minimap
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Semantics(
-              label: 'MINIMAP_BTN',
-              button: true,
-              onTap: () => showDialog(
+            child: IconButton(
+              onPressed: () => showDialog(
                 context: context,
                 builder: (_) => const MiniMapView(),
               ),
-              child: IconButton(
-                onPressed: () => showDialog(
-                  context: context,
-                  builder: (_) => const MiniMapView(),
-                ),
-                icon: const Icon(Icons.map, size: 20),
-                tooltip: 'Carte du Monde',
-                style: IconButton.styleFrom(
-                  backgroundColor: Colors.teal.shade900.withValues(alpha: 0.4),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.all(4),
-                ),
+              icon: const Icon(Icons.map, size: 20),
+              tooltip: 'MINIMAP_BTN',
+              style: IconButton.styleFrom(
+                backgroundColor: Colors.teal.shade900.withValues(alpha: 0.4),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.all(4),
               ),
             ),
           ),
@@ -306,7 +290,7 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
                 child: AspectRatio(
                   aspectRatio: 1,
                   child: AnimatedBuilder(
-                    animation: Listenable.merge([_animationController, _shakeController]),
+                    animation: _shakeController,
                     builder: (context, child) {
                       // Calcul de la secousse
                       double shake = 0;
@@ -318,15 +302,16 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
                         offset: Offset(shake, shake / 2),
                         child: Semantics(
                           label: 'SHIP_ICON',
-                          child: CustomPaint(
-                            painter: MapPainter(
-                              session: session, 
-                              tileSize: MediaQuery.of(context).size.shortestSide / 5,
-                              animationValue: _animationController.value,
-                              background: _mapBg,
-                              shipImage: _shipIcon,
-                              islandImage: _islandIcon,
-                              reefImage: _reefIcon,
+                          child: RepaintBoundary(
+                            child: CustomPaint(
+                              painter: MapPainter(
+                                session: session, 
+                                tileSize: MediaQuery.of(context).size.shortestSide / 5,
+                                background: _mapBg,
+                                shipImage: _shipIcon,
+                                islandImage: _islandIcon,
+                                reefImage: _reefIcon,
+                              ),
                             ),
                           ),
                         ),
@@ -580,7 +565,8 @@ class _DirectionArrow extends StatelessWidget {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: isDisabled ? null : onTap,
+            onTapDown: isDisabled ? null : (_) => onTap(),
+            onTap: isDisabled ? null : () {}, // Keep empty onTap to maintain InkWell visual effects
             borderRadius: BorderRadius.circular(30),
             child: Container(
               padding: const EdgeInsets.all(4),

@@ -2,7 +2,6 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:flutter/foundation.dart';
 import '../models/session_model.dart';
 import '../core/utils.dart';
 
@@ -196,19 +195,21 @@ class SessionNotifier extends Notifier<SessionState?> {
     final current = state;
     if (current == null || current.sessionId == null) return;
 
-    try {
-      await _functions.httpsCallable('moveShip').call({
-        'sessionId': current.sessionId,
-        'direction': direction,
-      });
+    // Optimisation : on applique la logique locale AVANT d'attendre le serveur
+    // pour une réactivité instantanée de l'UI.
+    internalPredictiveMove(direction);
 
-      // Optimisation : au lieu de tout relire de Firestore, on applique la même logique localement
-      // car le serveur est le maître, mais on veut de la réactivité.
-      // Dans une version plus robuste, on écouterait le document Firestore (stream).
-      internalPredictiveMove(direction);
-    } catch (e) {
-      debugPrint("Erreur move: $e");
-    }
+    // On lance la requête sans bloquer avec un await explicite qui ralentirait les inputs suivants
+    () async {
+      try {
+        await _functions.httpsCallable('moveShip').call({
+          'sessionId': current.sessionId,
+          'direction': direction,
+        });
+      } catch (e) {
+        debugPrint("Erreur move: $e");
+      }
+    }();
   }
 
   void internalPredictiveMove(String direction) {

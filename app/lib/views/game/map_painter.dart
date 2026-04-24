@@ -6,7 +6,6 @@ import '../../models/session_model.dart';
 class MapPainter extends CustomPainter {
   final SessionState session;
   final double tileSize;
-  final double animationValue;
   final ui.Image? background;
   final ui.Image? shipImage;
   final ui.Image? islandImage;
@@ -14,7 +13,6 @@ class MapPainter extends CustomPainter {
 
   MapPainter({
     required this.session,
-    required this.animationValue,
     this.tileSize = 64.0,
     this.background,
     this.shipImage,
@@ -26,13 +24,21 @@ class MapPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paintWater = Paint()..color = const Color(0xFF003366);
     final paintIsland = Paint()..color = Colors.deepOrange.shade300;
+    final paintGrid = Paint()..color = Colors.black26..style = PaintingStyle.stroke..strokeWidth = 0.5;
+    final paintImage = Paint()..filterQuality = ui.FilterQuality.low;
+    final paintIslandSpecial = Paint()
+      ..filterQuality = ui.FilterQuality.low
+      ..colorFilter = const ColorFilter.matrix(<double>[
+        1, 0, 0, 0, 0,
+        0, 1, 0, 0, 0,
+        0, 0, 1, 0, 0,
+        -1, -1, -1, 3, 0,
+      ]);
 
     // Dessin du fond de mer (Scrolling UV mapping)
     if (background != null) {
-      final double worldSize = session.map.length.toDouble(); // Taille totale du monde
+      final double worldSize = session.map.length.toDouble(); 
       
-      // On calcule la région source dans l'image (0.0 à background.width/height)
-      // Clamping pour éviter les coordonnées négatives aux bords (x=0, y=0)
       final double srcX = max(0.0, (session.x - 2) / worldSize * background!.width);
       final double srcY = max(0.0, (session.y - 2) / worldSize * background!.height);
       final double srcW = 5.0 / worldSize * background!.width;
@@ -42,20 +48,17 @@ class MapPainter extends CustomPainter {
         background!,
         Rect.fromLTWH(srcX, srcY, srcW, srcH),
         Rect.fromLTWH(0, 0, size.width, size.height),
-        Paint()..filterQuality = ui.FilterQuality.medium,
+        paintImage,
       );
     } else {
-      // Par défaut si pas d'image
       canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), Paint()..color = const Color(0xFF1E3A8A));
     }
 
     // Rayon de vision (5x5 centrée sur le navire)
     const int visionRadius = 2;
-    const double gridPadding = 0.0; // Espace supprimé pour les chiffres sur les axes
-    final double actualTileSize = (size.width - gridPadding) / 5;
+    final double actualTileSize = size.width / 5;
 
     canvas.save();
-    canvas.translate(gridPadding, gridPadding);
 
     for (int dx = -visionRadius; dx <= visionRadius; dx++) {
       for (int dy = -visionRadius; dy <= visionRadius; dy++) {
@@ -69,19 +72,17 @@ class MapPainter extends CustomPainter {
           actualTileSize
         );
 
-        // Si hors limites, on dessine du vide ou de l'eau
         if (targetX < 0 || targetX >= session.map.length || targetY < 0 || targetY >= session.map[0].length) {
           canvas.drawRect(rect, paintWater..color = const Color(0xFF003366).withOpacity(0.5));
-          // _drawWaves(canvas, rect, animationValue, targetX, targetY);
           continue;
         }
 
         TileType tile = session.map[targetX][targetY];
         
-        // Dessin de l'eau stylisée
         if (tile == TileType.sea || tile == TileType.shallow) {
-           // On utilise des couleurs semi-transparentes pour laisser transparaître le fond mer.png
-           canvas.drawRect(rect, paintWater..color = (tile == TileType.shallow ? const Color(0xFF00ACC1) : Colors.transparent).withOpacity(tile == TileType.shallow ? 0.3 : 0.0));
+           if (tile == TileType.shallow) {
+             canvas.drawRect(rect, paintWater..color = const Color(0xFF00ACC1).withOpacity(0.3));
+           }
         } else if (tile == TileType.continent) {
            _drawLand(canvas, rect, tile);
         }
@@ -90,15 +91,8 @@ class MapPainter extends CustomPainter {
           canvas.drawImageRect(
             islandImage!,
             Rect.fromLTWH(0, 0, islandImage!.width.toDouble(), islandImage!.height.toDouble()),
-            rect, // Full tile instead of deflate(4) to make it "bigger"
-            Paint()
-              ..filterQuality = ui.FilterQuality.medium
-              ..colorFilter = const ColorFilter.matrix(<double>[
-                1, 0, 0, 0, 0,
-                0, 1, 0, 0, 0,
-                0, 0, 1, 0, 0,
-                -1, -1, -1, 3, 0,
-              ]),
+            rect,
+            paintIslandSpecial,
           );
         } else if (tile == TileType.island) {
           canvas.drawRect(rect, paintIsland);
@@ -109,12 +103,11 @@ class MapPainter extends CustomPainter {
             reefImage!,
             Rect.fromLTWH(0, 0, reefImage!.width.toDouble(), reefImage!.height.toDouble()),
             rect,
-            Paint()..filterQuality = ui.FilterQuality.medium,
+            paintImage,
           );
         }
         
-        // Bordure de grille fine
-        canvas.drawRect(rect, Paint()..color = Colors.black26..style = PaintingStyle.stroke..strokeWidth = 0.5);
+        canvas.drawRect(rect, paintGrid);
       }
     }
 
@@ -151,20 +144,20 @@ class MapPainter extends CustomPainter {
       }
 
       // Filtre matriciel pour rendre le blanc transparent (Chroma Key sur le blanc)
-      const ColorFilter whiteToTransparent = ColorFilter.matrix(<double>[
-        1, 0, 0, 0, 0,
-        0, 1, 0, 0, 0,
-        0, 0, 1, 0, 0,
-        -1, -1, -1, 3, 0,
-      ]);
+      final Paint shipPaint = Paint()
+        ..filterQuality = ui.FilterQuality.low
+        ..colorFilter = const ColorFilter.matrix(<double>[
+          1, 0, 0, 0, 0,
+          0, 1, 0, 0, 0,
+          0, 0, 1, 0, 0,
+          -1, -1, -1, 3, 0,
+        ]);
 
       canvas.drawImageRect(
         shipImage!,
         Rect.fromLTWH(0, 0, shipImage!.width.toDouble(), shipImage!.height.toDouble()),
         Rect.fromCenter(center: Offset.zero, width: size * 0.6, height: size * 0.75),
-        Paint()
-          ..filterQuality = ui.FilterQuality.medium
-          ..colorFilter = whiteToTransparent,
+        shipPaint,
       );
     } else {
       canvas.rotate(session.orientation * pi / 180);
@@ -195,7 +188,9 @@ class MapPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant MapPainter oldDelegate) {
     return oldDelegate.session != session || 
-           oldDelegate.animationValue != animationValue ||
+           oldDelegate.background != background ||
+           oldDelegate.shipImage != shipImage ||
+           oldDelegate.islandImage != islandImage ||
            oldDelegate.reefImage != reefImage;
   }
 }

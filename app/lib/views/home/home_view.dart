@@ -120,11 +120,14 @@ class _HomeViewState extends ConsumerState<HomeView>
                           profile.role == 'superAdmin')
                         PopupMenuItem<String>(
                           value: 'admin',
-                          child: ListTile(
-                            leading: Icon(Icons.admin_panel_settings,
-                                color: Color(0xFF3D2B1F)),
-                            title: Text('Panel Admin'),
-                            contentPadding: EdgeInsets.zero,
+                          child: Semantics(
+                            label: 'ADMIN_PANEL_BTN',
+                            child: ListTile(
+                              leading: Icon(Icons.admin_panel_settings,
+                                  color: Color(0xFF3D2B1F)),
+                              title: Text('Panel Admin'),
+                              contentPadding: EdgeInsets.zero,
+                            ),
                           ),
                         ),
                       const PopupMenuItem<String>(
