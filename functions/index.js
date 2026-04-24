@@ -26,6 +26,11 @@ exports.startExpedition = onCall(async (request) => {
   if (!auth) throw new HttpsError("unauthenticated", "Utilisateurs authentifiés uniquement.");
 
   const { provisions, wood, seed } = request.data;
+
+  if (!Number.isFinite(provisions) || provisions < 0 || !Number.isFinite(wood) || wood < 0) {
+    throw new HttpsError("invalid-argument", "Les provisions et le bois doivent être des nombres positifs ou nuls.");
+  }
+
   const cost = (Math.floor(provisions / 20) * 5) + (wood * 5);
 
   const userRef = db.collection("users").doc(auth.uid);
