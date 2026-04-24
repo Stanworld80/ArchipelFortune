@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
@@ -334,7 +335,7 @@ class SessionNotifier extends Notifier<SessionState?> {
     state = current.copyWith(lootRemaining: current.lootRemaining - 1);
   }
 
-  void addLootToCargaison(int gold, int prov, int wood) {
+  Future<void> addLootToCargaison(int gold, int prov, int wood) async {
     final current = state;
     if (current == null) return;
     
