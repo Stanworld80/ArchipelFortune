@@ -7,7 +7,7 @@ admin.initializeApp();
 const db = getFirestore();
 
 // Définir les options globales (Région us-central1 pour correspondre à Cloud Run)
-setGlobalOptions({ region: "us-central1" });
+setGlobalOptions({ region: "us-central1", cors: true });
 
 // Constantes partagées avec le client
 const MAP_SIZE = 64;

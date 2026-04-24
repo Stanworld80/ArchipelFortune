@@ -374,7 +374,13 @@ class SessionNotifier extends Notifier<SessionState?> {
         'sessionId': current.sessionId,
       });
       
-      if (result.data['success'] == true) {
+      final data = result.data;
+      bool success = false;
+      if (data is Map) {
+        success = data['success'] == true;
+      }
+
+      if (success) {
         state = current.copyWith(
           orVolatil: 0,
           statusMessage: "Or sécurisé à la banque !",

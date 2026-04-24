@@ -1,0 +1,192 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: gameplay.spec.ts >> Archipel Fortune Gameplay Loop >> Full Journey: Register -> Prepare -> Navigate
+- Location: tests\gameplay.spec.ts:15:7
+
+# Error details
+
+```
+TimeoutError: locator.waitFor: Timeout 60000ms exceeded.
+Call log:
+  - waiting for locator('[aria-label*="JOURNAL_BTN"], [aria-label="JOURNAL_BTN"], flt-semantics:has-text("JOURNAL_BTN")').first()
+
+```
+
+# Page snapshot
+
+```yaml
+- generic [ref=e5]:
+  - dialog:
+    - button "Fermer" [ref=e6]
+```
+
+# Test source
+
+```ts
+  1   | import { Page, Locator, expect } from '@playwright/test';
+  2   | 
+  3   | /**
+  4   |  * Ensures Flutter Web accessibility (semantics) is enabled.
+  5   |  * Critical for CanvasKit renderer in headless CI.
+  6   |  */
+  7   | export async function ensureAccessibility(page: Page) {
+  8   |     // 1. Wait for the app container
+  9   |     await page.waitForSelector('flutter-view', { timeout: 60000 });
+  10  |     
+  11  |     // 2. Try to click the hidden accessibility button if it exists
+  12  |     const accessBtn = page.locator('flt-semantics-placeholder, [aria-label="Enable accessibility"]').first();
+  13  |     const isVisible = await accessBtn.isVisible().catch(() => false);
+  14  |     
+  15  |     if (isVisible) {
+  16  |         await accessBtn.click({ force: true }).catch(() => {});
+  17  |     }
+  18  | 
+  19  |     // 3. Send multiple native TAB key presses - some Flutter versions need more than one
+  20  |     await page.keyboard.press('Tab');
+  21  |     await page.waitForTimeout(500);
+  22  |     await page.keyboard.press('Tab');
+  23  |     
+  24  |     // 4. Wait for the semantics tree to populate
+  25  |     // We expect at least one flt-semantics node to appear eventually
+  26  |     try {
+  27  |         await page.waitForSelector('flt-semantics', { timeout: 45000 });
+  28  |     } catch (e) {
+  29  |         console.log("Warning: No flt-semantics nodes found after Tab. Retrying Tab...");
+  30  |         await page.keyboard.press('Tab');
+  31  |         await page.waitForTimeout(2000);
+  32  |     }
+  33  | 
+  34  |     // 5. Short stability delay
+  35  |     await page.waitForTimeout(2000);
+  36  | }
+  37  | 
+  38  | /**
+  39  |  * Waits for any loading indicator (CircularProgressIndicator) to disappear.
+  40  |  */
+  41  | export async function waitForNoLoading(page: Page, options: { timeout?: number } = {}) {
+  42  |     // Wait for the indicator to potentially appear, then disappear
+  43  |     // In Flutter, these often have aria-label "Chargement" or similar, or just a specific role
+  44  |     const loader = page.locator('flt-semantics[role="progressbar"], [aria-label*="Loading"], [aria-label*="Chargement"]').first();
+  45  |     
+  46  |     // Give it a moment to appear if it's about to
+  47  |     await page.waitForTimeout(1000);
+  48  |     
+  49  |     if (await loader.isVisible()) {
+  50  |         await loader.waitFor({ state: 'hidden', timeout: options.timeout || 60000 }).catch(() => {
+  51  |             console.log("Timeout waiting for loader to hide, continuing anyway...");
+  52  |         });
+  53  |     }
+  54  | }
+  55  | 
+  56  | /**
+  57  |  * Waits for the app to be fully loaded and interactive.
+  58  |  */
+  59  | export async function waitForAppLoaded(page: Page, options: { timeout?: number } = {}) {
+  60  |     await page.waitForSelector('flutter-view', { timeout: options.timeout || 60000 });
+  61  |     await ensureAccessibility(page);
+  62  | }
+  63  | 
+  64  | /**
+  65  |  * Robustly finds an element using role, aria-label or text content (regex).
+  66  |  * Targets flt-semantics nodes specifically used by Flutter Web.
+  67  |  */
+  68  | export function getResilientLocator(page: Page, label: string): Locator {
+  69  |     // Target nodes that have the label in aria-label or inner text
+  70  |     return page.locator(`[aria-label*="${label}"], [aria-label="${label}"], flt-semantics:has-text("${label}")`).first();
+  71  | }
+  72  | 
+  73  | /**
+  74  |  * Clicks an element using multiple strategies sequentially (standard, coordinate, pointer sequence).
+  75  |  * Essential for Flutter Web where semantic nodes can be finicky.
+  76  |  */
+  77  | export async function robustClick(page: Page, locator: Locator, options: { timeout?: number } = {}) {
+> 78  |     await locator.waitFor({ state: 'attached', timeout: options.timeout || 60000 });
+      |                   ^ TimeoutError: locator.waitFor: Timeout 60000ms exceeded.
+  79  |     
+  80  |     // Stability check: Ensure the element is not moving (useful for animated menus)
+  81  |     let prevBox = await locator.boundingBox();
+  82  |     for (let i = 0; i < 5; i++) {
+  83  |         await page.waitForTimeout(200);
+  84  |         const currentBox = await locator.boundingBox();
+  85  |         if (prevBox && currentBox && 
+  86  |             Math.abs(prevBox.x - currentBox.x) < 1 && 
+  87  |             Math.abs(prevBox.y - currentBox.y) < 1) {
+  88  |             break; // Element is stable
+  89  |         }
+  90  |         prevBox = currentBox;
+  91  |     }
+  92  | 
+  93  |     const box = await locator.boundingBox();
+  94  |     if (!box) {
+  95  |         // Fallback to standard click if no bounding box
+  96  |         await locator.click({ force: true, timeout: 15000 }).catch(() => {});
+  97  |         return;
+  98  |     }
+  99  | 
+  100 |     const x = box.x + box.width / 2;
+  101 |     const y = box.y + box.height / 2;
+  102 | 
+  103 |     try {
+  104 |         // Move mouse and click using coordinates - often more reliable for CanvasKit
+  105 |         await page.mouse.move(x, y);
+  106 |         await page.mouse.down();
+  107 |         await page.waitForTimeout(150); // Slightly longer press
+  108 |         await page.mouse.up();
+  109 |         // Give time for UI feedback
+  110 |         await page.waitForTimeout(1000);
+  111 |     } catch (e) {
+  112 |         await locator.click({ force: true }).catch(() => {});
+  113 |     }
+  114 | }
+  115 | 
+  116 | /**
+  117 |  * Specialized login helper for Archipel Fortune
+  118 |  */
+  119 | export async function archipelLogin(page: Page, email: string, pass: string) {
+  120 |     const emailField = getResilientLocator(page, 'AUTH_EMAIL_FIELD');
+  121 |     const passwordField = getResilientLocator(page, 'AUTH_PASSWORD_FIELD');
+  122 |     const submitBtn = getResilientLocator(page, 'AUTH_SUBMIT_BTN');
+  123 |     const toggleBtn = getResilientLocator(page, 'AUTH_TOGGLE_BTN');
+  124 | 
+  125 |     // Wait for stability
+  126 |     await page.waitForTimeout(2000);
+  127 | 
+  128 |     // 1. Ensure we are in LOGIN mode, not REGISTER
+  129 |     const text = await toggleBtn.textContent().catch(() => '');
+  130 |     const altText = await toggleBtn.getAttribute('aria-label').catch(() => '');
+  131 |     const combinedText = (text + altText).toUpperCase();
+  132 | 
+  133 |     if (combinedText.includes('DÉJÀ MEMBRE') || combinedText.includes('CONNECTER')) {
+  134 |         await robustClick(page, toggleBtn);
+  135 |         await page.waitForTimeout(1500);
+  136 |     }
+  137 | 
+  138 |     // 2. Fill email (with clear)
+  139 |     await robustClick(page, emailField);
+  140 |     await page.keyboard.press('Control+A');
+  141 |     await page.keyboard.press('Backspace');
+  142 |     await page.keyboard.type(email, { delay: 50 });
+  143 |     
+  144 |     // 3. Fill password (with clear)
+  145 |     await robustClick(page, passwordField);
+  146 |     await page.keyboard.press('Control+A');
+  147 |     await page.keyboard.press('Backspace');
+  148 |     await page.keyboard.type(pass, { delay: 50 });
+  149 | 
+  150 |     await page.waitForTimeout(1000);
+  151 |     
+  152 |     // 4. Submit and wait for loading to start/finish
+  153 |     await robustClick(page, submitBtn);
+  154 |     
+  155 |     // Wait for the app to react
+  156 |     await page.waitForTimeout(2000);
+  157 |     await waitForNoLoading(page);
+  158 | }
+  159 | 
+```
