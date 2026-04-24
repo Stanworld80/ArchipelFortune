@@ -100,5 +100,36 @@ void main() {
       expect(state2.x, 17);
       expect(state2.y, 17); // North move
     });
+
+    test('internalPredictiveMove should reset isAtStopover when moving to sea', () {
+      final notifier = container.read(sessionProvider.notifier);
+      final mapSize = 64;
+      final mockMap = List.generate(
+        mapSize,
+        (_) => List.generate(mapSize, (_) => TileType.sea),
+      );
+
+      final initialState = SessionState(
+        x: 32,
+        y: 32,
+        orientation: 0,
+        provisions: 10,
+        orVolatil: 0,
+        boisCharpente: 0,
+        map: mockMap,
+        startTime: DateTime.now(),
+        isAtStopover: true,
+        lootRemaining: 1,
+      );
+
+      notifier.debugSetState(initialState);
+      
+      notifier.internalPredictiveMove('forward');
+      
+      final state = container.read(sessionProvider);
+      expect(state!.isAtStopover, isFalse);
+      expect(state.lootRemaining, 0);
+      expect(state.y, 31);
+    });
   });
 }

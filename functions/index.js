@@ -56,11 +56,11 @@ exports.startExpedition = onCall(async (request) => {
     map: map.flat(),
     inventory: [],
     collections: {},
-    isAtStopover: false,
-    lootRemaining: 0,
+    isAtStopover: true,
+    lootRemaining: 1, // "un grattage gratuit"
     startTime: FieldValue.serverTimestamp(),
     isGameOver: false,
-    statusMessage: "Expédition lancée !"
+    statusMessage: "Escale de départ ! Profitez de votre bonus."
   };
 
   await db.runTransaction(async (t) => {
@@ -132,6 +132,8 @@ exports.moveShip = onCall(async (request) => {
     y: nextY,
     orientation: nextOrientation,
     provisions: nextProvisions,
+    isAtStopover: false,
+    lootRemaining: 0,
     statusMessage: ""
   };
   const statusSuffix = "";
@@ -264,7 +266,11 @@ function generateProceduralMap(seed) {
       const nx = startX + i;
       const ny = startY + j;
       if (nx >= 0 && nx < MAP_SIZE && ny >= 0 && ny < MAP_SIZE) {
-        map[nx][ny] = TileType.sea;
+        if (i === 0 && j === 0) {
+          map[nx][ny] = TileType.island;
+        } else {
+          map[nx][ny] = TileType.sea;
+        }
       }
     }
   }
@@ -314,6 +320,8 @@ function generateProceduralMap(seed) {
   for (let i = 0; i < REEF_COUNT; i++) {
     const rx = rand.nextInt(MAP_SIZE);
     const ry = rand.nextInt(MAP_SIZE);
+    // Respect 5x5 sea (radius 2 around center)
+    if (Math.abs(rx - startX) < 3 && Math.abs(ry - startY) < 3) continue;
     if (map[rx][ry] === TileType.sea) map[rx][ry] = TileType.reef;
   }
 

@@ -17,7 +17,7 @@ L'économie du jeu repose sur une combinaison de ressources persistantes (conser
 - **Pièces d'Or Sécurisées (Permanentes) :** Richesse totale du joueur, sauvegardée sur son profil (Firebase/Firestore). Elles sont utilisées pour préparer l'expédition ou acheter des provisions depuis les banques.
 - **Or en main (Volatil) :** Richesses récoltées durant l'expédition courante. Elles sont stockées sur le navire et peuvent être perdues en cas de naufrage (Game Over).
 - **Les Provisions (🍎) :** Denrées achetables au début et pendant un voyage, ou pouvant être craftées en ramassant des éléments de kit de provisions. Chaque déplacement du navire consomme exactement 1 Provision. Si les provisions tombent à 0 en mer, le navire est perdu (Famine donc Game Over).
-- **Le Kit de Réparation (🛠️) :** Ressource volatile servant de "bouclier" (anciennement 'Bois de Charpente'). À l'impact avec un Récif ou après une défaite face à des pirates, un kit est consommé pour sauver le bateau du naufrage.
+- **Le Kit de Réparation (🛠️) :** Ressource volatile servant de "bouclier". À l'impact avec un Récif ou après une défaite face à des pirates, un kit est consommé pour sauver le bateau du naufrage.
 
 ---
 

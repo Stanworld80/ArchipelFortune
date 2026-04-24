@@ -69,6 +69,9 @@ class SessionNotifier extends Notifier<SessionState?> {
         startTime: DateTime.now(),
         seed: actualSeed,
         discoveredTiles: _calculateVisibleArea(startX, startY),
+        isAtStopover: true,
+        lootRemaining: 1, // "un grattage gratuit"
+        statusMessage: "Escale de départ ! Profitez de votre bonus.",
       );
       _logJournal("L'expédition Archipel Fortune commence !", type: JournalEntryType.start);
     } catch (e) {
@@ -95,7 +98,11 @@ class SessionNotifier extends Notifier<SessionState?> {
             int nx = sX + i;
             int ny = sY + j;
             if (nx >= 0 && nx < mapSize && ny >= 0 && ny < mapSize) {
-                map[nx][ny] = TileType.sea;
+                if (i == 0 && j == 0) {
+                    map[nx][ny] = TileType.island;
+                } else {
+                    map[nx][ny] = TileType.sea;
+                }
             }
         }
     }
@@ -261,12 +268,20 @@ class SessionNotifier extends Notifier<SessionState?> {
           orientation: newOrientation,
           provisions: nextProvisions,
           boisCharpente: (current.boisCharpente - 1).clamp(0, 999), 
+          isAtStopover: false,
+          lootRemaining: 0,
           statusMessage: "Collision ! -1 Kit Rép.$statusSuffix",
           discoveredTiles: newDiscovered,
         );
         _logJournal("Collision avec un récif !", type: JournalEntryType.incident);
       } else {
-        state = current.copyWith(isGameOver: true, statusMessage: "Naufrage !", discoveredTiles: newDiscovered);
+        state = current.copyWith(
+          isGameOver: true, 
+          isAtStopover: false,
+          lootRemaining: 0,
+          statusMessage: "Naufrage !", 
+          discoveredTiles: newDiscovered
+        );
         _logJournal("Naufrage !", type: JournalEntryType.incident);
       }
       return;
@@ -319,6 +334,8 @@ class SessionNotifier extends Notifier<SessionState?> {
       y: nextY,
       orientation: newOrientation,
       provisions: nextProvisions,
+      isAtStopover: false,
+      lootRemaining: 0,
       statusMessage: "Pleine mer...$statusSuffix",
       discoveredTiles: newDiscovered,
     );
