@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import '../models/user_model.dart';
 
 class FirestoreService {
@@ -13,7 +14,7 @@ class FirestoreService {
       }
       return null;
     } catch (e) {
-      print('Error getting user profile: $e');
+      debugPrint('Error getting user profile: $e');
       return null;
     }
   }
@@ -34,7 +35,7 @@ class FirestoreService {
     try {
       await _db.collection('users').doc(user.uid).set(user.toMap(), SetOptions(merge: true));
     } catch (e) {
-      print('Error saving user profile: $e');
+      debugPrint('Error saving user profile: $e');
     }
   }
 
@@ -43,7 +44,7 @@ class FirestoreService {
     try {
       await _db.collection('users').doc(uid).update({field: value});
     } catch (e) {
-      print('Error updating user field: $e');
+      debugPrint('Error updating user field: $e');
     }
   }
   

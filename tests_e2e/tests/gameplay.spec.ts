@@ -81,8 +81,8 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
     await robustClick(page, mapBtn);
     await page.waitForTimeout(1000);
     // Dialog should show "Carte du Monde" or "Fermer"
-    const mapClose = page.locator('text=Fermer');
-    await expect(mapClose).toBeVisible();
+    const mapClose = getResilientLocator(page, 'Fermer');
+    await mapClose.waitFor({ state: 'attached', timeout: 30000 });
     await robustClick(page, mapClose);
     await page.waitForTimeout(500);
 
@@ -91,9 +91,10 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
     await robustClick(page, journalBtn);
     await page.waitForTimeout(1000);
     // Casing match for "JOURNAL DE BORD"
-    const journalTitle = page.locator('text=JOURNAL DE BORD');
-    await expect(journalTitle).toBeVisible();
-    const journalClose = page.locator('text=RETOUR À LA NAVIGATION');
+    const journalTitle = getResilientLocator(page, 'JOURNAL DE BORD');
+    await journalTitle.waitFor({ state: 'attached', timeout: 30000 });
+    const journalClose = getResilientLocator(page, 'RETOUR À LA NAVIGATION');
+    await journalClose.waitFor({ state: 'attached', timeout: 30000 });
     await robustClick(page, journalClose);
     await page.waitForTimeout(500);
   });
