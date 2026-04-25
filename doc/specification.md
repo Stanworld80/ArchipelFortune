@@ -57,7 +57,15 @@ accoster sur une ile ou une case de continent déja visité ou pillés permet to
   - **Éléments de kit de réparation** (5 éléments nécessaires pour constituer 1 kit complet).
   - **Éléments de kit de provisions** (5 éléments nécessaires pour constituer 1 kit complet offrant 5 Provisions).
   - **Déchets** (Aucune utilité).
-- **Apparition visuelle :** Paquets de 6 tombant dans une grille de 3x2. 2 paquets à gratter lors d'une escale sur une île (5 pour le Continent). Leur contenu est révélé en interagissant avec, puis l'ensemble du butin crafté est ajouté à votre soute à la fin.
+  - **Coffre de trésor de cuivre** (Contient 100 pièces d'or). rare
+  - **Coffre de trésor d'argent** (Contient 250 pièces d'or). trés rare
+  - **Coffre de trésor d'or** (Contient 1000 pièces d'or). trés trés rare
+  - **Coffre de trésor majeur** (Contient 2500 pièces d'or). rarissime
+  - **Clé de cuivre** (Ouvre le coffre de trésor de cuivre). rare 
+  - **Clé d'argent** (Ouvre le coffre de trésor d'argent). trés rare
+  - **Clé d'or** (Ouvre le coffre de trésor d'or). trés trés rare
+
+  - **Apparition visuelle :** Paquets de 6 tombant dans une grille de 3x2. 2 paquets à gratter lors d'une escale sur une île (5 pour le Continent). Leur contenu est révélé en interagissant avec, puis l'ensemble du butin crafté est ajouté à votre soute à la fin.
 
 **La Banque du Capitaine & Marché de Départ:**
 - *Sécuriser* : Convertir "Or en main" en "Pièces d'Or".
@@ -87,7 +95,9 @@ Pendant les "grattages", des objets divers et rares peuvent être gagnés et s'a
 **4.2 Le Trésor Majeur**
 - L'objectif principal ultime est de trouver le **Trésor Majeur** et les **3 Clés** pour l'ouvrir (Cuivre, Argent, Or).
 - Ces éléments doivent être découverts et combinés durant la **même session**.
+- les clés sont conservées durant toute la session.
 - Les clés sont supprimées en fin de partie si elles ne sont pas employées.
+- Les clés peuvent être utilisées pour ouvrir un coffre de trésor de même couleur.
 
 ---
 
