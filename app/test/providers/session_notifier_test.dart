@@ -1,15 +1,27 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:app/providers/session_provider.dart';
-import 'package:app/models/session_model.dart';
-import 'dart:math';
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
+import 'session_notifier_test.mocks.dart';
 
+@GenerateMocks([FirebaseFunctions, HttpsCallable])
 void main() {
   group('SessionNotifier Logic Tests', () {
     late ProviderContainer container;
+    late MockFirebaseFunctions mockFunctions;
+    late MockHttpsCallable mockCallable;
 
     setUp(() {
-      container = ProviderContainer();
+      mockFunctions = MockFirebaseFunctions();
+      mockCallable = MockHttpsCallable();
+      
+      container = ProviderContainer(
+        overrides: [
+          firebaseFunctionsProvider.overrideWithValue(mockFunctions),
+        ],
+      );
+
+      when(mockFunctions.httpsCallable(any)).thenReturn(mockCallable);
+      when(mockCallable.call(any)).thenAnswer((_) async => FakeHttpsCallableResult({'success': true}));
     });
 
     tearDown(() {
@@ -65,7 +77,7 @@ void main() {
       expect(state.discoveredTiles.contains(18 * 64 + 17), isTrue); // Should add current tile
     });
 
-    test('internalPredictiveMove should handle port/starboard rotation', () {
+    test('internalPredictiveMove should handle port/starboard rotation (TURN ONLY)', () {
       final notifier = container.read(sessionProvider.notifier);
       final mapSize = 64;
       final mockMap = List.generate(
@@ -90,15 +102,15 @@ void main() {
       notifier.internalPredictiveMove('port');
       var state = container.read(sessionProvider);
       expect(state!.orientation, 270);
-      expect(state.x, 17); // West move
+      expect(state.x, 18); // NO MOVE anymore
       expect(state.y, 18);
 
       // Turn Starboard from West (90 deg right -> North/0)
       notifier.internalPredictiveMove('starboard');
       final state2 = container.read(sessionProvider);
       expect(state2!.orientation, 0);
-      expect(state2.x, 17);
-      expect(state2.y, 17); // North move
+      expect(state2.x, 18);
+      expect(state2.y, 18); // NO MOVE anymore
     });
 
     test('internalPredictiveMove should reset isAtStopover when moving to sea', () {
@@ -177,4 +189,10 @@ void main() {
       expect(state.journalEntries.last.message, contains("50 Or"));
     });
   });
+}
+
+class FakeHttpsCallableResult<T> implements HttpsCallableResult<T> {
+  @override
+  final T data;
+  FakeHttpsCallableResult(this.data);
 }

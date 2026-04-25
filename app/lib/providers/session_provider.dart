@@ -209,6 +209,30 @@ class SessionNotifier extends Notifier<SessionState?> {
       newOrientation = (newOrientation + 90) % 360;
     }
 
+    // Calcul de la consommation de provisions (1 par action)
+    final nextProvisions = (current.provisions - 1).clamp(0, 999);
+
+    if (nextProvisions <= 0) {
+      state = current.copyWith(
+        isGameOver: true,
+        statusMessage: "Famine ! Plus de provisions pour l'équipage.",
+        provisions: 0,
+      );
+      _logJournal("Famine ! L'équipage n'a plus de provisions.", type: JournalEntryType.incident);
+      return;
+    }
+
+    // Si c'est juste une rotation, on s'arrête là
+    if (direction != "forward") {
+      state = current.copyWith(
+        orientation: newOrientation,
+        provisions: nextProvisions,
+        statusMessage: direction == "port" ? "Vire à bâbord !" : "Vire à tribord !",
+      );
+      return;
+    }
+
+    // Calcul du mouvement vers l'avant
     int nextX = current.x;
     int nextY = current.y;
     if (newOrientation == 0) {
@@ -221,6 +245,7 @@ class SessionNotifier extends Notifier<SessionState?> {
       nextX--;
     }
 
+    // Vérification des limites de la carte
     if (nextX < 0 || nextX >= mapSize || nextY < 0 || nextY >= mapSize) {
       state = current.copyWith(statusMessage: "Mur infranchissable !");
       return;
@@ -230,18 +255,6 @@ class SessionNotifier extends Notifier<SessionState?> {
     newDiscovered.addAll(_calculateVisibleArea(nextX, nextY));
 
     TileType tile = current.map[nextX][nextY];
-    final nextProvisions = (current.provisions - 1).clamp(0, 999);
-
-    if (nextProvisions <= 0) {
-      state = current.copyWith(
-        isGameOver: true,
-        statusMessage: "Famine ! Plus de provisions pour l'équipage.",
-        provisions: 0,
-        discoveredTiles: newDiscovered,
-      );
-      _logJournal("Famine ! L'équipage n'a plus de provisions.", type: JournalEntryType.incident);
-      return;
-    }
 
     if (tile == TileType.reef) {
       if (current.boisCharpente > 0) {
@@ -319,6 +332,7 @@ class SessionNotifier extends Notifier<SessionState?> {
       discoveredTiles: newDiscovered,
     );
   }
+
 
 
 

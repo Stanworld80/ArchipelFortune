@@ -456,8 +456,10 @@ class ShipControlWheel extends StatelessWidget {
       return 'none';
     }
 
-    // Edge check
+    // Edge check (uniquement pour le mouvement vers l'avant)
     bool isEdge(int arrowAngle) {
+      if (getMoveType(arrowAngle) != 'forward') return false;
+
       if (arrowAngle == 0 && session.y == 0) return true;
       if (arrowAngle == 90 && session.x == mapSize - 1) return true;
       if (arrowAngle == 180 && session.y == mapSize - 1) return true;
