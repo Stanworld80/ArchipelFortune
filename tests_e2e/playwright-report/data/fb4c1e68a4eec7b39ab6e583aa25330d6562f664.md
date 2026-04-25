@@ -12,18 +12,10 @@
 # Error details
 
 ```
-TimeoutError: locator.waitFor: Timeout 60000ms exceeded.
+TimeoutError: page.waitForSelector: Timeout 60000ms exceeded.
 Call log:
-  - waiting for locator('[aria-label*="JOURNAL_BTN"], [aria-label="JOURNAL_BTN"], flt-semantics:has-text("JOURNAL_BTN")').first()
+  - waiting for locator('flutter-view') to be visible
 
-```
-
-# Page snapshot
-
-```yaml
-- generic [ref=e5]:
-  - dialog:
-    - button "Fermer" [ref=e6]
 ```
 
 # Test source
@@ -88,7 +80,8 @@ Call log:
   57  |  * Waits for the app to be fully loaded and interactive.
   58  |  */
   59  | export async function waitForAppLoaded(page: Page, options: { timeout?: number } = {}) {
-  60  |     await page.waitForSelector('flutter-view', { timeout: options.timeout || 60000 });
+> 60  |     await page.waitForSelector('flutter-view', { timeout: options.timeout || 60000 });
+      |                ^ TimeoutError: page.waitForSelector: Timeout 60000ms exceeded.
   61  |     await ensureAccessibility(page);
   62  | }
   63  | 
@@ -106,8 +99,7 @@ Call log:
   75  |  * Essential for Flutter Web where semantic nodes can be finicky.
   76  |  */
   77  | export async function robustClick(page: Page, locator: Locator, options: { timeout?: number } = {}) {
-> 78  |     await locator.waitFor({ state: 'attached', timeout: options.timeout || 60000 });
-      |                   ^ TimeoutError: locator.waitFor: Timeout 60000ms exceeded.
+  78  |     await locator.waitFor({ state: 'attached', timeout: options.timeout || 60000 });
   79  |     
   80  |     // Stability check: Ensure the element is not moving (useful for animated menus)
   81  |     let prevBox = await locator.boundingBox();

@@ -131,5 +131,50 @@ void main() {
       expect(state.lootRemaining, 0);
       expect(state.y, 31);
     });
+
+    test('generateMap should have a starting island at the center and sea around it', () {
+      final notifier = container.read(sessionProvider.notifier);
+      final seed = 999;
+      final map = notifier.generateMap(seed: seed);
+      
+      final centerX = 64 ~/ 2;
+      final centerY = 64 ~/ 2;
+      
+      // Center must be island
+      expect(map[centerX][centerY], TileType.island);
+      
+      // 5x5 area around center (radius 2) must be sea except the center
+      for (int i = -2; i <= 2; i++) {
+        for (int j = -2; j <= 2; j++) {
+          if (i == 0 && j == 0) continue;
+          expect(map[centerX + i][centerY + j], TileType.sea, 
+            reason: "Tile at (${centerX+i}, ${centerY+j}) should be sea");
+        }
+      }
+    });
+
+    test('addLootToCargaison should update state correctly', () async {
+      final notifier = container.read(sessionProvider.notifier);
+      final initialState = SessionState(
+        x: 32,
+        y: 32,
+        orientation: 0,
+        provisions: 10,
+        orVolatil: 5,
+        boisCharpente: 1,
+        map: List.generate(64, (_) => List.generate(64, (_) => TileType.sea)),
+        startTime: DateTime.now(),
+      );
+
+      notifier.debugSetState(initialState);
+      
+      await notifier.addLootToCargaison(50, 10, 2);
+      
+      final state = container.read(sessionProvider);
+      expect(state!.orVolatil, 55);
+      expect(state.provisions, 20);
+      expect(state.boisCharpente, 3);
+      expect(state.journalEntries.last.message, contains("50 Or"));
+    });
   });
 }

@@ -43,7 +43,10 @@ class MiniMapView extends ConsumerWidget {
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(),
               style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
-              child: const Text('Fermer', style: TextStyle(color: Colors.white)),
+              child: Semantics(
+                label: 'Fermer',
+                child: const Text('Fermer', style: TextStyle(color: Colors.white)),
+              ),
             ),
           ],
         ),

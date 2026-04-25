@@ -18,6 +18,9 @@ L'économie du jeu repose sur une combinaison de ressources persistantes (conser
 - **Or en main (Volatil) :** Richesses récoltées durant l'expédition courante. Elles sont stockées sur le navire et peuvent être perdues en cas de naufrage (Game Over).
 - **Les Provisions (🍎) :** Denrées achetables au début et pendant un voyage, ou pouvant être craftées en ramassant des éléments de kit de provisions. Chaque déplacement du navire consomme exactement 1 Provision. Si les provisions tombent à 0 en mer, le navire est perdu (Famine donc Game Over).
 - **Le Kit de Réparation (🛠️) :** Ressource volatile servant de "bouclier". À l'impact avec un Récif ou après une défaite face à des pirates, un kit est consommé pour sauver le bateau du naufrage.
+- **les objets de panoplies**
+- **les clés de coffres**
+
 
 ---
 
@@ -43,7 +46,7 @@ Aucun retour en arrière n'est permis. Le jeu se joue sur une rotation de 90° :
 - **Tribord :** Tourne de +90° puis avance d'une case.
 
 ### Phase 3 : L'Escale
-La carte contient une cinquantaine d'îles isolées et 1 grand Continent connecté le long d'un bord au hasard, le continent peut s'étendre jusqu'a 12 cases vers le centre de la carte , formant une côte à la forme varié. Accoster sur une de ces entités ouvre la Phase d'Escale. Les tuiles des îles et du continent ne disparaissent plus une fois visitées, elles restent affichées sur la carte du joueur, il n'y a alors plus de butin disponible sur ces tuiles. 
+La carte contient une cinquantaine d'îles isolées et 1 grand Continent connecté le long d'un bord au hasard, le continent peut s'étendre jusqu'a 12 cases vers le centre de la carte , formant une côte à la forme variée. Accoster sur une de ces entités ouvre la Phase d'Escale. Les tuiles des îles et du continent ne disparaissent plus une fois visitées, elles restent affichées sur la carte du joueur, il n'y a alors plus de butin disponible sur ces tuiles. 
 
 **Le Continent :**
 - 15 zones de "butin".
@@ -64,7 +67,7 @@ accoster sur une ile ou une case de continent déja visité ou pillés permet to
   - **Clé de cuivre** (Ouvre le coffre de trésor de cuivre). rare 
   - **Clé d'argent** (Ouvre le coffre de trésor d'argent). trés rare
   - **Clé d'or** (Ouvre le coffre de trésor d'or). trés trés rare
-
+  - **carte mystérieuses** : révéle l'emplacement d'une ile qui n'es pas encore découverte. (elle devient d'un coup visible sur la mini-carte, et il deviendra alors possible de s'y rendre)
   - **Apparition visuelle :** Paquets de 6 tombant dans une grille de 3x2. 2 paquets à gratter lors d'une escale sur une île (5 pour le Continent). Leur contenu est révélé en interagissant avec, puis l'ensemble du butin crafté est ajouté à votre soute à la fin.
 
 **La Banque du Capitaine & Marché de Départ:**
