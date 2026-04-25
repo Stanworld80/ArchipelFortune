@@ -251,6 +251,42 @@ exports.secureGold = onCall(async (request) => {
   return { success: true, transferred: goldToTransfer };
 });
 
+exports.finishExpedition = onCall(async (request) => {
+  const auth = request.auth;
+  if (!auth) throw new HttpsError("unauthenticated", "Auth requise.");
+
+  const { sessionId } = request.data;
+  const sessionRef = db.collection("sessions").doc(sessionId);
+  const userRef = db.collection("users").doc(auth.uid);
+
+  let totalReward = 0;
+  await db.runTransaction(async (t) => {
+    const sessionSnap = await t.get(sessionRef);
+
+    if (!sessionSnap.exists || sessionSnap.data().uid !== auth.uid) {
+      throw new HttpsError("not-found", "Session invalide.");
+    }
+
+    const session = sessionSnap.data();
+    if (session.isGameOver && session.provisions <= 0 && session.wood <= 0) {
+        return;
+    }
+
+    const provisionGold = Math.floor(session.provisions / 4);
+    totalReward = (session.orVolatil || 0) + provisionGold;
+
+    t.update(userRef, { piecesOr: FieldValue.increment(totalReward) });
+    t.update(sessionRef, { 
+        isGameOver: true, 
+        orVolatil: 0, 
+        provisions: 0, 
+        statusMessage: "Expédition terminée. Butin récupéré !" 
+    });
+  });
+
+  return { success: true, reward: totalReward };
+});
+
 // Helper pour simuler le Random déterministe
 function generateProceduralMap(seed) {
   const rand = new Random(seed);

@@ -185,80 +185,63 @@ class SessionNotifier extends Notifier<SessionState?> {
 
   Future<void> moveForward() async {
     if (state == null || state!.isGameOver) return;
-    await _callMove("forward");
+    _move("forward");
   }
 
   Future<void> movePort() async {
     if (state == null || state!.isGameOver) return;
-    await _callMove("port");
+    _move("port");
   }
 
   Future<void> moveStarboard() async {
     if (state == null || state!.isGameOver) return;
-    await _callMove("starboard");
+    _move("starboard");
   }
 
-  Future<void> _callMove(String direction) async {
-    final current = state;
-    if (current == null || current.sessionId == null) return;
-
-    // Optimisation : on applique la logique locale AVANT d'attendre le serveur
-    // pour une réactivité instantanée de l'UI.
-    internalPredictiveMove(direction);
-
-    // On lance la requête sans bloquer avec un await explicite qui ralentirait les inputs suivants
-    () async {
-      try {
-        await _functions.httpsCallable('moveShip').call({
-          'sessionId': current.sessionId,
-          'direction': direction,
-        });
-      } catch (e) {
-        debugPrint("Erreur move: $e");
-      }
-    }();
-  }
-
-  void internalPredictiveMove(String direction) {
+  void _move(String direction) {
     final current = state;
     if (current == null) return;
 
     int newOrientation = current.orientation;
-    if (direction == "port") newOrientation = (newOrientation - 90 + 360) % 360;
-    else if (direction == "starboard") newOrientation = (newOrientation + 90) % 360;
+    if (direction == "port") {
+      newOrientation = (newOrientation - 90 + 360) % 360;
+    } else if (direction == "starboard") {
+      newOrientation = (newOrientation + 90) % 360;
+    }
 
     int nextX = current.x;
     int nextY = current.y;
-    if (newOrientation == 0) nextY--; 
-    else if (newOrientation == 90) nextX++; 
-    else if (newOrientation == 180) nextY++; 
-    else if (newOrientation == 270) nextX--; 
+    if (newOrientation == 0) {
+      nextY--;
+    } else if (newOrientation == 90) {
+      nextX++;
+    } else if (newOrientation == 180) {
+      nextY++;
+    } else if (newOrientation == 270) {
+      nextX--;
+    }
 
     if (nextX < 0 || nextX >= mapSize || nextY < 0 || nextY >= mapSize) {
-        state = current.copyWith(statusMessage: "Mur infranchissable !"); // Mouvement annulé
-        return;
+      state = current.copyWith(statusMessage: "Mur infranchissable !");
+      return;
     }
 
     final newDiscovered = Set<int>.from(current.discoveredTiles);
     newDiscovered.addAll(_calculateVisibleArea(nextX, nextY));
 
     TileType tile = current.map[nextX][nextY];
-
-    final statusSuffix = "";
-    
     final nextProvisions = (current.provisions - 1).clamp(0, 999);
 
     if (nextProvisions <= 0) {
       state = current.copyWith(
-        isGameOver: true, 
+        isGameOver: true,
         statusMessage: "Famine ! Plus de provisions pour l'équipage.",
         provisions: 0,
-        discoveredTiles: newDiscovered
+        discoveredTiles: newDiscovered,
       );
       _logJournal("Famine ! L'équipage n'a plus de provisions.", type: JournalEntryType.incident);
       return;
     }
-
 
     if (tile == TileType.reef) {
       if (current.boisCharpente > 0) {
@@ -267,67 +250,63 @@ class SessionNotifier extends Notifier<SessionState?> {
           y: nextY,
           orientation: newOrientation,
           provisions: nextProvisions,
-          boisCharpente: (current.boisCharpente - 1).clamp(0, 999), 
+          boisCharpente: (current.boisCharpente - 1).clamp(0, 999),
           isAtStopover: false,
           lootRemaining: 0,
-          statusMessage: "Collision ! -1 Kit Rép.$statusSuffix",
+          statusMessage: "Collision ! -1 Kit Rép.",
           discoveredTiles: newDiscovered,
         );
         _logJournal("Collision avec un récif !", type: JournalEntryType.incident);
       } else {
         state = current.copyWith(
-          isGameOver: true, 
+          isGameOver: true,
           isAtStopover: false,
           lootRemaining: 0,
-          statusMessage: "Naufrage !", 
-          discoveredTiles: newDiscovered
+          statusMessage: "Naufrage !",
+          discoveredTiles: newDiscovered,
         );
         _logJournal("Naufrage !", type: JournalEntryType.incident);
       }
       return;
     }
 
-
     if (tile == TileType.island) {
-        state = current.copyWith(
-            x: nextX,
-            y: nextY,
-            orientation: newOrientation,
-            provisions: nextProvisions,
-            isAtStopover: true,
-            lootRemaining: 2, // 2 paquets
-            statusMessage: "Escale ! Butin récupéré.",
-            discoveredTiles: newDiscovered,
-        );
-        _logJournal("Escale réussie sur une Île ($nextX, $nextY).", type: JournalEntryType.discovery);
-        return;
+      state = current.copyWith(
+        x: nextX,
+        y: nextY,
+        orientation: newOrientation,
+        provisions: nextProvisions,
+        isAtStopover: true,
+        lootRemaining: 2,
+        statusMessage: "Escale ! Butin récupéré.",
+        discoveredTiles: newDiscovered,
+      );
+      _logJournal("Escale réussie sur une Île ($nextX, $nextY).", type: JournalEntryType.discovery);
+      return;
     }
-
 
     if (tile == TileType.continent) {
-        // US06: Tout le continent devient mer après le premier loot (pour respecter 'pas d'herbe')
-        final newMap = List<List<TileType>>.generate(mapSize, (i) => List<TileType>.from(current.map[i]));
-        for (int r = 0; r < mapSize; r++) {
-          for (int c = 0; c < mapSize; c++) {
-            if (newMap[r][c] == TileType.continent) newMap[r][c] = TileType.sea;
-          }
+      final newMap = List<List<TileType>>.generate(mapSize, (i) => List<TileType>.from(current.map[i]));
+      for (int r = 0; r < mapSize; r++) {
+        for (int c = 0; c < mapSize; c++) {
+          if (newMap[r][c] == TileType.continent) newMap[r][c] = TileType.sea;
         }
-        
-        state = current.copyWith(
-            x: nextX,
-            y: nextY,
-            orientation: newOrientation,
-            provisions: nextProvisions,
-            isAtStopover: true,
-            lootRemaining: 5, // 5 paquets
-            map: newMap,
-            statusMessage: "Continent atteint ! Objectif final en vue.",
-            discoveredTiles: newDiscovered,
-        );
-        _logJournal("TERRE EN VUE ! Le continent a été atteint.", type: JournalEntryType.discovery);
-        return;
-    }
+      }
 
+      state = current.copyWith(
+        x: nextX,
+        y: nextY,
+        orientation: newOrientation,
+        provisions: nextProvisions,
+        isAtStopover: true,
+        lootRemaining: 5,
+        map: newMap,
+        statusMessage: "Continent atteint ! Objectif final en vue.",
+        discoveredTiles: newDiscovered,
+      );
+      _logJournal("TERRE EN VUE ! Le continent a été atteint.", type: JournalEntryType.discovery);
+      return;
+    }
 
     state = current.copyWith(
       x: nextX,
@@ -336,10 +315,11 @@ class SessionNotifier extends Notifier<SessionState?> {
       provisions: nextProvisions,
       isAtStopover: false,
       lootRemaining: 0,
-      statusMessage: "Pleine mer...$statusSuffix",
+      statusMessage: "Pleine mer...",
       discoveredTiles: newDiscovered,
     );
   }
+
 
   void resumeExpedition() {
     final current = state;
