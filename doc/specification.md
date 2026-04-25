@@ -43,15 +43,13 @@ Aucun retour en arrière n'est permis. Le jeu se joue sur une rotation de 90° :
 - **Tribord :** Tourne de +90° puis avance d'une case.
 
 ### Phase 3 : L'Escale
-La carte contient 9 Îles isolées et 1 grand Continent connecté le long d'un bord au hasard. Accoster sur une de ces entités ouvre la Phase d'Escale. Les tuiles des îles ne disparaissent plus une fois visitées, elles restent affichées sur la carte du joueur bien qu'elles aient été "pillées".
-
-**L'Île :**
-- 5 zones de "butin" pour obtenir divers butins.
+La carte contient une cinquantaine d'îles isolées et 1 grand Continent connecté le long d'un bord au hasard, le continent peut s'étendre jusqu'a 12 cases vers le centre de la carte , formant une côte à la forme varié. Accoster sur une de ces entités ouvre la Phase d'Escale. Les tuiles des îles et du continent ne disparaissent plus une fois visitées, elles restent affichées sur la carte du joueur, il n'y a alors plus de butin disponible sur ces tuiles. 
 
 **Le Continent :**
-- Arriver ici signifie une victoire totale (Fin de la session).
-- 15 zones de "butin". 
-- Fin d'expédition automatique et conversion des Provisions restantes en Or permanent.
+- 15 zones de "butin".
+une fois que le joueur a visité une des cases du continent, toutes les zones de butin du continent sont considérées comme visitées et donc non réutilisables. 
+
+accoster sur une ile ou une case de continent déja visité ou pillés permet tout de même d'accéder à la banque du joueur et au ravitaillement. 
 
 **La Fouille (Le mode de "Grattage") :**
 - **Série de caisses :** Boîtes tirées aléatoirement. Chaque boîte peut contenir :
@@ -63,12 +61,15 @@ La carte contient 9 Îles isolées et 1 grand Continent connecté le long d'un b
 
 **La Banque du Capitaine & Marché de Départ:**
 - *Sécuriser* : Convertir "Or en main" en "Pièces d'Or".
-- *Se Ravitailler (Début)* : Dépenser des "Pièces d'Or Sécurisées" pour acheter de nouvelles Provisions. Formule ajustée : 5 d'Or = 20 Provisions. L'équipement de base par défaut fourni est de 20 Provisions et 2 kits de réparation.
+- *Se Ravitailler (Début)* : Dépenser des "Pièces d'Or Sécurisées" pour acheter de nouvelles Provisions. Formule ajustée : 5 d'Or = 20 Provisions.
+- *Achat d'un kit de réparation (Début)* : Dépenser des "Pièces d'Or Sécurisées" pour acheter de nouvelles Provisions. Formule ajustée : 5 d'Or = 1 Kit de Réparation.
 - *Risquer plus* : Retirer des "Pièces d'Or Sécurisées" en "Or en main" (Optionnel selon Gameplay visé mais indiqué).
 
-**Le Choix Fin d'Escale (sur l'Île) :**
+**Le Choix Fin d'Escale :**
 1. *Reprendre la Mer :* Continu l'aventure. Les îles déjà visitées ne peuvent plus être "fouillées" mais simplement servir d'escales bancaires/de ravitaillement.
-2. *S'Arrêter :* Fin volontaire (Victoire Partielle). Sécurisation de l'Or en main. **Convertit toutes les Provisions restantes en Pièces d'Or permanentes. Détruit les objets de Panoplies incomplètes et les Clés non exploitées.**
+2. *S'Arrêter :* Fin volontaire (Victoire Partielle). Sécurisation de l'Or en main. 
+
+**Convertit toutes les Provisions restantes en Pièces d'Or permanentes. Détruit les objets de Panoplies incomplètes et les Clés non exploitées.**
 
 ---
 
