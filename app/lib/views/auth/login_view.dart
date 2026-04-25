@@ -382,13 +382,16 @@ class _LoginViewState extends ConsumerState<LoginView> {
               icon,
               const SizedBox(width: 12),
             ],
-            Text(
-              label,
-              style: GoogleFonts.cinzel(
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.5,
-                color: Colors.white,
-                fontSize: 14,
+            Flexible(
+              child: Text(
+                label,
+                style: GoogleFonts.cinzel(
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.5,
+                  color: Colors.white,
+                  fontSize: 14,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],

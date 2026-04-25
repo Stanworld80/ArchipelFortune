@@ -185,20 +185,20 @@ class SessionNotifier extends Notifier<SessionState?> {
 
   Future<void> moveForward() async {
     if (state == null || state!.isGameOver) return;
-    _move("forward");
+    internalPredictiveMove("forward");
   }
 
   Future<void> movePort() async {
     if (state == null || state!.isGameOver) return;
-    _move("port");
+    internalPredictiveMove("port");
   }
 
   Future<void> moveStarboard() async {
     if (state == null || state!.isGameOver) return;
-    _move("starboard");
+    internalPredictiveMove("starboard");
   }
 
-  void _move(String direction) {
+  void internalPredictiveMove(String direction) {
     final current = state;
     if (current == null) return;
 
@@ -321,6 +321,7 @@ class SessionNotifier extends Notifier<SessionState?> {
   }
 
 
+
   void resumeExpedition() {
     final current = state;
     if (current == null) return;
@@ -385,6 +386,25 @@ class SessionNotifier extends Notifier<SessionState?> {
       }
     } catch (e) {
       debugPrint("Erreur secure gold: $e");
+    }
+  }
+
+  Future<void> finishExpedition({bool isSuccess = true}) async {
+    final current = state;
+    if (current == null || current.sessionId == null) return;
+
+    try {
+      final result = await _functions.httpsCallable('finishExpedition').call({
+        'sessionId': current.sessionId,
+        'isSuccess': isSuccess,
+      });
+      
+      final data = result.data;
+      if (data is Map && data['success'] == true) {
+        state = null; // On ferme la session locale
+      }
+    } catch (e) {
+      debugPrint("Erreur finish expedition: $e");
     }
   }
 

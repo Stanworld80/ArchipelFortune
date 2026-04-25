@@ -77,9 +77,7 @@ class BankOverlay extends ConsumerWidget {
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(backgroundColor: Colors.red.shade900, foregroundColor: Colors.white),
                           onPressed: () async {
-                            if (session.orVolatil > 0) {
-                              await ref.read(sessionProvider.notifier).secureGold();
-                            }
+                            await ref.read(sessionProvider.notifier).finishExpedition();
                             if (context.mounted) {
                               Navigator.of(context).pop();
                             }

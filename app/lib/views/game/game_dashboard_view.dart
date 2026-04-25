@@ -403,10 +403,7 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
                       onPressed: () async {
-                        // Sauvegarde de l'or si game over (Naufrage/Famine)
-                        if (session.orVolatil > 0) {
-                          await ref.read(sessionProvider.notifier).secureGold();
-                        }
+                        await ref.read(sessionProvider.notifier).finishExpedition(isSuccess: false);
                         
                         // Retour au port
                         if (context.mounted) {

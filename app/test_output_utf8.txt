@@ -1,0 +1,29 @@
+00:00 +0: loading D:/development/ArchipelFortune/app/test/views/login_view_test.dart
+00:00 +0: LoginView should show title and input fields
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: exactly one matching candidate
+  Actual: _ElementPredicateWidgetFinder:<Found 0 widgets with element matching predicate: []>
+   Which: means none were found but one was expected
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure> (file:///D:/development/ArchipelFortune/app/test/views/login_view_test.dart:23:5)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1059:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///D:/development/ArchipelFortune/app/test/views/login_view_test.dart line 23
+The test description was:
+  LoginView should show title and input fields
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:04 +0 -1: LoginView should show title and input fields [E]
+  Test failed. See exception logs above.
+  The test description was: LoginView should show title and input fields
+  
+00:04 +0 -1: LoginView should toggle between login and register
+00:05 +1 -1: Some tests failed.

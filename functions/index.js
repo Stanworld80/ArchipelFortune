@@ -255,7 +255,7 @@ exports.finishExpedition = onCall(async (request) => {
   const auth = request.auth;
   if (!auth) throw new HttpsError("unauthenticated", "Auth requise.");
 
-  const { sessionId } = request.data;
+  const { sessionId, isSuccess } = request.data;
   const sessionRef = db.collection("sessions").doc(sessionId);
   const userRef = db.collection("users").doc(auth.uid);
 
@@ -272,15 +272,21 @@ exports.finishExpedition = onCall(async (request) => {
         return;
     }
 
-    const provisionGold = Math.floor(session.provisions / 4);
-    totalReward = (session.orVolatil || 0) + provisionGold;
+    if (isSuccess) {
+      // Succès : conversion des provisions en or (4 pour 1)
+      const provisionGold = Math.floor((session.provisions || 0) / 4);
+      totalReward = (session.orVolatil || 0) + provisionGold;
+    } else {
+      // Échec : on perd l'or volatil, mais on peut imaginer qu'on garde l'or déjà sécurisé (qui est déjà sur le profil)
+      totalReward = 0;
+    }
 
     t.update(userRef, { piecesOr: FieldValue.increment(totalReward) });
     t.update(sessionRef, { 
         isGameOver: true, 
         orVolatil: 0, 
         provisions: 0, 
-        statusMessage: "Expédition terminée. Butin récupéré !" 
+        statusMessage: isSuccess ? "Expédition réussie !" : "Expédition terminée par un naufrage." 
     });
   });
 

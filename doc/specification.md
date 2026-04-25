@@ -131,7 +131,7 @@ Pendant les "grattages", des objets divers et rares peuvent être gagnés et s'a
 
 ### 6.3 Interactions Réseau et Back-End
 - **Anti-Cheat (Allégé) :** Initialement conçu comme une logique serveur forte via Cloud Functions pour chaque mouvement, le système a été simplifié pour améliorer les performances. La génération de carte utilise une graine (seed) partagée. Le client gère les mouvements pour une réactivité optimale, tandis que le serveur valide uniquement les étapes critiques (Escale, Fin de partie, Sécurisation de l'or).
--- **Gestion Profil & Authentification :** Utilisation de **Firebase Authentication** pour l'identification des joueurs (connexion par Email/Mot de passe ou via **Google Sign-In**) et **Firestore** pour stocker l'Or sécurisé de façon persistante.
+- **Gestion Profil & Authentification :** Utilisation de **Firebase Authentication** pour l'identification des joueurs (connexion par Email/Mot de passe ou via **Google Sign-In**) et **Firestore** pour stocker l'Or sécurisé de façon persistante.
 - **Gestion des Droits (Admin & Super Admin) :** 
   - Un **Super Administrateur** est identifié via une variable d'environnement (ex: un email précis forcé dans `APP_ENV` ou `--dart-define=SUPER_ADMIN_EMAIL="..."`).
   - Des **Administrateurs** standards sont identifiés via une collection/un champ dans Firestore. Les autres joueurs sont des utilisateurs normaux.
