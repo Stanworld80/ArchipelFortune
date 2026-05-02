@@ -52,4 +52,13 @@ class AudioService {
       // Ignorer l'erreur
     }
   }
+
+  Future<void> playGameOver() async {
+    try {
+      await stopBgm();
+      await _sfxPlayer.play(AssetSource('audio/game_over.wav'));
+    } catch (e) {
+      // Ignorer l'erreur
+    }
+  }
 }

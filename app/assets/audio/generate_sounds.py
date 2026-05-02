@@ -55,6 +55,15 @@ def generate_poor_loot():
         samples.extend(generate_tone(f, 250, waveform='sawtooth'))
     save_wav('poor_loot.wav', samples)
 
+def generate_game_over():
+    # Dramatic descending tone
+    notes = [392.00, 311.13, 261.63, 196.00]
+    samples = []
+    for f in notes[:-1]:
+        samples.extend(generate_tone(f, 300, waveform='sawtooth', amplitude=20000))
+    samples.extend(generate_tone(notes[-1], 1500, waveform='sawtooth', amplitude=20000))
+    save_wav('game_over.wav', samples)
+
 def generate_bgm():
     # simple repeating 4-note bassline for a background ambient loop
     # We will make it short, loopable in flutter
@@ -69,4 +78,5 @@ if __name__ == '__main__':
     generate_treasure_great()
     generate_poor_loot()
     generate_bgm()
+    generate_game_over()
     print("Sounds generated!")

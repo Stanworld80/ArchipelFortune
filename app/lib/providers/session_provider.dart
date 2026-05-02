@@ -221,6 +221,7 @@ class SessionNotifier extends Notifier<SessionState?> {
         provisions: 0,
       );
       _logJournal("Famine ! L'équipage n'a plus de provisions.", type: JournalEntryType.incident);
+      ref.read(audioServiceProvider).playGameOver();
       return;
     }
 
@@ -282,7 +283,7 @@ class SessionNotifier extends Notifier<SessionState?> {
           discoveredTiles: newDiscovered,
         );
         _logJournal("Naufrage !", type: JournalEntryType.incident);
-        ref.read(audioServiceProvider).playPoorLoot();
+        ref.read(audioServiceProvider).playGameOver();
       }
       return;
     }
@@ -323,6 +324,7 @@ class SessionNotifier extends Notifier<SessionState?> {
         discoveredTiles: newDiscovered,
       );
       _logJournal("TERRE EN VUE ! Le continent a été atteint.", type: JournalEntryType.discovery);
+      ref.read(audioServiceProvider).stopBgm();
       ref.read(audioServiceProvider).playTreasureGreat();
       return;
     }
