@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/session_provider.dart';
 import '../../services/audio_service.dart';
-class LootOverlay extends StatefulWidget {
+class LootOverlay extends ConsumerStatefulWidget {
   const LootOverlay({super.key});
 
   @override
