@@ -15,7 +15,7 @@ class AudioService {
 
   Future<void> playBgm() async {
     try {
-      await _bgmPlayer.play(AssetSource('audio/bgm.wav'), volume: 0.3);
+      await _bgmPlayer.play(AssetSource('audio/Compass_and_Pine.mp3'), volume: 0.3);
     } catch (e) {
       // Ignorer l'erreur d'audio (par ex. sur simulateur ou test)
     }
