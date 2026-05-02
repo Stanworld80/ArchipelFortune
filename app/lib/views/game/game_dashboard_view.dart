@@ -372,11 +372,11 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
             child: Center(
               child: ShipControlWheel(
                 session: session,
-                onMove: (dir) async {
+                onMove: (dir) {
                   HapticFeedback.lightImpact();
-                  if (dir == 'forward') await ref.read(sessionProvider.notifier).moveForward();
-                  if (dir == 'port') await ref.read(sessionProvider.notifier).movePort();
-                  if (dir == 'starboard') await ref.read(sessionProvider.notifier).moveStarboard();
+                  if (dir == 'forward') ref.read(sessionProvider.notifier).moveForward();
+                  if (dir == 'port') ref.read(sessionProvider.notifier).movePort();
+                  if (dir == 'starboard') ref.read(sessionProvider.notifier).moveStarboard();
                 },
               ),
             ),
@@ -570,18 +570,20 @@ class _DirectionArrow extends StatelessWidget {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            onTapDown: isDisabled ? null : (_) => onTap(),
-            onTap: isDisabled ? null : () {}, // Keep empty onTap to maintain InkWell visual effects
-            borderRadius: BorderRadius.circular(30),
-            child: Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: isDisabled ? Colors.grey.withOpacity(0.5) : Colors.teal.shade700,
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white24, width: 2),
-                boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2))],
+            onTap: isDisabled ? null : onTap,
+            borderRadius: BorderRadius.circular(40),
+            child: Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: isDisabled ? Colors.grey.withOpacity(0.5) : Colors.teal.shade700,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white24, width: 2),
+                  boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2))],
+                ),
+                child: Icon(icon, color: isDisabled ? Colors.white38 : Colors.white, size: 40),
               ),
-              child: Icon(icon, color: isDisabled ? Colors.white38 : Colors.white, size: 40),
             ),
           ),
         ),
