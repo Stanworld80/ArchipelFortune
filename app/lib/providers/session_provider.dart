@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import '../models/session_model.dart';
 import '../core/utils.dart';
+import '../services/audio_service.dart';
 
 final firebaseFunctionsProvider = Provider<FirebaseFunctions>((ref) => FirebaseFunctions.instance);
 
@@ -74,6 +75,7 @@ class SessionNotifier extends Notifier<SessionState?> {
         statusMessage: "Escale de départ ! Profitez de votre bonus.",
       );
       _logJournal("L'expédition Archipel Fortune commence !", type: JournalEntryType.start);
+      ref.read(audioServiceProvider).playIslandFound();
     } catch (e) {
 
       rethrow;
@@ -270,6 +272,7 @@ class SessionNotifier extends Notifier<SessionState?> {
           discoveredTiles: newDiscovered,
         );
         _logJournal("Collision avec un récif !", type: JournalEntryType.incident);
+        ref.read(audioServiceProvider).playPoorLoot();
       } else {
         state = current.copyWith(
           isGameOver: true,
@@ -279,6 +282,7 @@ class SessionNotifier extends Notifier<SessionState?> {
           discoveredTiles: newDiscovered,
         );
         _logJournal("Naufrage !", type: JournalEntryType.incident);
+        ref.read(audioServiceProvider).playPoorLoot();
       }
       return;
     }
@@ -295,6 +299,7 @@ class SessionNotifier extends Notifier<SessionState?> {
         discoveredTiles: newDiscovered,
       );
       _logJournal("Escale réussie sur une Île ($nextX, $nextY).", type: JournalEntryType.discovery);
+      ref.read(audioServiceProvider).playIslandFound();
       return;
     }
 
@@ -318,6 +323,7 @@ class SessionNotifier extends Notifier<SessionState?> {
         discoveredTiles: newDiscovered,
       );
       _logJournal("TERRE EN VUE ! Le continent a été atteint.", type: JournalEntryType.discovery);
+      ref.read(audioServiceProvider).playTreasureGreat();
       return;
     }
 

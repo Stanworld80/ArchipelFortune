@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/session_provider.dart';
-
+import '../../services/audio_service.dart';
 class LootOverlay extends StatefulWidget {
   const LootOverlay({super.key});
 
   @override
-  State<LootOverlay> createState() => _LootOverlayState();
+  ConsumerState<LootOverlay> createState() => _LootOverlayState();
 }
 
-class _LootOverlayState extends State<LootOverlay> {
+class _LootOverlayState extends ConsumerState<LootOverlay> {
   late List<_CrateContent> _crates;
   bool _allRevealed = false;
   bool _isAutoRevealing = false;
@@ -91,18 +91,31 @@ class _LootOverlayState extends State<LootOverlay> {
   void _processRevealedContent(_CrateContent content) {
     if (content.type == 'gold') {
       _goldGained += content.value;
+      if (content.value >= 25) {
+        ref.read(audioServiceProvider).playTreasureGreat();
+      } else {
+        ref.read(audioServiceProvider).playTreasureGreat(); // could use a different sound, but this is fine
+      }
     } else if (content.type == 'repair_part') {
       _repairPartsFound.add(content.itemId!);
       if (_repairPartsFound.length == 4) {
         _repairKitsGained++;
         _repairPartsFound.clear();
+        ref.read(audioServiceProvider).playTreasureGreat();
+      } else {
+        ref.read(audioServiceProvider).playIslandFound(); // using island found for finding a piece
       }
     } else if (content.type == 'prov_part') {
        _provisionPartsFound++;
        if (_provisionPartsFound == 5) {
           _provisionKitsGained++;
           _provisionPartsFound = 0;
+          ref.read(audioServiceProvider).playTreasureGreat();
+       } else {
+          ref.read(audioServiceProvider).playIslandFound();
        }
+    } else if (content.type == 'trash') {
+      ref.read(audioServiceProvider).playPoorLoot();
     }
     
     if (_crates.every((c) => c.revealed)) {

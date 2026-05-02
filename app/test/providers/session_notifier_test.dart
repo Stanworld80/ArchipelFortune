@@ -1,27 +1,24 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:app/providers/session_provider.dart';
+import 'package:app/models/session_model.dart';
+import 'dart:math';
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:mockito/annotations.dart';
-import 'package:mockito/mockito.dart';
-import 'session_notifier_test.mocks.dart';
+import 'package:meta/meta.dart';
 
-@GenerateMocks([FirebaseFunctions, HttpsCallable])
 void main() {
   group('SessionNotifier Logic Tests', () {
     late ProviderContainer container;
     late MockFirebaseFunctions mockFunctions;
-    late MockHttpsCallable mockCallable;
 
     setUp(() {
       mockFunctions = MockFirebaseFunctions();
-      mockCallable = MockHttpsCallable();
       
       container = ProviderContainer(
         overrides: [
           firebaseFunctionsProvider.overrideWithValue(mockFunctions),
         ],
       );
-
-      when(mockFunctions.httpsCallable(any)).thenReturn(mockCallable);
-      when(mockCallable.call(any)).thenAnswer((_) async => FakeHttpsCallableResult({'success': true}));
     });
 
     tearDown(() {
@@ -189,6 +186,20 @@ void main() {
       expect(state.journalEntries.last.message, contains("50 Or"));
     });
   });
+}
+
+class MockFirebaseFunctions extends Fake implements FirebaseFunctions {
+  @override
+  HttpsCallable httpsCallable(String name, {HttpsCallableOptions? options}) {
+    return MockHttpsCallable();
+  }
+}
+
+class MockHttpsCallable extends Fake implements HttpsCallable {
+  @override
+  Future<HttpsCallableResult<T>> call<T>([Object? parameters]) async {
+    return FakeHttpsCallableResult({'success': true} as T);
+  }
 }
 
 class FakeHttpsCallableResult<T> implements HttpsCallableResult<T> {

@@ -9,6 +9,7 @@ import 'bank_overlay.dart';
 
 import '../../providers/session_provider.dart';
 import '../../models/session_model.dart';
+import '../../services/audio_service.dart';
 import 'collections_view.dart';
 import 'journal_view.dart';
 import 'minimap_view.dart';
@@ -56,6 +57,10 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
     )..repeat(reverse: true);
 
     _loadAssets();
+    
+    Future.microtask(() {
+      ref.read(audioServiceProvider).playBgm();
+    });
   }
 
   Future<void> _loadAssets() async {
@@ -80,6 +85,7 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
     _shakeController.dispose();
     _flashController.dispose();
     _blinkController.dispose();
+    ref.read(audioServiceProvider).stopBgm();
     super.dispose();
   }
 

@@ -17,6 +17,7 @@ dependencies:
   cloud_functions: ^6.1.0
   google_fonts: ^8.0.2
   meta: ^1.11.0
+  audioplayers: ^6.6.0
 
 dev_dependencies:
   integration_test:
@@ -33,3 +34,4 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/audio/
