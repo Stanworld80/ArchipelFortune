@@ -22,13 +22,18 @@ void main() {
     await tester.pump();
 
     // Verify title (APP_TITLE is in Semantics)
-    expect(find.bySemanticsLabel('APP_TITLE'), findsOneWidget);
+    // We need to use ensureSemantics to make bySemanticsLabel work
+    final semanticsHandle = tester.ensureSemantics();
+    
+    expect(find.byWidgetPredicate((w) => w is Semantics && w.properties.label == 'APP_TITLE'), findsOneWidget);
     
     // Verify that we have the login/register text
     expect(find.text('AUTHENTIFICATION'), findsOneWidget);
     
     // Verify submit button
-    expect(find.bySemanticsLabel('AUTH_SUBMIT_BTN'), findsOneWidget);
+    expect(find.byWidgetPredicate((w) => w is Semantics && w.properties.label == 'AUTH_SUBMIT_BTN'), findsOneWidget);
+    
+    semanticsHandle.dispose();
   });
 
   testWidgets('LoginView should toggle between login and register', (tester) async {
@@ -44,15 +49,19 @@ void main() {
       ),
     );
     await tester.pump();
+    
+    final semanticsHandle = tester.ensureSemantics();
 
     // Initial state: Authentification
     expect(find.text('AUTHENTIFICATION'), findsOneWidget);
     
     // Tap toggle button
-    await tester.tap(find.bySemanticsLabel('AUTH_TOGGLE_BTN'));
+    await tester.tap(find.byWidgetPredicate((w) => w is Semantics && w.properties.label == 'AUTH_TOGGLE_BTN'));
     await tester.pumpAndSettle();
     
     // After toggle: Rejoindre l'équipage
     expect(find.text('REJOINDRE L\'ÉQUIPAGE'), findsOneWidget);
+    
+    semanticsHandle.dispose();
   });
 }
