@@ -17,23 +17,24 @@ export async function ensureAccessibility(page: Page) {
     }
 
     // 3. Send multiple native TAB key presses - critical for enabling the semantic tree
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 5; i++) {
         await page.keyboard.press('Tab');
-        await page.waitForTimeout(500);
+        await page.waitForTimeout(800);
     }
     
     // 4. Wait for the semantics tree to populate
     try {
-        await page.waitForSelector('flt-semantics', { timeout: 45000 });
+        await page.waitForSelector('flt-semantics', { timeout: 60000 });
     } catch (e) {
-        console.log("Warning: No flt-semantics nodes found after Tab. Retrying Tab sequence...");
-        await page.keyboard.press('Tab');
-        await page.waitForTimeout(2000);
-        await page.keyboard.press('Tab');
+        console.log("Warning: No flt-semantics nodes found after Tab. Retrying more Tabs...");
+        for (let i = 0; i < 3; i++) {
+            await page.keyboard.press('Tab');
+            await page.waitForTimeout(1000);
+        }
     }
 
     // 5. Final stability delay
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(3000);
 }
 
 
@@ -158,15 +159,18 @@ export async function clickMenuItem(page: Page, menuAnchorLabel: string, itemLab
     if (!menuVisible) {
         console.log("Menu not open after Enter, trying robustClick and Space...");
         await robustClick(page, anchor);
-        await page.waitForTimeout(500);
+        await page.waitForTimeout(800);
         await page.keyboard.press(' '); 
-        await page.waitForTimeout(1500);
+        await page.waitForTimeout(2000);
     }
     
     // Force semantic tree update for the menu by Tabbing
     await page.keyboard.press('Tab');
-    await page.waitForTimeout(1000); 
+    await page.waitForTimeout(1500); 
     
+    // Check again if menu items are visible in the DOM
+    const itemsCount = await page.locator('flt-semantics[role="menuitem"], flt-semantics[role="button"]').count();
+    console.log(`Current semantic nodes in menu area: ${itemsCount}`);    
     // 3. Find the item
     let item = await getResilientLocator(page, itemLabel);
     

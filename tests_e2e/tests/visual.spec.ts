@@ -12,7 +12,7 @@ test.describe('Archipel Fortune Visual & Button Tests', () => {
 
   test('Visual Regression - Landing Page', async ({ page }) => {
     // establish baselines or verify existing
-    // test.skip(true, 'Skip visual tests in CI until baselines are established');
+    test.skip(process.env.CI === 'true', 'Skip visual tests in CI until baselines are established');
     
     await expect(page).toHaveScreenshot('landing-page.png', {
       fullPage: true,

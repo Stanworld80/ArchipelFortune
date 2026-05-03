@@ -18,9 +18,11 @@ void main() async {
   
   AppEnvironment.printEnv();
 
-  if (AppEnvironment.isDev) {
-    SemanticsBinding.instance.ensureSemantics();
-  }
+  // We no longer call ensureSemantics() here because it causes resource leaks in integration tests.
+  // E2E tests (Playwright) will enable it via the 'Enable accessibility' button or Tab keys.
+  // if (AppEnvironment.isDev) {
+  //   SemanticsBinding.instance.ensureSemantics();
+  // }
 
   // Initialisation de Firebase
   try {

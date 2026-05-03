@@ -55,7 +55,7 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
         throw e;
     }
     
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(5000);
 
     // 3. Start Expedition
     const exploreBtn = await getResilientLocator(page, 'EXPLORE_MAIN_BTN');
@@ -67,7 +67,7 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
         await dumpSemanticTree(page);
         throw e;
     }
-    await page.waitForTimeout(3000); // Wait for dialog to open
+    await page.waitForTimeout(5000); // Wait for dialog to open completely
 
     // 4. Preparation Dialog
     const startBtn = await getResilientLocator(page, 'START_EXPEDITION_BTN');
@@ -142,6 +142,6 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
     const journalClose = await getResilientLocator(page, 'RETOUR À LA NAVIGATION');
     await journalClose.waitFor({ state: 'visible', timeout: 30000 });
     await robustClick(page, journalClose);
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000);
   });
 });

@@ -18,7 +18,11 @@ test.describe('Admin Panel Tests', () => {
     await archipelLogin(page, SUPER_ADMIN_EMAIL, SUPER_ADMIN_PASSWORD);
     
     // Stability delay for Flutter tree rebuild
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(5000);
+    
+    // Sometimes the first Tab sequence doesn't fully enable semantics on large pages
+    await page.keyboard.press('Tab');
+    await page.waitForTimeout(1000);
     
     const profileBtn = await getResilientLocator(page, 'PROFILE_BTN');
     try {
@@ -77,7 +81,10 @@ test.describe('Admin Panel Tests', () => {
         playerItem = page.locator('[aria-label*="player_item_"]').first();
     }
 
-    await playerItem.waitFor({ state: 'attached', timeout: 30000 });
+    // Increase wait time for the player list to load from Firestore
+    await page.waitForTimeout(4000);
+    
+    await playerItem.waitFor({ state: 'attached', timeout: 45000 });
     await robustClick(page, playerItem);
 
     // In Dialog, modify gold
