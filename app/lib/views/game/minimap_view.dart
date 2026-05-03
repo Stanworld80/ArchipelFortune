@@ -22,9 +22,14 @@ class MiniMapView extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'Carte du Monde',
-              style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+            Semantics(
+              header: true,
+              label: 'Carte du Monde',
+              container: true,
+              child: const Text(
+                'Carte du Monde',
+                style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+              ),
             ),
             const SizedBox(height: 16),
             SizedBox(
@@ -44,6 +49,7 @@ class MiniMapView extends ConsumerWidget {
               onPressed: () => Navigator.of(context).pop(),
               style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
               child: Semantics(
+                button: true,
                 label: 'Fermer',
                 child: const Text('Fermer', style: TextStyle(color: Colors.white)),
               ),

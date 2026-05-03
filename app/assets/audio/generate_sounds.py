@@ -73,10 +73,31 @@ def generate_bgm():
         samples.extend(generate_tone(f, 500, waveform='sine', amplitude=8000))
     save_wav('bgm.wav', samples)
 
+def generate_victory():
+    # Grand triumphant fanfarre
+    # C4, G4, C5, E5, G5
+    notes = [261.63, 392.00, 523.25, 659.25, 783.99]
+    samples = []
+    for f in notes[:-1]:
+        samples.extend(generate_tone(f, 200, waveform='sine', amplitude=20000))
+    # Long final note
+    samples.extend(generate_tone(notes[-1], 2000, waveform='sine', amplitude=20000))
+    save_wav('victory.wav', samples)
+
+def generate_treasure_normal():
+    # Pleasant chime
+    notes = [523.25, 659.25, 783.99]
+    samples = []
+    for f in notes:
+        samples.extend(generate_tone(f, 150, waveform='sine'))
+    save_wav('treasure_normal.wav', samples)
+
 if __name__ == '__main__':
     generate_island_found()
     generate_treasure_great()
+    generate_treasure_normal()
     generate_poor_loot()
     generate_bgm()
     generate_game_over()
+    generate_victory()
     print("Sounds generated!")

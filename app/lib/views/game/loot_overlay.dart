@@ -89,33 +89,37 @@ class _LootOverlayState extends ConsumerState<LootOverlay> {
   }
 
   void _processRevealedContent(_CrateContent content) {
+    final audio = ref.read(audioServiceProvider);
+    
     if (content.type == 'gold') {
       _goldGained += content.value;
       if (content.value >= 25) {
-        ref.read(audioServiceProvider).playTreasureGreat();
+        audio.playTreasureGreat();
+      } else if (content.value >= 5) {
+        audio.playTreasureNormal();
       } else {
-        ref.read(audioServiceProvider).playTreasureGreat(); // could use a different sound, but this is fine
+        audio.playIslandFound(); // Small gold
       }
     } else if (content.type == 'repair_part') {
       _repairPartsFound.add(content.itemId!);
       if (_repairPartsFound.length == 4) {
         _repairKitsGained++;
         _repairPartsFound.clear();
-        ref.read(audioServiceProvider).playTreasureGreat();
+        audio.playTreasureGreat(); // Completed kit!
       } else {
-        ref.read(audioServiceProvider).playIslandFound(); // using island found for finding a piece
+        audio.playIslandFound(); // Found a piece
       }
     } else if (content.type == 'prov_part') {
        _provisionPartsFound++;
        if (_provisionPartsFound == 5) {
           _provisionKitsGained++;
           _provisionPartsFound = 0;
-          ref.read(audioServiceProvider).playTreasureGreat();
+          audio.playTreasureGreat(); // Completed kit!
        } else {
-          ref.read(audioServiceProvider).playIslandFound();
+          audio.playIslandFound(); // Found a piece
        }
     } else if (content.type == 'trash') {
-      ref.read(audioServiceProvider).playPoorLoot();
+      audio.playPoorLoot();
     }
     
     if (_crates.every((c) => c.revealed)) {
@@ -129,7 +133,7 @@ class _LootOverlayState extends ConsumerState<LootOverlay> {
 
     for (var crate in _crates) {
       if (!crate.revealed) {
-        await Future.delayed(const Duration(milliseconds: 300));
+        await Future.delayed(const Duration(milliseconds: 3500));
         if (!mounted) return;
         setState(() {
           crate.revealed = true;

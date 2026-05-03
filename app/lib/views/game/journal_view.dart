@@ -92,13 +92,17 @@ class JournalView extends ConsumerWidget {
         children: [
           Icon(Icons.history_edu, color: Colors.white, size: 32),
           SizedBox(height: 8),
-          Text(
-            "JOURNAL DE BORD",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 3,
+          Semantics(
+            header: true,
+            label: "JOURNAL DE BORD",
+            child: const Text(
+              "JOURNAL DE BORD",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 3,
+              ),
             ),
           ),
         ],
@@ -228,9 +232,13 @@ class JournalView extends ConsumerWidget {
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        child: const Text(
-          "RETOUR À LA NAVIGATION",
-          style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.2),
+        child: Semantics(
+          label: "RETOUR À LA NAVIGATION",
+          button: true,
+          child: const Text(
+            "RETOUR À LA NAVIGATION",
+            style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.2),
+          ),
         ),
       ),
     );

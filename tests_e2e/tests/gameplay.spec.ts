@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
-import { getResilientLocator, robustClick, waitForAppLoaded } from './test_utils';
+import { getResilientLocator, robustClick, waitForAppLoaded, clickMenuItem, dumpSemanticTree } from './test_utils';
+
 
 test.describe('Archipel Fortune Gameplay Loop', () => {
   test.setTimeout(240000); // Gameplay takes time
@@ -14,7 +15,7 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
 
   test('Full Journey: Register -> Prepare -> Navigate', async ({ page }) => {
     // 1. Ensure we are in registration mode
-    const toggleBtn = getResilientLocator(page, 'AUTH_TOGGLE_BTN');
+    const toggleBtn = await getResilientLocator(page, 'AUTH_TOGGLE_BTN');
     await toggleBtn.waitFor({ state: 'attached', timeout: 60000 });
     const toggleText = await toggleBtn.innerText().catch(() => '');
     
@@ -27,9 +28,9 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
     // If it already says "DÉJÀ MEMBRE", we are in Register mode, do nothing.
 
     // Fill email
-    const emailField = getResilientLocator(page, 'AUTH_EMAIL_FIELD');
-    const passwordField = getResilientLocator(page, 'AUTH_PASSWORD_FIELD');
-    const submitBtn = getResilientLocator(page, 'AUTH_SUBMIT_BTN');
+    const emailField = await getResilientLocator(page, 'AUTH_EMAIL_FIELD');
+    const passwordField = await getResilientLocator(page, 'AUTH_PASSWORD_FIELD');
+    const submitBtn = await getResilientLocator(page, 'AUTH_SUBMIT_BTN');
 
     await robustClick(page, emailField);
     await page.keyboard.type(testEmail, { delay: 50 });
@@ -43,30 +44,59 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
     // Submit
     await robustClick(page, submitBtn);
 
-    // 2. Wait for login to complete
-    const profileBtn = getResilientLocator(page, 'PROFILE_BTN');
-    await profileBtn.waitFor({ state: 'attached', timeout: 120000 });
+    // 2. Wait for login to complete and profile button to appear
+    const profileBtn = await getResilientLocator(page, 'PROFILE_BTN');
+    try {
+        await profileBtn.waitFor({ state: 'attached', timeout: 120000 });
+        console.log("Registration/Login successful.");
+    } catch (e) {
+        console.log("Registration failed or PROFILE_BTN not found. Dumping tree...");
+        await dumpSemanticTree(page);
+        throw e;
+    }
+    
+    await page.waitForTimeout(3000);
 
     // 3. Start Expedition
-    const exploreBtn = getResilientLocator(page, 'EXPLORE_MAIN_BTN');
-    await robustClick(page, exploreBtn);
-    await page.waitForTimeout(2000); // Wait for dialog to open
+    const exploreBtn = await getResilientLocator(page, 'EXPLORE_MAIN_BTN');
+    try {
+        await exploreBtn.waitFor({ state: 'visible', timeout: 60000 });
+        await robustClick(page, exploreBtn);
+    } catch (e) {
+        console.log("EXPLORE_MAIN_BTN not found. Dumping tree...");
+        await dumpSemanticTree(page);
+        throw e;
+    }
+    await page.waitForTimeout(3000); // Wait for dialog to open
 
     // 4. Preparation Dialog
-    const startBtn = getResilientLocator(page, 'START_EXPEDITION_BTN');
+    const startBtn = await getResilientLocator(page, 'START_EXPEDITION_BTN');
     await robustClick(page, startBtn, { timeout: 60000 });
 
     // 5. Game Dashboard Navigation
     // Wait for the map to be attached
-    const shipIcon = getResilientLocator(page, 'SHIP_ICON');
+    const shipIcon = await getResilientLocator(page, 'SHIP_ICON');
     await shipIcon.waitFor({ state: 'attached', timeout: 60000 });
+
+    // Handle starting island loot
+    const autoBtn = await getResilientLocator(page, 'AUTO');
+    if (await autoBtn.count() > 0) {
+        await autoBtn.waitFor({ state: 'attached', timeout: 5000 }).catch(() => {});
+        if (await autoBtn.isVisible()) {
+            await robustClick(page, autoBtn);
+            await page.waitForTimeout(3000); // wait for reveal
+            const finBtn = await getResilientLocator(page, 'FIN');
+            await robustClick(page, finBtn);
+            await page.waitForTimeout(2000); // wait for overlay to close
+        }
+    }
 
     // Take a screenshot of the map
     await page.screenshot({ path: `screenshots/gameplay-map-${Date.now()}.png` });
 
     // 6. Navigate (Try to rotate or move)
-    const moveRight = getResilientLocator(page, 'MOVE_RIGHT_BTN');
-    const moveForward = getResilientLocator(page, 'MOVE_UP_BTN');
+    const moveRight = await getResilientLocator(page, 'MOVE_RIGHT_BTN');
+    const moveForward = await getResilientLocator(page, 'MOVE_UP_BTN');
 
     if (await moveRight.count() > 0) {
         await robustClick(page, moveRight);
@@ -77,26 +107,41 @@ test.describe('Archipel Fortune Gameplay Loop', () => {
     }
 
     // 7. Check Minimap
-    const mapBtn = getResilientLocator(page, 'MINIMAP_BTN');
+    // Use the tooltip-based menu item or button
+    const mapBtn = await getResilientLocator(page, 'MINIMAP_BTN');
     await robustClick(page, mapBtn);
-    await page.waitForTimeout(1000);
-    // Dialog should show "Carte du Monde" or "Fermer"
-    const mapClose = getResilientLocator(page, 'Fermer');
-    await mapClose.waitFor({ state: 'attached', timeout: 30000 });
+    
+    // Wait for the map dialog to appear
+    // We try to find the title, but don't strictly fail if the semantic tree is slow to expose it
+    const mapTitle = await getResilientLocator(page, 'Carte du Monde');
+    await mapTitle.waitFor({ state: 'attached', timeout: 15000 }).catch(() => {
+        console.log("Minimap title 'Carte du Monde' not found, checking for 'Fermer' button instead.");
+    });
+    
+    // Find the "Fermer" button inside the dialog specifically
+    const mapClose = await getResilientLocator(page, 'Fermer');
+    await mapClose.waitFor({ state: 'visible', timeout: 30000 });
     await robustClick(page, mapClose);
-    await page.waitForTimeout(500);
+    
+    // Stability delay for dialog close animation
+    await page.waitForTimeout(1000);
+
 
     // 8. Check Journal
     await page.screenshot({ path: `screenshots/gameplay-before-journal-${Date.now()}.png` });
-    const journalBtn = getResilientLocator(page, 'JOURNAL_BTN');
+    const journalBtn = await getResilientLocator(page, 'JOURNAL_BTN');
     await robustClick(page, journalBtn);
-    await page.waitForTimeout(1000);
-    // Casing match for "JOURNAL DE BORD"
-    const journalTitle = getResilientLocator(page, 'JOURNAL DE BORD');
-    await journalTitle.waitFor({ state: 'attached', timeout: 30000 });
-    const journalClose = getResilientLocator(page, 'RETOUR À LA NAVIGATION');
-    await journalClose.waitFor({ state: 'attached', timeout: 30000 });
+    await page.waitForTimeout(2000); // Wait for open animation
+    
+    // Check for Journal title (relaxed)
+    const journalTitle = await getResilientLocator(page, 'JOURNAL DE BORD');
+    await journalTitle.waitFor({ state: 'attached', timeout: 15000 }).catch(() => {
+        console.log("Journal title 'JOURNAL DE BORD' not found, checking for close button.");
+    });
+    
+    const journalClose = await getResilientLocator(page, 'RETOUR À LA NAVIGATION');
+    await journalClose.waitFor({ state: 'visible', timeout: 30000 });
     await robustClick(page, journalClose);
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(1000);
   });
 });

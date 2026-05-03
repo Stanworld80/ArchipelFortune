@@ -6,6 +6,7 @@ import '../../providers/session_provider.dart';
 import '../admin/admin_view.dart';
 
 import '../game/game_dashboard_view.dart';
+import '../../services/audio_service.dart';
 import '../../models/user_model.dart';
 import '../../core/widgets/sprite_button.dart';
 import '../../core/environment.dart';
@@ -37,6 +38,10 @@ class _HomeViewState extends ConsumerState<HomeView>
     );
     _titleFade = CurvedAnimation(parent: _titleCtrl, curve: Curves.easeIn);
     _titleCtrl.forward();
+    
+    Future.microtask(() {
+      ref.read(audioServiceProvider).playBgm();
+    });
   }
 
   @override
@@ -92,13 +97,11 @@ class _HomeViewState extends ConsumerState<HomeView>
                         ref.read(authControllerProvider).signOut();
                       }
                     },
-                    child: Semantics(
+                    tooltip: null,
+                    icon: Semantics(
                       label: 'PROFILE_BTN',
                       container: true,
-                      button: true,
-                      enabled: true,
                       child: Container(
-                        margin: const EdgeInsets.only(right: 8, top: 4),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
@@ -121,11 +124,15 @@ class _HomeViewState extends ConsumerState<HomeView>
                           profile.role == 'superAdmin')
                         PopupMenuItem<String>(
                           value: 'admin',
-                          child: ListTile(
-                            leading: Icon(Icons.admin_panel_settings,
-                                color: Color(0xFF3D2B1F)),
-                            title: Text('Panel Admin'),
-                            contentPadding: EdgeInsets.zero,
+                          child: Semantics(
+                            label: 'ADMIN_PANEL_BTN',
+                            button: true,
+                            child: const ListTile(
+                              leading: Icon(Icons.admin_panel_settings,
+                                  color: Color(0xFF3D2B1F)),
+                              title: Text('Panel Admin'),
+                              contentPadding: EdgeInsets.zero,
+                            ),
                           ),
                         ),
                       const PopupMenuItem<String>(

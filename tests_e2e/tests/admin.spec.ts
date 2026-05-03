@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
-import { getResilientLocator, robustClick, archipelLogin, waitForAppLoaded } from './test_utils';
+import { getResilientLocator, robustClick, archipelLogin, waitForAppLoaded, clickMenuItem, dumpSemanticTree } from './test_utils';
+
 
 test.describe('Admin Panel Tests', () => {
   // Use a long timeout for admin operations
@@ -17,40 +18,36 @@ test.describe('Admin Panel Tests', () => {
     await archipelLogin(page, SUPER_ADMIN_EMAIL, SUPER_ADMIN_PASSWORD);
     
     // Stability delay for Flutter tree rebuild
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(3000);
     
-    const profileBtn = getResilientLocator(page, 'PROFILE_BTN');
+    const profileBtn = await getResilientLocator(page, 'PROFILE_BTN');
     try {
-        await profileBtn.waitFor({ state: 'attached', timeout: 30000 });
-        await page.screenshot({ path: `screenshots/admin-success-${Date.now()}.png` });
+        await profileBtn.waitFor({ state: 'attached', timeout: 45000 });
+        console.log("Login successful, PROFILE_BTN found.");
     } catch (e) {
-        throw new Error("Could not find PROFILE_BTN after login. App might be stuck.");
+        console.log("Could not find PROFILE_BTN after login. Dumping tree...");
+        await dumpSemanticTree(page);
+        await page.screenshot({ path: `screenshots/failed-login-${Date.now()}.png` });
+        throw new Error("Could not find PROFILE_BTN after login. App might be stuck on login page or failed to authenticate.");
     }
   }
 
   test('Admin Authentication and Navigation', async ({ page }) => {
     await performAdminLogin(page);
 
-    const profileBtn = getResilientLocator(page, 'PROFILE_BTN');
-    await robustClick(page, profileBtn);
-
     // Admin Panel should appear in the popup menu
-    // We try multiple ways to find it as Flutter menus are tricky
-    const adminPanelBtn = page.locator('flt-semantics, [role="menuitem"], [role="button"]').filter({ hasText: /Panel Admin/i }).first();
-    
-    try {
-        await adminPanelBtn.waitFor({ state: 'visible', timeout: 15000 });
-    } catch (e) {
-        // Retry menu click if it didn't open - use a simpler click this time
-        await profileBtn.click({ force: true });
-        await page.waitForTimeout(1000);
-        await adminPanelBtn.waitFor({ state: 'visible', timeout: 60000 });
-    }
-    
-    await robustClick(page, adminPanelBtn);
+    await clickMenuItem(page, 'PROFILE_BTN', 'ADMIN_PANEL_BTN');
 
-    const title = getResilientLocator(page, 'ADMINISTRATION');
-    await title.waitFor({ state: 'attached', timeout: 60000 });
+    // Wait for the Administration title to confirm we are on the dashboard
+    const title = await getResilientLocator(page, 'ADMINISTRATION');
+    try {
+        await title.waitFor({ state: 'visible', timeout: 60000 });
+        console.log("Successfully navigated to Admin Panel.");
+    } catch (e) {
+        console.log("Admin title not found. Dumping tree...");
+        await dumpSemanticTree(page);
+        throw e;
+    }
     
     await page.screenshot({ path: `screenshots/admin-panel-view-${Date.now()}.png` });
   });
@@ -61,21 +58,31 @@ test.describe('Admin Panel Tests', () => {
     // Stability delay
     await page.waitForTimeout(2000);
     
-    const profileBtn = getResilientLocator(page, 'PROFILE_BTN');
-    await robustClick(page, profileBtn);
+    // Use clickMenuItem to open admin panel
+    await clickMenuItem(page, 'PROFILE_BTN', 'ADMIN_PANEL_BTN');
 
-    const adminPanelBtn = page.locator('flt-semantics, [role="menuitem"], [role="button"]').filter({ hasText: /Panel Admin/i }).first();
-    await adminPanelBtn.waitFor({ state: 'visible', timeout: 30000 });
-    await robustClick(page, adminPanelBtn);
 
     // In Admin Panel, click a player to open dialog
-    const playerItem = page.locator('[aria-label*="player_item_"]').first();
+    let playerItem = await getResilientLocator(page, 'player_item_');
+    
+    if (await playerItem.count() === 0) {
+        console.log("No player_item_ found by getResilientLocator. Printing all labels:");
+        const labels = await page.evaluate(() => {
+            return Array.from(document.querySelectorAll('flt-semantics[aria-label]'))
+                .map(n => n.getAttribute('aria-label'));
+        });
+        console.log(labels.filter(l => l && l.length > 0).join(', '));
+        
+        // Fallback to a broader selector
+        playerItem = page.locator('[aria-label*="player_item_"]').first();
+    }
+
     await playerItem.waitFor({ state: 'attached', timeout: 30000 });
     await robustClick(page, playerItem);
 
     // In Dialog, modify gold
-    const goldInput = getResilientLocator(page, 'GOLD_INPUT');
-    const updateBtn = getResilientLocator(page, 'SAVE_USER_BTN');
+    const goldInput = await getResilientLocator(page, 'GOLD_INPUT');
+    const updateBtn = await getResilientLocator(page, 'SAVE_USER_BTN');
 
     await goldInput.waitFor({ state: 'attached', timeout: 30000 });
     if (await goldInput.count() > 0) {

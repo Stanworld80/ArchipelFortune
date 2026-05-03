@@ -325,7 +325,7 @@ class SessionNotifier extends Notifier<SessionState?> {
       );
       _logJournal("TERRE EN VUE ! Le continent a été atteint.", type: JournalEntryType.discovery);
       ref.read(audioServiceProvider).stopBgm();
-      ref.read(audioServiceProvider).playTreasureGreat();
+      ref.read(audioServiceProvider).playVictory();
       return;
     }
 
@@ -348,6 +348,7 @@ class SessionNotifier extends Notifier<SessionState?> {
     final current = state;
     if (current == null) return;
     state = current.copyWith(isAtStopover: false, statusMessage: "Cap sur l'aventure !");
+    ref.read(audioServiceProvider).playBgm();
   }
 
   void endLootSerie() {

@@ -12,7 +12,12 @@ class AdminView extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pannel d\'Administration'),
+        title: Semantics(
+          label: 'ADMINISTRATION',
+          header: true,
+          container: true,
+          child: const Text('Pannel d\'Administration'),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -40,6 +45,7 @@ class AdminView extends ConsumerWidget {
               final user = users[index];
               return Semantics(
                 label: 'player_item_${user.uid}',
+                container: true,
                 child: ListTile(
                   title: Text(user.displayName),
                   subtitle: Text('${user.email} - Rôle: ${user.role}'),

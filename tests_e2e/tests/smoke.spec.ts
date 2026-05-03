@@ -14,10 +14,10 @@ test.describe('Archipel Fortune Smoke Tests', () => {
   });
 
   test('Authentication UI Presence', async ({ page }) => {
-    const emailField = getResilientLocator(page, 'AUTH_EMAIL_FIELD');
-    const passwordField = getResilientLocator(page, 'AUTH_PASSWORD_FIELD');
-    const submitBtn = getResilientLocator(page, 'AUTH_SUBMIT_BTN');
-    const toggleBtn = getResilientLocator(page, 'AUTH_TOGGLE_BTN');
+    const emailField = await getResilientLocator(page, 'AUTH_EMAIL_FIELD');
+    const passwordField = await getResilientLocator(page, 'AUTH_PASSWORD_FIELD');
+    const submitBtn = await getResilientLocator(page, 'AUTH_SUBMIT_BTN');
+    const toggleBtn = await getResilientLocator(page, 'AUTH_TOGGLE_BTN');
 
     await expect(emailField).toBeVisible({ timeout: 60000 });
     await expect(passwordField).toBeVisible();
@@ -26,7 +26,7 @@ test.describe('Archipel Fortune Smoke Tests', () => {
   });
 
   test('Form Interaction', async ({ page }) => {
-    const emailField = getResilientLocator(page, 'AUTH_EMAIL_FIELD');
+    const emailField = await getResilientLocator(page, 'AUTH_EMAIL_FIELD');
     await expect(emailField).toBeVisible({ timeout: 20000 });
     await emailField.click({ force: true });
     await emailField.fill('test@example.com');

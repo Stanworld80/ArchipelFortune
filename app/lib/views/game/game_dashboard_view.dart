@@ -214,17 +214,21 @@ class _GameDashboardViewState extends ConsumerState<GameDashboardView> with Tick
           // Bouton Minimap
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
-            child: IconButton(
-              onPressed: () => showDialog(
-                context: context,
-                builder: (_) => const MiniMapView(),
-              ),
-              icon: const Icon(Icons.map, size: 20),
-              tooltip: 'MINIMAP_BTN',
-              style: IconButton.styleFrom(
-                backgroundColor: Colors.teal.shade900.withValues(alpha: 0.4),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.all(4),
+            child: Semantics(
+              label: 'MINIMAP_BTN',
+              container: true,
+              child: IconButton(
+                onPressed: () => showDialog(
+                  context: context,
+                  builder: (_) => const MiniMapView(),
+                ),
+                icon: const Icon(Icons.map, size: 20),
+                tooltip: 'MINIMAP_BTN',
+                style: IconButton.styleFrom(
+                  backgroundColor: Colors.teal.shade900.withValues(alpha: 0.4),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.all(4),
+                ),
               ),
             ),
           ),
@@ -566,24 +570,22 @@ class _DirectionArrow extends StatelessWidget {
       child: Semantics(
         label: semanticLabel,
         button: true,
+        container: true,
         enabled: !isDisabled,
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: isDisabled ? null : onTap,
-            borderRadius: BorderRadius.circular(40),
-            child: Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: isDisabled ? Colors.grey.withOpacity(0.5) : Colors.teal.shade700,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white24, width: 2),
-                  boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2))],
-                ),
-                child: Icon(icon, color: isDisabled ? Colors.white38 : Colors.white, size: 40),
+        child: GestureDetector(
+          onTap: isDisabled ? null : onTap,
+          behavior: HitTestBehavior.opaque,
+          child: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: isDisabled ? Colors.grey.withOpacity(0.5) : Colors.teal.shade700,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white24, width: 2),
+                boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2))],
               ),
+              child: Icon(icon, color: isDisabled ? Colors.white38 : Colors.white, size: 40),
             ),
           ),
         ),
