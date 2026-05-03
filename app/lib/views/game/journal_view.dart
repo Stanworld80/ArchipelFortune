@@ -88,10 +88,10 @@ class JournalView extends ConsumerWidget {
           BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2)),
         ],
       ),
-      child: const Column(
+      child: Column(
         children: [
-          Icon(Icons.history_edu, color: Colors.white, size: 32),
-          SizedBox(height: 8),
+          const Icon(Icons.history_edu, color: Colors.white, size: 32),
+          const SizedBox(height: 8),
           Semantics(
             header: true,
             label: "JOURNAL DE BORD",
